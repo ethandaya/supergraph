@@ -61,7 +61,10 @@ export function isEnumTypeDefinition(
 }
 
 export class BaseSchemaAdaptor {
-  constructor(public readonly config: AdaptorConfig) {}
+  ast: DocumentNode;
+  constructor(public readonly config: AdaptorConfig) {
+    this.ast = this.config.ast;
+  }
 
   public mapFieldsToColumn(fields: readonly FieldDefinitionNode[]) {
     return fields.map((field) => ({

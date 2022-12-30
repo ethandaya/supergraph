@@ -4,17 +4,18 @@ import { parse } from "graphql/language";
 import { expect } from "@jest/globals";
 import { formatSchema } from "@prisma/internals";
 
-// const schemaHeaderFilePath = "./base.schema.prisma";
-// const schemaPath = "./schema.prisma";
 const filename = "./schema.graphql";
+const expectedSchemaPath = "./expected-schema.prisma";
 
 describe("Prisma Adaptor", () => {
   let parser: PrismaAdaptor = {} as PrismaAdaptor;
+  let expectedSchema: string = "";
 
   beforeAll(async () => {
     const document = await fs.readFile(filename, "utf-8");
     const ast = parse(document);
     parser = new PrismaAdaptor(ast);
+    expectedSchema = await fs.readFile(expectedSchemaPath, "utf-8");
   });
 
   it("should be able to get enums for schema", async () => {
@@ -27,7 +28,7 @@ describe("Prisma Adaptor", () => {
     const enums = parser.getEnumTypes();
     const models = enums.map((e) => parser.mapEnumToPrismaModel(e));
     expect(models).toEqual([
-      "enum ProposalStatus { PENDING, ACTIVE, CANCELLED, VETOED, QUEUED, EXECUTED }",
+      "enum ProposalStatus {\nPENDING\nACTIVE\nCANCELLED\nVETOED\nQUEUED\nEXECUTED\n}",
     ]);
   });
 
@@ -67,5 +68,11 @@ describe("Prisma Adaptor", () => {
       `,
     });
     expect(delegationEventModel).toEqual(expectedModel);
+  });
+
+  it("should be able to generate a valid prisma schema", async () => {
+    const schema = parser.mapSchemaToPrismaModel();
+    const formattedSchema = await formatSchema({ schema });
+    expect(formattedSchema).toEqual(expectedSchema);
   });
 });

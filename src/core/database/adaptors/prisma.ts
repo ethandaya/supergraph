@@ -76,6 +76,16 @@ export class PrismaAdaptor extends BaseSchemaAdaptor {
 
   public mapEnumToPrismaModel(enumDef: EnumTypeDefinitionNode) {
     const values = enumDef.values?.map((v) => v.name.value) || [];
-    return `enum ${enumDef.name.value} { ${values.join(", ")} }`;
+    return `enum ${enumDef.name.value} {\n${values.join("\n")}\n}`;
+  }
+
+  public mapSchemaToPrismaModel(): string {
+    const models = this.getObjectTypes().map((d) =>
+      this.mapObjectToPrismaModel(d as ObjectTypeDefinitionNode)
+    );
+    const enums = this.getEnumTypes().map((d) =>
+      this.mapEnumToPrismaModel(d as EnumTypeDefinitionNode)
+    );
+    return [...enums, ...models].join("\n");
   }
 }
