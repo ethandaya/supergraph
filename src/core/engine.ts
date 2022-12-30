@@ -9,7 +9,7 @@ export interface Store {
 }
 
 export class Entity {
-  name: string = this.constructor.name;
+  name: string = this.constructor.name.toLowerCase();
   pk: string | number;
   data: any = {};
   store!: Store;

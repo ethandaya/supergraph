@@ -1,6 +1,5 @@
-import fetch from "cross-fetch";
 import { Store } from "./core/engine";
-import { connect, Connection } from "@planetscale/database";
+import { Connection, connect } from "@planetscale/database/dist";
 
 class PlanetscaleStore implements Store {
   conn: Connection;
@@ -8,9 +7,9 @@ class PlanetscaleStore implements Store {
   constructor() {
     this.conn = connect({
       fetch,
-      username: "mpra1n6udmhkjwsnslfg",
-      host: "us-east.connect.psdb.cloud",
-      password: "pscale_pw_DK5OCPjvXn6KUxr2wF2is7NCp9y3hNp1M4m4GI2oHAm",
+      username: "wydfrhewbd1dhsa7993q",
+      host: "aws.connect.psdb.cloud",
+      password: "pscale_pw_Or4LlF6M1DVNwwsVgAKGoKY4NWQ9xtSciK58tUG1znt",
     });
   }
 
@@ -26,5 +25,4 @@ class PlanetscaleStore implements Store {
     await this.conn.execute(this.getInsertStatement(entity, pk, data));
   }
 }
-
 export const store = new PlanetscaleStore();

@@ -1,4 +1,6 @@
 import { Entity } from "../src/core/engine";
+import { parseSchema } from "../src/core/schema";
+import * as fs from "fs";
 
 describe("Entity", () => {
   it("should be able to set and get data", () => {
