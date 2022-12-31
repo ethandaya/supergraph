@@ -8,41 +8,53 @@ enum ProposalStatus {
 }
 
 model DelegationEvent {
-  id                 Int     @id
+  id                 Int                      @id
   nounId             Int
   previousDelegateId Int
   newDelegateId      Int
   blockNumber        Decimal
   blockTimestamp     Decimal
+  blockRange         Unsupported("int4range")
+  createdAt          DateTime
+  updatedAt          DateTime
 }
 
 model TransferEvent {
-  id               Int     @id
+  id               Int                      @id
   nounId           Int
   previousHolderId Int
   newHolderId      Int
   blockNumber      Decimal
   blockTimestamp   Decimal
+  blockRange       Unsupported("int4range")
+  createdAt        DateTime
+  updatedAt        DateTime
 }
 
 model Seed {
-  id         Int     @id
+  id         Int                      @id
   background Decimal
   body       Decimal
   accessory  Decimal
   head       Decimal
   glasses    Decimal
+  blockRange Unsupported("int4range")
+  createdAt  DateTime
+  updatedAt  DateTime
 }
 
 model Noun {
-  id       Int   @id
-  seedId   Int
-  ownerId  Int
-  votesIds Int[]
+  id         Int                      @id
+  seedId     Int
+  ownerId    Int
+  votesIds   Int[]
+  blockRange Unsupported("int4range")
+  createdAt  DateTime
+  updatedAt  DateTime
 }
 
 model Bid {
-  id             Int     @id
+  id             Int                      @id
   nounId         Int
   amount         Decimal
   bidderId       Int
@@ -50,31 +62,40 @@ model Bid {
   txIndex        Decimal
   auctionId      Int
   blockTimestamp Decimal
+  blockRange     Unsupported("int4range")
+  createdAt      DateTime
+  updatedAt      DateTime
 }
 
 model Auction {
-  id        Int     @id
-  nounId    Int
-  amount    Decimal
-  startTime Decimal
-  endTime   Decimal
-  bidderId  Int
-  settled   Boolean
-  bidsIds   Int[]
+  id         Int                      @id
+  nounId     Int
+  amount     Decimal
+  startTime  Decimal
+  endTime    Decimal
+  bidderId   Int
+  settled    Boolean
+  bidsIds    Int[]
+  blockRange Unsupported("int4range")
+  createdAt  DateTime
+  updatedAt  DateTime
 }
 
 model Account {
-  id                 Int     @id
+  id                 Int                      @id
   delegateId         Int
   tokenBalanceRaw    Decimal
   tokenBalance       Decimal
   totalTokensHeldRaw Decimal
   totalTokensHeld    Decimal
   nounsIds           Int[]
+  blockRange         Unsupported("int4range")
+  createdAt          DateTime
+  updatedAt          DateTime
 }
 
 model Delegate {
-  id                            Int     @id
+  id                            Int                      @id
   delegatedVotesRaw             Decimal
   delegatedVotes                Decimal
   tokenHoldersRepresentedAmount Int
@@ -82,10 +103,13 @@ model Delegate {
   nounsRepresentedIds           Int[]
   votesIds                      Int[]
   proposalsIds                  Int[]
+  blockRange                    Unsupported("int4range")
+  createdAt                     DateTime
+  updatedAt                     DateTime
 }
 
 model Proposal {
-  id                     Int       @id
+  id                     Int                      @id
   proposerId             Int
   targets                Bytes[]
   values                 Decimal[]
@@ -108,10 +132,13 @@ model Proposal {
   minQuorumVotesBPS      Int
   maxQuorumVotesBPS      Int
   quorumCoefficient      Decimal
+  blockRange             Unsupported("int4range")
+  createdAt              DateTime
+  updatedAt              DateTime
 }
 
 model Vote {
-  id              Int     @id
+  id              Int                      @id
   support         Boolean
   supportDetailed Int
   votesRaw        Decimal
@@ -121,10 +148,13 @@ model Vote {
   nounsIds        Int[]
   proposalId      Int
   blockNumber     Decimal
+  blockRange      Unsupported("int4range")
+  createdAt       DateTime
+  updatedAt       DateTime
 }
 
 model Governance {
-  id                  Int     @id
+  id                  Int                      @id
   proposals           Decimal
   currentTokenHolders Decimal
   currentDelegates    Decimal
@@ -133,12 +163,18 @@ model Governance {
   delegatedVotesRaw   Decimal
   delegatedVotes      Decimal
   proposalsQueued     Decimal
+  blockRange          Unsupported("int4range")
+  createdAt           DateTime
+  updatedAt           DateTime
 }
 
 model DynamicQuorumParams {
-  id                      Int     @id
+  id                      Int                      @id
   minQuorumVotesBPS       Int
   maxQuorumVotesBPS       Int
   quorumCoefficient       Decimal
   dynamicQuorumStartBlock Decimal
+  blockRange              Unsupported("int4range")
+  createdAt               DateTime
+  updatedAt               DateTime
 }

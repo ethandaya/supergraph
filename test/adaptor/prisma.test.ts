@@ -5,7 +5,7 @@ import { expect } from "@jest/globals";
 import { formatSchema } from "@prisma/internals";
 
 const filename = "./schema.graphql";
-const expectedSchemaPath = "./expected-schema.prisma";
+const expectedSchemaPath = "./test-schema.prisma";
 
 describe("Prisma Adaptor", () => {
   let parser: PrismaAdaptor = {} as PrismaAdaptor;
@@ -64,6 +64,9 @@ describe("Prisma Adaptor", () => {
           newDelegateId      Int
           blockNumber        Decimal
           blockTimestamp     Decimal
+          blockRange         Unsupported("int4range")
+          createdAt          DateTime
+          updatedAt          DateTime
         }
       `,
     });

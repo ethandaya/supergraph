@@ -61,15 +61,35 @@ export class PrismaAdaptor extends BaseSchemaAdaptor {
     return field;
   }
 
+  private getMetaFields() {
+    const metaFields: Column[] = [
+      {
+        name: "blockRange",
+        type: 'Unsupported("int4range")',
+      },
+      {
+        name: "createdAt",
+        type: "DateTime",
+      },
+      {
+        name: "updatedAt",
+        type: "DateTime",
+      },
+    ];
+    return metaFields.map((m) => this.mapColumnToPrismaField(m));
+  }
+
   public mapObjectToPrismaModel(entity: ObjectTypeDefinitionNode): string {
     const fields = entity?.fields || [];
     const cols = this.mapFieldsToColumn(fields);
     const prismaFields = cols
       .filter((c) => c.type !== "TODO")
       .map((col) => this.mapColumnToPrismaField(col));
+    const metaFields = this.getMetaFields();
     return `
       model ${entity.name.value} {
         ${prismaFields.join("\n")}
+        ${metaFields.join("\n")}
       } \n\n
     `;
   }
