@@ -48,16 +48,6 @@ export class PrismaAdaptor extends BaseSchemaAdaptor {
       field = `${field} @id`;
     }
 
-    // if (column.isRelation) {
-    //   field += ` @relation(name: "${column.name}")`;
-    // }
-
-    //
-    // if (column.isEnum) {
-    //   // You will need to specify the enum values in the field definition.
-    //   field = `${field} @enum(values: [VALUE1, VALUE2, VALUE3])`;
-    // }
-
     return field;
   }
 
@@ -106,6 +96,17 @@ export class PrismaAdaptor extends BaseSchemaAdaptor {
     const enums = this.getEnumTypes().map((d) =>
       this.mapEnumToPrismaModel(d as EnumTypeDefinitionNode)
     );
-    return [...enums, ...models].join("\n");
+    const base = `
+      datasource db {
+        provider = "postgresql"
+        url      = env("DATABASE_URL")
+      }
+      \n
+      generator client {
+        provider = "prisma-client-js"
+      }
+      \n
+    `;
+    return base + [...enums, ...models].join("\n");
   }
 }

@@ -6,6 +6,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
+    "infra:up": "docker-compose up -d",
     "build": "tsup",
     "dev": "tsup --watch",
     "lint": "TIMING=1 eslint src/**/*.ts* --fix",
