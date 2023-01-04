@@ -1,4 +1,4 @@
-import { ClickhouseAdaptor } from "../../src/core/database/adaptors/clickhouse";
+import { ClickhouseAdaptor } from "../../src/core/database/schema/adaptors/clickhouse";
 import fs from "fs/promises";
 import { parse } from "graphql/language";
 

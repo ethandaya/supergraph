@@ -1,5 +1,5 @@
 import fs from "fs/promises";
-import { PrismaAdaptor } from "../../src/core/database/adaptors/prisma";
+import { PrismaAdaptor } from "../../src/core/database/schema/adaptors/prisma";
 import { parse } from "graphql/language";
 import { expect } from "@jest/globals";
 import { formatSchema } from "@prisma/internals";
@@ -64,9 +64,8 @@ describe("Prisma Adaptor", () => {
           newDelegateId      Int
           blockNumber        Decimal
           blockTimestamp     Decimal
-          blockRange         Unsupported("int4range")
-          createdAt          DateTime
-          updatedAt          DateTime
+          createdAt          DateTime @default(now())
+          updatedAt          DateTime @updatedAt
         }
       `,
     });

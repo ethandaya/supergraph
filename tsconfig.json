@@ -19,7 +19,7 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
   },
-  "include": ["src"]
+  "include": ["src"],
 }

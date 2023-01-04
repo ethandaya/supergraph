@@ -54,16 +54,12 @@ export class PrismaAdaptor extends BaseSchemaAdaptor {
   private getMetaFields() {
     const metaFields: Column[] = [
       {
-        name: "blockRange",
-        type: 'Unsupported("int4range")',
-      },
-      {
         name: "createdAt",
-        type: "DateTime",
+        type: "DateTime @default(now())",
       },
       {
         name: "updatedAt",
-        type: "DateTime",
+        type: "DateTime @updatedAt",
       },
     ];
     return metaFields.map((m) => this.mapColumnToPrismaField(m));
