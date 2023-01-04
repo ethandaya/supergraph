@@ -1,6 +1,19 @@
-import { Entity, KeyAccessError } from "../../src/core/engine";
+import { Entity, KeyAccessError, Store } from "../../src/core/engine";
 
-type PersonModel = { name: string };
+class TestStore implements Store {
+  set<T>(_: string, pk: string | number, value: T) {
+    return Promise.resolve({
+      id: pk,
+      ...value,
+    });
+  }
+}
+
+const store = new TestStore();
+
+interface PersonModel {
+  name: string;
+}
 class Person extends Entity<PersonModel> {
   get name(): string {
     const value = this.get("name");
@@ -13,6 +26,16 @@ class Person extends Entity<PersonModel> {
   set name(value: string) {
     this.set("name", value);
   }
+
+  async save(): Promise<void> {
+    if (!this.data.name) {
+      throw new Error("Field name is missing");
+    }
+    const dto: PersonModel = {
+      name: this.data.name,
+    };
+    await store.set<PersonModel>(this.constructor.name.valueOf(), this.pk, dto);
+  }
 }
 describe("Entity", () => {
   let testEntity: Person;
@@ -21,8 +44,8 @@ describe("Entity", () => {
     testEntity = new Person(1);
   });
 
-  it("should be able to set and get data", () => {
-    const entity = new Entity(1);
+  it("should be able to set and get data on raw entity", () => {
+    const entity = new Entity<{ name: string }>(1);
     entity.set("name", "John");
     expect(entity.get("name")).toEqual("John");
   });
@@ -32,5 +55,9 @@ describe("Entity", () => {
   });
   it("should fail to access getter before set", () => {
     expect(() => testEntity.name).toThrow(KeyAccessError);
+  });
+
+  it("should fail to save entity before fields set", () => {
+    expect(testEntity.save()).rejects.toThrow("Field name is missing");
   });
 });

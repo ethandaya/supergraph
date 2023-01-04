@@ -1,4 +1,4 @@
-export class KeyAccessError<T extends Record<string, string>> extends Error {
+export class KeyAccessError<T> extends Error {
   constructor(key: keyof T) {
     super(`${String(key)} accessed before set`);
   }
@@ -12,7 +12,7 @@ export interface Store {
 
 type LocalData<T> = T | Partial<T>;
 
-export class Entity<T extends Record<string, string | number>> {
+export class Entity<T> {
   pk: number;
   data: LocalData<T> = {};
 
