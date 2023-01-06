@@ -1,14 +1,9 @@
 import { CrudEntity, Entity, KeyAccessError } from "../../core/engine";
-import {
-  AuctionModel,
-  AuctionSchema,
-  NounModel,
-  NounSchema,
-  SeedModel,
-  SeedSchema,
-} from "./models";
+import { AuctionSchema, NounSchema, SeedSchema } from "../models";
 import { store } from "../store";
+import { z } from "zod";
 
+export type SeedModel = z.infer<typeof SeedSchema>;
 export class Seed extends Entity<SeedModel> {
   constructor(id: number) {
     super(id, SeedSchema, store);
@@ -74,6 +69,8 @@ export class Seed extends Entity<SeedModel> {
   }
 }
 
+export type NounModel = z.infer<typeof NounSchema>;
+
 export class Noun extends Entity<NounModel> {
   constructor(id: number) {
     super(id, NounSchema, store);
@@ -121,6 +118,8 @@ export class Noun extends Entity<NounModel> {
     throw new Error("Method not implemented");
   }
 }
+
+export type AuctionModel = z.infer<typeof AuctionSchema>;
 
 export class Auction extends Entity<AuctionModel> {
   constructor(id: number) {
