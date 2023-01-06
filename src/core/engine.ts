@@ -1,3 +1,10 @@
+import { z } from "zod";
+
+export type CrudEntity<T> = T & {
+  createdAt: number;
+  updatedAt: number;
+};
+
 export class KeyAccessError<T> extends Error {
   constructor(key: keyof T) {
     super(`${String(key)} accessed before set`);
@@ -5,45 +12,56 @@ export class KeyAccessError<T> extends Error {
 }
 
 export interface Store {
-  set<T extends {}>(table: string, pk: string | number, value: T): void;
-
+  set<T>(table: string, pk: string | number, value: T): Promise<CrudEntity<T>>;
+  // get<T>(table: string, pk: string | number): Promise<CrudEntity<T>>;
   // setMany(values: { [key: string]: any }): void;
 }
 
-type LocalData<T> = T | Partial<T>;
+type TempData<T> = T | Partial<T>;
 
 export class Entity<T> {
-  pk: number;
-  data: LocalData<T> = {};
+  public id: number;
+  data: TempData<T> = {};
 
-  constructor(pk: number) {
-    this.pk = pk;
+  constructor(
+    pk: number,
+    private readonly schema: z.ZodSchema<T>,
+    private readonly store: Store
+  ) {
+    this.id = pk;
   }
 
-  public set<K extends keyof LocalData<T>>(
+  public set<K extends keyof TempData<T>>(
     key: K,
-    value: LocalData<T>[typeof key]
+    value: TempData<T>[typeof key]
   ) {
-    // console.debug("setting into temp store", key, value);
     this.data = { ...this.data, [key]: value };
     return value;
   }
 
-  public get<K extends keyof LocalData<T>>(key: K): LocalData<T>[typeof key] {
-    // console.debug("getting from temp store", key);
+  public unset<K extends keyof TempData<T>>(key: K) {
+    this.data = { ...this.data, [key]: null };
+  }
+
+  public get<K extends keyof TempData<T>>(key: K): TempData<T>[typeof key] {
     return this.data[key];
   }
+
+  async save(): Promise<CrudEntity<T>> {
+    const dto = this.schema.parse({ id: this.id, ...this.data });
+    return this.store.set<T>("seed", this.id, dto);
+  }
 }
-//
-// export class Batch<T extends Entity<T>> {
+
+// export class Batch<K, T extends Entity<K>> {
 //   _queue: T[] = [];
 //
 //   queue(entity: T) {
 //     this._queue.push(entity);
 //   }
 //
-//   save() {
-//     const dtos = this._queue.map((e: T) => e.getEntity());
-//     console.log(`persisting batch w. len ${dtos.length} to db`);
-//   }
+//   // save() {
+//   //   const dtos = this._queue.map((e: T) => e.getEntity());
+//   //   console.log(`persisting batch w. len ${dtos.length} to db`);
+//   // }
 // }

@@ -5,7 +5,7 @@ import { expect } from "@jest/globals";
 import { formatSchema } from "@prisma/internals";
 
 const filename = "./schema.graphql";
-const expectedSchemaPath = "./test-schema.prisma";
+const expectedSchemaPath = "./fixtures/test-schema.prisma";
 
 describe("Prisma Adaptor", () => {
   let parser: PrismaAdaptor = {} as PrismaAdaptor;
@@ -75,6 +75,7 @@ describe("Prisma Adaptor", () => {
   it("should be able to generate a valid prisma schema", async () => {
     const schema = parser.mapSchemaToPrismaModel();
     const formattedSchema = await formatSchema({ schema });
+    await fs.writeFile("schema.prisma", formattedSchema);
     expect(formattedSchema).toEqual(expectedSchema);
   });
 });
