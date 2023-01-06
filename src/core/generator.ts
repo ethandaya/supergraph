@@ -17,13 +17,13 @@ export function generateClassForSchema(schemaName: string, schema: any) {
 
   for (const key in schema.shape) {
     const type = `${schemaName}Model["${key}"]`;
-    // const isNullable = schema.shape[key].isNullable;
+    const isNullable = schema.shape[key].isNullable();
     methods.push({
       name: `get ${key}`,
       returnType: type,
       statements: [
         `const value = this.get("${key}")`,
-        `if (!value) {`,
+        `if (!value${isNullable ? " && value !== null" : ""}) {`,
         `  throw new KeyAccessError<${schemaName}>("${key}")`,
         `}`,
         `return value`,
