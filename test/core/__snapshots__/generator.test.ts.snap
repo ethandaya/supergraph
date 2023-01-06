@@ -1,0 +1,90 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Generator should get all classes in models.ts 1`] = `
+"type SeedModel = z.infer<typeof SeedSchema>;
+
+export class Seed extends Entity<SeedModel> {
+    constructor(id: string) {
+        super(id, SeedSchema, store)
+    }
+
+    get id(): SeedModel["id"] {
+        const value = this.get("id")
+        if (!value) {
+          throw new KeyAccessError<Seed>("id")
+        }
+
+        return value
+    }
+
+    set id(value: SeedModel["id"]) {
+        this.set("id", value);
+    }
+
+    get background(): SeedModel["background"] {
+        const value = this.get("background")
+        if (!value) {
+          throw new KeyAccessError<Seed>("background")
+        }
+
+        return value
+    }
+
+    set background(value: SeedModel["background"]) {
+        this.set("background", value);
+    }
+
+    get body(): SeedModel["body"] {
+        const value = this.get("body")
+        if (!value) {
+          throw new KeyAccessError<Seed>("body")
+        }
+
+        return value
+    }
+
+    set body(value: SeedModel["body"]) {
+        this.set("body", value);
+    }
+
+    get accessory(): SeedModel["accessory"] {
+        const value = this.get("accessory")
+        if (!value) {
+          throw new KeyAccessError<Seed>("accessory")
+        }
+
+        return value
+    }
+
+    set accessory(value: SeedModel["accessory"]) {
+        this.set("accessory", value);
+    }
+
+    get head(): SeedModel["head"] {
+        const value = this.get("head")
+        if (!value) {
+          throw new KeyAccessError<Seed>("head")
+        }
+
+        return value
+    }
+
+    set head(value: SeedModel["head"]) {
+        this.set("head", value);
+    }
+
+    get glasses(): SeedModel["glasses"] {
+        const value = this.get("glasses")
+        if (!value) {
+          throw new KeyAccessError<Seed>("glasses")
+        }
+
+        return value
+    }
+
+    set glasses(value: SeedModel["glasses"]) {
+        this.set("glasses", value);
+    }
+}
+"
+`;

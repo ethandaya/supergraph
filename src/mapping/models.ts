@@ -1,10 +1,6 @@
 import { z } from "zod";
 import { isBigNumberish } from "@ethersproject/bignumber/lib/bignumber";
 
-z = {
-  ...z,
-};
-
 export const SeedSchema = z.object({
   id: z.number(),
   background: z.string(),
