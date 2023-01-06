@@ -19,16 +19,28 @@ export interface Store {
 
 type TempData<T> = T | Partial<T>;
 
-export class Entity<T> {
-  public id: number;
-  data: TempData<T> = {};
+export class Entity<T extends { id: string }> {
+  public data: TempData<T> = {};
 
   constructor(
-    pk: number,
+    pk: string,
     private readonly schema: z.ZodSchema<T>,
     private readonly store: Store
   ) {
     this.id = pk;
+  }
+
+  get id(): T["id"] {
+    const value = this.get("id");
+    if (!value) {
+      throw new KeyAccessError<T>("id");
+    }
+
+    return value;
+  }
+
+  set id(value: T["id"]) {
+    this.set("id", value);
   }
 
   public set<K extends keyof TempData<T>>(
