@@ -149,7 +149,7 @@ export class Auction extends Entity<AuctionModel> {
     this.set("amount", value);
   }
 
-  get startTime(): number {
+  get startTime(): AuctionModel["startTime"] {
     let value = this.get("startTime");
     if (!value) {
       throw new KeyAccessError<Auction>("startTime");
@@ -157,11 +157,11 @@ export class Auction extends Entity<AuctionModel> {
     return value;
   }
 
-  set startTime(value: number) {
+  set startTime(value: AuctionModel["startTime"]) {
     this.set("startTime", value);
   }
 
-  get endTime(): number {
+  get endTime(): AuctionModel["endTime"] {
     let value = this.get("endTime");
     if (!value) {
       throw new KeyAccessError<Auction>("endTime");
@@ -169,7 +169,7 @@ export class Auction extends Entity<AuctionModel> {
     return value;
   }
 
-  set endTime(value: number) {
+  set endTime(value: AuctionModel["endTime"]) {
     this.set("endTime", value);
   }
 

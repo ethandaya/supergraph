@@ -16,7 +16,7 @@ export async function handleAuctionCreated(event: any): Promise<void> {
 
   auction.noun = noun.id;
   auction.amount = 0;
-  auction.startTime = event.params.startTime;
+  auction.startTime = "3";
   auction.endTime = event.params.endTime;
   auction.settled = false;
 
