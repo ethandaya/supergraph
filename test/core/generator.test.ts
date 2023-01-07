@@ -11,7 +11,7 @@ describe("Generator", () => {
   beforeEach(() => {
     generator = new EntityGenerator(
       getFullPath("./src/mapping/models.ts"),
-      getFullPath("./src/mapping/generated/schema.ts")
+      getFullPath("./src/mapping/types/schema.ts")
     );
   });
 

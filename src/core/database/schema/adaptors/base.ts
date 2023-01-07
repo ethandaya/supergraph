@@ -136,9 +136,9 @@ export class BaseSchemaAdaptor {
   }
 
   public mapNonNullType(type: NonNullTypeNode): UnamedColumn {
-    const nullableType = this.mapInputField(type.type);
+    const nullabconstype = this.mapInputField(type.type);
     return {
-      ...nullableType,
+      ...nullabconstype,
       isNullable: false,
     };
   }

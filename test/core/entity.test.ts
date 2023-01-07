@@ -62,7 +62,7 @@ class Person extends Entity<PersonModel> {
   }
 }
 describe("Entity", () => {
-  let testEntity: Person;
+  const testEntity: Person;
 
   beforeEach(() => {
     testEntity = new Person(1);

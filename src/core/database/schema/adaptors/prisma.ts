@@ -28,7 +28,7 @@ export class PrismaAdaptor extends BaseSchemaAdaptor {
   }
 
   mapColumnToPrismaField(column: Column): string {
-    let field = `${column.name}`;
+    const field = `${column.name}`;
 
     if (column.isRelation) {
       field += `${column.isArray ? "Ids" : "Id"}`;

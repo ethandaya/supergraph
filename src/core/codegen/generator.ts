@@ -46,7 +46,7 @@ export class EntityGenerator {
   }
 
   public generateClassForSchema(name: string, schema: z.ZodObject<any>) {
-    let methods: OptionalKind<MethodDeclarationStructure>[] = [];
+    const methods: OptionalKind<MethodDeclarationStructure>[] = [];
 
     methods.push({
       name: "load",

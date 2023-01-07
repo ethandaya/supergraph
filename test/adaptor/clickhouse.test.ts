@@ -4,8 +4,8 @@ import { parse } from "graphql/language";
 
 const filename = "./schema.graphql";
 describe("Clickhouse Adaptor", () => {
-  let parser: ClickhouseAdaptor = {} as ClickhouseAdaptor;
-  // let expectedSQL: string = "";
+  const parser: ClickhouseAdaptor = {} as ClickhouseAdaptor;
+  // const expectedSQL: string = "";
 
   beforeAll(async () => {
     const document = await fs.readFile(filename, "utf-8");

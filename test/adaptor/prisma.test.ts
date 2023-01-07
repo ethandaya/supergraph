@@ -8,8 +8,8 @@ const filename = "./schema.graphql";
 const expectedSchemaPath = "./fixtures/test-schema.prisma";
 
 describe("Prisma Adaptor", () => {
-  let parser: PrismaAdaptor = {} as PrismaAdaptor;
-  let expectedSchema: string = "";
+  const parser: PrismaAdaptor = {} as PrismaAdaptor;
+  const expectedSchema: string = "";
 
   beforeAll(async () => {
     const document = await fs.readFile(filename, "utf-8");

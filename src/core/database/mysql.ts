@@ -9,7 +9,7 @@ import {
 } from "graphql";
 
 export function createTable(typeDef: ObjectTypeDefinitionNode): string {
-  let statement = `CREATE TABLE ${typeDef.name.value} (`;
+  const statement = `CREATE TABLE ${typeDef.name.value} (`;
 
   const fields = typeDef.fields || [];
 
@@ -104,10 +104,10 @@ function mapListType(type: ListTypeNode): string {
 
 function mapNonNullType(type: NonNullTypeNode): string {
   // Convert the non-null type to a string
-  const nullableType = mapInputType(type.type);
+  const nullabconstype = mapInputType(type.type);
 
   // Return the non-null type as NOT NULL
-  return `${nullableType} NOT NULL`;
+  return `${nullabconstype} NOT NULL`;
 }
 
 function mapEnumType(type: EnumTypeDefinitionNode): string {
