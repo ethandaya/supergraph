@@ -13,8 +13,8 @@ export class Noun extends Entity<NounModel> {
         this.data = data || {};
     }
 
-    static async load(id: string): Promise<Noun | null> {
-        const data = await store.get<NounModel>("noun", id);
+    static load(id: string): Noun | null {
+        const data = store.get<NounModel>("noun", id);
         if (!data) {
            return new Noun(id);
         }
@@ -83,8 +83,8 @@ export class Bid extends Entity<BidModel> {
         this.data = data || {};
     }
 
-    static async load(id: string): Promise<Bid | null> {
-        const data = await store.get<BidModel>("bid", id);
+    static load(id: string): Bid | null {
+        const data = store.get<BidModel>("bid", id);
         if (!data) {
            return new Bid(id);
         }
@@ -205,8 +205,8 @@ export class Auction extends Entity<AuctionModel> {
         this.data = data || {};
     }
 
-    static async load(id: string): Promise<Auction | null> {
-        const data = await store.get<AuctionModel>("auction", id);
+    static load(id: string): Auction | null {
+        const data = store.get<AuctionModel>("auction", id);
         if (!data) {
            return new Auction(id);
         }
@@ -327,8 +327,8 @@ export class Account extends Entity<AccountModel> {
         this.data = data || {};
     }
 
-    static async load(id: string): Promise<Account | null> {
-        const data = await store.get<AccountModel>("account", id);
+    static load(id: string): Account | null {
+        const data = store.get<AccountModel>("account", id);
         if (!data) {
            return new Account(id);
         }

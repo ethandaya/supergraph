@@ -6,54 +6,50 @@ type AuctionCreated = any;
 type AuctionExtended = any;
 type AuctionSettled = any;
 
-export async function handleAuctionCreated(
-  event: AuctionCreated
-): Promise<void> {
-  const nounId = event.params.nounId.toString();
+const log = console;
 
-  const noun = await Noun.load(nounId);
+export function handleAuctionCreated(event: AuctionCreated): void {
+  let nounId = event.params.nounId.toString();
+
+  let noun = Noun.load(nounId);
   if (noun == null) {
-    console.error("[handleAuctionCreated] Noun #{} not found. Hash: {}", [
+    log.error("[handleAuctionCreated] Noun #{} not found. Hash: {}", [
       nounId,
       event.transaction.hash.toHex(),
     ]);
     return;
   }
 
-  const auction = new Auction(nounId);
-
+  let auction = new Auction(nounId);
   auction.noun = noun.id;
   auction.amount = "0";
   auction.startTime = event.params.startTime;
   auction.endTime = event.params.endTime;
   auction.settled = false;
-
-  await auction.save();
+  auction.save();
 }
 
-export async function handleAuctionBid(event: AuctionBid): Promise<void> {
-  const nounId = event.params.nounId.toString();
-  const bidderAddress = event.params.sender.toHex();
+export function handleAuctionBid(event: AuctionBid): void {
+  let nounId = event.params.nounId.toString();
+  let bidderAddress = event.params.sender.toHex();
 
-  const bidder = await getOrCreateAccount(bidderAddress);
+  let bidder = getOrCreateAccount(bidderAddress);
 
-  const auction = await Auction.load(nounId);
+  let auction = Auction.load(nounId);
   if (auction == null) {
-    console.error(
-      "[handleAuctionBid] Auction not found for Noun #{}. Hash: {}",
-      [nounId, event.transaction.hash.toHex()]
-    );
+    log.error("[handleAuctionBid] Auction not found for Noun #{}. Hash: {}", [
+      nounId,
+      event.transaction.hash.toHex(),
+    ]);
     return;
   }
 
   auction.amount = event.params.value;
   auction.bidder = bidder.id;
-
-  await auction.save();
+  auction.save();
 
   // Save Bid
-  const bid = new Bid(event.transaction.hash.toHex());
-
+  let bid = new Bid(event.transaction.hash.toHex());
   bid.bidder = bidder.id;
   bid.amount = auction.amount;
   bid.noun = auction.noun;
@@ -61,18 +57,15 @@ export async function handleAuctionBid(event: AuctionBid): Promise<void> {
   bid.blockNumber = event.block.number;
   bid.blockTimestamp = event.block.timestamp;
   bid.auction = auction.id;
-
-  await bid.save();
+  bid.save();
 }
 
-export async function handleAuctionExtended(
-  event: AuctionExtended
-): Promise<void> {
-  const nounId = event.params.nounId.toString();
+export function handleAuctionExtended(event: AuctionExtended): void {
+  let nounId = event.params.nounId.toString();
 
-  const auction = await Auction.load(nounId);
+  let auction = Auction.load(nounId);
   if (auction == null) {
-    console.error(
+    log.error(
       "[handleAuctionExtended] Auction not found for Noun #{}. Hash: {}",
       [nounId, event.transaction.hash.toHex()]
     );
@@ -80,18 +73,15 @@ export async function handleAuctionExtended(
   }
 
   auction.endTime = event.params.endTime;
-
-  await auction.save();
+  auction.save();
 }
 
-export async function handleAuctionSettled(
-  event: AuctionSettled
-): Promise<void> {
-  const nounId = event.params.nounId.toString();
+export function handleAuctionSettled(event: AuctionSettled): void {
+  let nounId = event.params.nounId.toString();
 
-  const auction = await Auction.load(nounId);
+  let auction = Auction.load(nounId);
   if (auction == null) {
-    console.error(
+    log.error(
       "[handleAuctionSettled] Auction not found for Noun #{}. Hash: {}",
       [nounId, event.transaction.hash.toHex()]
     );
@@ -99,6 +89,5 @@ export async function handleAuctionSettled(
   }
 
   auction.settled = true;
-
-  await auction.save();
+  auction.save();
 }

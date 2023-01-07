@@ -51,16 +51,15 @@ export class EntityGenerator {
     methods.push({
       name: "load",
       isStatic: true,
-      isAsync: true,
       parameters: [
         {
           name: "id",
           type: "string",
         },
       ],
-      returnType: `Promise<${name} | null>`,
+      returnType: `${name} | null`,
       statements: [
-        `const data = await store.get<${name}Model>("${name.toLowerCase()}", id);`,
+        `const data = store.get<${name}Model>("${name.toLowerCase()}", id);`,
         `if (!data) {`,
         `   return new ${name}(id);`,
         `}`,

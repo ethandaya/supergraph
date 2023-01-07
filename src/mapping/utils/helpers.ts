@@ -1,12 +1,12 @@
 import { Account } from "../types/schema";
 
-export async function getOrCreateAccount(id: string): Promise<Account>;
-export async function getOrCreateAccount(
+export function getOrCreateAccount(id: string): Account;
+export function getOrCreateAccount(
   id: string,
   createIfNotFound: boolean = true,
   save: boolean = true
-): Promise<Account | null> {
-  const tokenHolder = await Account.load(id);
+): Account | null {
+  let tokenHolder = Account.load(id);
 
   if (tokenHolder == null && createIfNotFound) {
     tokenHolder = new Account(id);
@@ -17,7 +17,7 @@ export async function getOrCreateAccount(
     tokenHolder.nouns = [];
 
     if (save) {
-      await tokenHolder.save();
+      tokenHolder.save();
       return tokenHolder;
     }
   }

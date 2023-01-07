@@ -12,7 +12,7 @@ export class KeyAccessError<T> extends Error {
 }
 
 export interface Store {
-  set<T>(table: string, pk: string | number, value: T): Promise<CrudEntity<T>>;
+  set<T>(table: string, pk: string | number, value: T): CrudEntity<T>;
   // get<T>(table: string, pk: string | number): Promise<CrudEntity<T>>;
   // setMany(values: { [key: string]: any }): void;
 }
@@ -59,21 +59,8 @@ export class Entity<T extends { id: string }> {
     return this.data[key];
   }
 
-  async save(): Promise<CrudEntity<T>> {
+  save(): CrudEntity<T> {
     const dto = this.schema.parse({ id: this.id, ...this.data });
     return this.store.set<T>("seed", this.id, dto);
   }
 }
-
-// export class Batch<K, T extends Entity<K>> {
-//   _queue: T[] = [];
-//
-//   queue(entity: T) {
-//     this._queue.push(entity);
-//   }
-//
-//   // save() {
-//   //   const dtos = this._queue.map((e: T) => e.getEntity());
-//   //   console.log(`persisting batch w. len ${dtos.length} to db`);
-//   // }
-// }
