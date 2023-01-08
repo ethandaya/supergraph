@@ -1,4 +1,4 @@
-import { Database } from "bun:sqlite";
+import Database from "better-sqlite3";
 import { z } from "zod";
 import { CrudEntity, Store } from "./engine";
 
@@ -15,7 +15,7 @@ type StatementLookup<T extends string> = {
 };
 
 export class SQLiteStore<K extends string> implements Store {
-  public db: Database;
+  public db: Database.Database;
   public stmts: StatementLookup<K>;
 
   constructor(pathToDb: string, public readonly models: ModelLookup<K>) {
@@ -61,27 +61,21 @@ export class SQLiteStore<K extends string> implements Store {
     id: string | number,
     data: T
   ): CrudEntity<T> {
-    const params = Object.keys(data).reduce(
-      (acc, key: string) => ({
-        ...acc,
-        [`$${key}`]: data[key],
-      }),
-      {}
-    );
     const stmts = this.stmts[entity];
-    this.db.prepare(stmts.insert).run({
-      ...params,
-      $id: id,
-      $createdAt: Date.now(),
-      $updatedAt: Date.now(),
-    });
-    return this.db.prepare(stmts.select).get({ $id: id });
+    const dto = {
+      ...data,
+      id: id,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    };
+    this.db.prepare(stmts.insert).run(dto);
+    return this.db.prepare(stmts.select).get({ id: id });
   }
 
   get<T extends Record<string, any>>(
     entity: K,
     id: string | number
   ): CrudEntity<T> {
-    return this.db.prepare(this.stmts[entity].select).get({ $id: id });
+    return this.db.prepare(this.stmts[entity].select).get({ id: id });
   }
 }

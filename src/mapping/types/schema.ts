@@ -15,10 +15,10 @@ export const store = new Store<SchemaNames>("", {
 
 type NounModel = z.infer<typeof NounSchema>;
 
-export class Noun extends Entity<NounModel> {
+export class Noun extends Entity<NounModel, typeof NounSchema> {
     constructor(id: string, data?: NounModel) {
         super(id, NounSchema, store)
-        this.data = data || {};
+        this.data = { id, ...data } || {};
     }
 
     static load(id: string): Noun | null {
@@ -32,7 +32,7 @@ export class Noun extends Entity<NounModel> {
 
     get id(): NounModel["id"] {
         const value = this.get("id")
-        if (!value) {
+        if (typeof value === "undefined") {
           throw new KeyAccessError<Noun>("id")
         }
 
@@ -45,7 +45,7 @@ export class Noun extends Entity<NounModel> {
 
     get seed(): NounModel["seed"] {
         const value = this.get("seed")
-        if (!value && value !== null) {
+        if (typeof value === "undefined" && value !== null) {
           throw new KeyAccessError<Noun>("seed")
         }
 
@@ -58,7 +58,7 @@ export class Noun extends Entity<NounModel> {
 
     get owner(): NounModel["owner"] {
         const value = this.get("owner")
-        if (!value) {
+        if (typeof value === "undefined") {
           throw new KeyAccessError<Noun>("owner")
         }
 
@@ -68,27 +68,14 @@ export class Noun extends Entity<NounModel> {
     set owner(value: NounModel["owner"]) {
         this.set("owner", value);
     }
-
-    get votes(): NounModel["votes"] {
-        const value = this.get("votes")
-        if (!value) {
-          throw new KeyAccessError<Noun>("votes")
-        }
-
-        return value
-    }
-
-    set votes(value: NounModel["votes"]) {
-        this.set("votes", value);
-    }
 }
 
 type BidModel = z.infer<typeof BidSchema>;
 
-export class Bid extends Entity<BidModel> {
+export class Bid extends Entity<BidModel, typeof BidSchema> {
     constructor(id: string, data?: BidModel) {
         super(id, BidSchema, store)
-        this.data = data || {};
+        this.data = { id, ...data } || {};
     }
 
     static load(id: string): Bid | null {
@@ -102,7 +89,7 @@ export class Bid extends Entity<BidModel> {
 
     get id(): BidModel["id"] {
         const value = this.get("id")
-        if (!value) {
+        if (typeof value === "undefined") {
           throw new KeyAccessError<Bid>("id")
         }
 
@@ -115,7 +102,7 @@ export class Bid extends Entity<BidModel> {
 
     get noun(): BidModel["noun"] {
         const value = this.get("noun")
-        if (!value) {
+        if (typeof value === "undefined") {
           throw new KeyAccessError<Bid>("noun")
         }
 
@@ -128,7 +115,7 @@ export class Bid extends Entity<BidModel> {
 
     get amount(): BidModel["amount"] {
         const value = this.get("amount")
-        if (!value) {
+        if (typeof value === "undefined") {
           throw new KeyAccessError<Bid>("amount")
         }
 
@@ -141,7 +128,7 @@ export class Bid extends Entity<BidModel> {
 
     get bidder(): BidModel["bidder"] {
         const value = this.get("bidder")
-        if (!value) {
+        if (typeof value === "undefined") {
           throw new KeyAccessError<Bid>("bidder")
         }
 
@@ -154,7 +141,7 @@ export class Bid extends Entity<BidModel> {
 
     get auction(): BidModel["auction"] {
         const value = this.get("auction")
-        if (!value) {
+        if (typeof value === "undefined") {
           throw new KeyAccessError<Bid>("auction")
         }
 
@@ -167,7 +154,7 @@ export class Bid extends Entity<BidModel> {
 
     get txIndex(): BidModel["txIndex"] {
         const value = this.get("txIndex")
-        if (!value) {
+        if (typeof value === "undefined") {
           throw new KeyAccessError<Bid>("txIndex")
         }
 
@@ -180,7 +167,7 @@ export class Bid extends Entity<BidModel> {
 
     get blockNumber(): BidModel["blockNumber"] {
         const value = this.get("blockNumber")
-        if (!value) {
+        if (typeof value === "undefined") {
           throw new KeyAccessError<Bid>("blockNumber")
         }
 
@@ -193,7 +180,7 @@ export class Bid extends Entity<BidModel> {
 
     get blockTimestamp(): BidModel["blockTimestamp"] {
         const value = this.get("blockTimestamp")
-        if (!value) {
+        if (typeof value === "undefined") {
           throw new KeyAccessError<Bid>("blockTimestamp")
         }
 
@@ -207,10 +194,10 @@ export class Bid extends Entity<BidModel> {
 
 type AuctionModel = z.infer<typeof AuctionSchema>;
 
-export class Auction extends Entity<AuctionModel> {
+export class Auction extends Entity<AuctionModel, typeof AuctionSchema> {
     constructor(id: string, data?: AuctionModel) {
         super(id, AuctionSchema, store)
-        this.data = data || {};
+        this.data = { id, ...data } || {};
     }
 
     static load(id: string): Auction | null {
@@ -224,7 +211,7 @@ export class Auction extends Entity<AuctionModel> {
 
     get id(): AuctionModel["id"] {
         const value = this.get("id")
-        if (!value) {
+        if (typeof value === "undefined") {
           throw new KeyAccessError<Auction>("id")
         }
 
@@ -237,7 +224,7 @@ export class Auction extends Entity<AuctionModel> {
 
     get noun(): AuctionModel["noun"] {
         const value = this.get("noun")
-        if (!value) {
+        if (typeof value === "undefined") {
           throw new KeyAccessError<Auction>("noun")
         }
 
@@ -250,7 +237,7 @@ export class Auction extends Entity<AuctionModel> {
 
     get amount(): AuctionModel["amount"] {
         const value = this.get("amount")
-        if (!value) {
+        if (typeof value === "undefined") {
           throw new KeyAccessError<Auction>("amount")
         }
 
@@ -263,7 +250,7 @@ export class Auction extends Entity<AuctionModel> {
 
     get startTime(): AuctionModel["startTime"] {
         const value = this.get("startTime")
-        if (!value) {
+        if (typeof value === "undefined") {
           throw new KeyAccessError<Auction>("startTime")
         }
 
@@ -276,7 +263,7 @@ export class Auction extends Entity<AuctionModel> {
 
     get endTime(): AuctionModel["endTime"] {
         const value = this.get("endTime")
-        if (!value) {
+        if (typeof value === "undefined") {
           throw new KeyAccessError<Auction>("endTime")
         }
 
@@ -289,7 +276,7 @@ export class Auction extends Entity<AuctionModel> {
 
     get settled(): AuctionModel["settled"] {
         const value = this.get("settled")
-        if (!value) {
+        if (typeof value === "undefined") {
           throw new KeyAccessError<Auction>("settled")
         }
 
@@ -302,7 +289,7 @@ export class Auction extends Entity<AuctionModel> {
 
     get bidder(): AuctionModel["bidder"] {
         const value = this.get("bidder")
-        if (!value && value !== null) {
+        if (typeof value === "undefined" && value !== null) {
           throw new KeyAccessError<Auction>("bidder")
         }
 
@@ -312,27 +299,14 @@ export class Auction extends Entity<AuctionModel> {
     set bidder(value: AuctionModel["bidder"]) {
         this.set("bidder", value);
     }
-
-    get bids(): AuctionModel["bids"] {
-        const value = this.get("bids")
-        if (!value) {
-          throw new KeyAccessError<Auction>("bids")
-        }
-
-        return value
-    }
-
-    set bids(value: AuctionModel["bids"]) {
-        this.set("bids", value);
-    }
 }
 
 type AccountModel = z.infer<typeof AccountSchema>;
 
-export class Account extends Entity<AccountModel> {
+export class Account extends Entity<AccountModel, typeof AccountSchema> {
     constructor(id: string, data?: AccountModel) {
         super(id, AccountSchema, store)
-        this.data = data || {};
+        this.data = { id, ...data } || {};
     }
 
     static load(id: string): Account | null {
@@ -346,7 +320,7 @@ export class Account extends Entity<AccountModel> {
 
     get id(): AccountModel["id"] {
         const value = this.get("id")
-        if (!value) {
+        if (typeof value === "undefined") {
           throw new KeyAccessError<Account>("id")
         }
 
@@ -359,7 +333,7 @@ export class Account extends Entity<AccountModel> {
 
     get delegate(): AccountModel["delegate"] {
         const value = this.get("delegate")
-        if (!value) {
+        if (typeof value === "undefined") {
           throw new KeyAccessError<Account>("delegate")
         }
 
@@ -372,7 +346,7 @@ export class Account extends Entity<AccountModel> {
 
     get tokenBalanceRaw(): AccountModel["tokenBalanceRaw"] {
         const value = this.get("tokenBalanceRaw")
-        if (!value) {
+        if (typeof value === "undefined") {
           throw new KeyAccessError<Account>("tokenBalanceRaw")
         }
 
@@ -385,7 +359,7 @@ export class Account extends Entity<AccountModel> {
 
     get tokenBalance(): AccountModel["tokenBalance"] {
         const value = this.get("tokenBalance")
-        if (!value) {
+        if (typeof value === "undefined") {
           throw new KeyAccessError<Account>("tokenBalance")
         }
 
@@ -398,7 +372,7 @@ export class Account extends Entity<AccountModel> {
 
     get totalTokensHeldRaw(): AccountModel["totalTokensHeldRaw"] {
         const value = this.get("totalTokensHeldRaw")
-        if (!value) {
+        if (typeof value === "undefined") {
           throw new KeyAccessError<Account>("totalTokensHeldRaw")
         }
 
@@ -411,7 +385,7 @@ export class Account extends Entity<AccountModel> {
 
     get totalTokensHeld(): AccountModel["totalTokensHeld"] {
         const value = this.get("totalTokensHeld")
-        if (!value) {
+        if (typeof value === "undefined") {
           throw new KeyAccessError<Account>("totalTokensHeld")
         }
 
@@ -420,18 +394,5 @@ export class Account extends Entity<AccountModel> {
 
     set totalTokensHeld(value: AccountModel["totalTokensHeld"]) {
         this.set("totalTokensHeld", value);
-    }
-
-    get nouns(): AccountModel["nouns"] {
-        const value = this.get("nouns")
-        if (!value) {
-          throw new KeyAccessError<Account>("nouns")
-        }
-
-        return value
-    }
-
-    set nouns(value: AccountModel["nouns"]) {
-        this.set("nouns", value);
     }
 }

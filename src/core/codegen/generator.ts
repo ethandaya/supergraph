@@ -85,7 +85,7 @@ export class EntityGenerator {
     this.targetFile.addClass({
       name,
       isExported: true,
-      extends: `Entity<${name}Model>`,
+      extends: `Entity<${name}Model, typeof ${name}Schema>`,
       ctors: [
         {
           parameters: [
@@ -101,7 +101,7 @@ export class EntityGenerator {
           ],
           statements: [
             `super(id, ${name}Schema, store)`,
-            `this.data = data || {};`,
+            `this.data = { id, ...data } || {};`,
           ],
         },
       ],

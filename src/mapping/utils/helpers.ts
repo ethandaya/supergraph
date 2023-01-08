@@ -14,7 +14,7 @@ export function getOrCreateAccount(
     tokenHolder.tokenBalance = "0";
     tokenHolder.totalTokensHeldRaw = "0";
     tokenHolder.totalTokensHeld = "0";
-    tokenHolder.nouns = [];
+    // tokenHolder.nouns = [];
 
     if (save) {
       tokenHolder.save();

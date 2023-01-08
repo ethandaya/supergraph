@@ -10,7 +10,9 @@ export function makeGetterStatements({
 }: GetterStatementOptions) {
   return [
     `const value = this.get("${key}")`,
-    `if (!value${isNullable ? " && value !== null" : ""}) {`,
+    `if (typeof value === "undefined"${
+      isNullable ? " && value !== null" : ""
+    }) {`,
     `  throw new KeyAccessError<${name}>("${key}")`,
     `}`,
     `return value`,

@@ -1,48 +1,21 @@
-import {
-  CrudEntity,
-  Entity,
-  KeyAccessError,
-  Store,
-} from "../../src/core/engine";
+import { Entity, KeyAccessError } from "../../src/core/engine";
 import { z, ZodError } from "zod";
+import { SQLiteStore } from "../../src/core/store";
 
-class TestStore implements Store {
-  repo: Record<string, any> = {};
-  set<T>(name: string, pk: string | number, value: T): CrudEntity<T> {
-    const dto = {
-      id: pk,
-      ...value,
-      updatedAt: Date.now(),
-      ...(!this.repo?.[name]?.[pk]
-        ? {
-            createdAt: Date.now(),
-          }
-        : {
-            createdAt: this.repo[name][pk].createdAt,
-          }),
-    };
-    this.repo = {
-      [name]: {
-        ...(this.repo?.[name] || {}),
-        [dto.id]: {
-          ...dto,
-        },
-      },
-    };
-    return this.repo[name][dto.id];
-  }
-}
-
-const store = new TestStore();
-
-const schema = z.object({
+const PersonSchema = z.object({
   id: z.string(),
   name: z.string(),
 });
-type PersonModel = z.infer<typeof schema>;
+
+const store = new SQLiteStore("", {
+  person: PersonSchema,
+});
+
+type PersonModel = z.infer<typeof PersonSchema>;
+
 class Person extends Entity<PersonModel> {
   constructor(id: string) {
-    super(id, schema, store);
+    super(id, PersonSchema, store);
   }
 
   get name(): PersonModel["name"] {
@@ -57,8 +30,21 @@ class Person extends Entity<PersonModel> {
     this.set("name", value);
   }
 }
+
 describe("Entity", () => {
   let testEntity: Person;
+
+  beforeAll(() => {
+    store.db.exec(
+      `CREATE TABLE IF NOT EXISTS person
+       (
+           id        TEXT PRIMARY KEY,
+           name      TEXT,
+           updatedAt INTEGER,
+           createdAt INTEGER
+       )`
+    );
+  });
 
   beforeEach(() => {
     testEntity = new Person("1");
@@ -70,7 +56,7 @@ describe("Entity", () => {
   // });
   it("should be able to set implemented entity", () => {
     testEntity.name = "John";
-    expect(() => testEntity.name).toEqual("John");
+    expect(testEntity.name).toEqual("John");
   });
   it("should fail to access getter before set", () => {
     expect(() => testEntity.name).toThrowError(KeyAccessError);

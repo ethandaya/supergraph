@@ -19,24 +19,23 @@ export interface Store {
 
 type TempData<T> = T | Partial<T>;
 
-export class Entity<T extends { id: string }> {
+export class Entity<T extends { id: string }, K extends z.ZodTypeAny> {
   public data: TempData<T> = {};
 
   constructor(
-    pk: string,
-    private readonly schema: z.ZodSchema<T>,
+    id: string,
+    private readonly schema: K,
     private readonly store: Store
   ) {
-    this.id = pk;
+    this.id = id;
   }
 
   get id(): T["id"] {
     const value = this.get("id");
-    if (!value) {
+    if (typeof value === "undefined") {
       throw new KeyAccessError<T>("id");
     }
-
-    return value;
+    return value as T["id"];
   }
 
   set id(value: T["id"]) {
@@ -61,6 +60,10 @@ export class Entity<T extends { id: string }> {
 
   save(): CrudEntity<T> {
     const dto = this.schema.parse({ id: this.id, ...this.data });
-    return this.store.set<T>("seed", this.id, dto);
+    return this.store.set<T>(
+      this.constructor.name.valueOf().toLowerCase(),
+      this.id,
+      dto
+    );
   }
 }

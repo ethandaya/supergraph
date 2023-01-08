@@ -24,8 +24,13 @@ describe("Generator", () => {
     generator.generateGlobalDefinitions();
     expect(generator.targetFile.getFullText()).toMatchSnapshot();
   });
-  it("should generate an entity & model definition for a schema with nullables", () => {
+  it("should generate the full type set", () => {
     generator.generate();
     expect(generator.targetFile.getFullText()).toMatchSnapshot();
+  });
+  it('should generate a "store" object', () => {
+    generator.generate();
+    // expect(generator.targetFile.getFullText()).toMatchSnapshot();
+    generator.targetFile.saveSync();
   });
 });
