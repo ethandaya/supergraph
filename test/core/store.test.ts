@@ -61,4 +61,20 @@ describe("Store", () => {
       },
     });
   });
+
+  it("should be able to set an entity", () => {
+    const dto = store.set("test", "1", { name: "test" });
+
+    const createdAt = dto.createdAt;
+    const updatedAt = dto.updatedAt;
+
+    const result = store.db
+      .query("SELECT * FROM test WHERE id = '1' LIMIT 1")
+      .get();
+
+    expect(dto).toEqual(result);
+
+    expect(createdAt).toBeLessThanOrEqual(Date.now());
+    expect(updatedAt).toBeLessThanOrEqual(Date.now());
+  });
 });

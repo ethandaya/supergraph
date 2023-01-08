@@ -1,5 +1,6 @@
 import { Database } from "bun:sqlite";
 import { z } from "zod";
+import { CrudEntity } from "./engine";
 
 type ModelLookup<T extends string> = {
   [key in T]: z.AnyZodObject;
@@ -55,37 +56,25 @@ export class SQLiteStore<K extends string> {
     return `SELECT * FROM ${tableName} WHERE id = $id LIMIT 1`;
   }
 
-  //
-  // private prepareInsertStmts(models: ModelLookup<K>) {
-  //   const keys = Object.keys(models) as Array<keyof ModelLookup<K>>;
-  //   // return keys.reduce<{ [key in K]: string }>((acc, key) => {
-  //   //   const model = models[key];
-  //   //   const fields = Object.keys(model.shape);
-  //   //   const stmt = this.db.prepare(
-  //   //     `INSERT INTO ${key} (${fields.join(",")}) VALUES (${fields
-  //   //       .map((_) => "?")
-  //   //       .join(",")})`
-  //   //   );
-  //   //   return { ...acc, [key]: stmt };
-  //   // });
-  // }
-  // set<T extends Record<string, any>>(
-  //   entity: K,
-  //   id: string | number,
-  //   data: T
-  // ): CrudEntity<T> {
-  //   const params = Object.keys(data).reduce(
-  //     (acc, key: string) => ({
-  //       ...acc,
-  //       [`$${key}`]: data[key],
-  //     }),
-  //     {}
-  //   );
-  //   const stmt = this.stmts[entity];
-  //   await stmt;
-  //   return {
-  //     id,
-  //     ...data,
-  //   };
-  // }
+  set<T extends Record<string, any>>(
+    entity: K,
+    id: string | number,
+    data: T
+  ): CrudEntity<T> {
+    const params = Object.keys(data).reduce(
+      (acc, key: string) => ({
+        ...acc,
+        [`$${key}`]: data[key],
+      }),
+      {}
+    );
+    const stmts = this.stmts[entity];
+    this.db.prepare(stmts.insert).run({
+      ...params,
+      $id: id,
+      $createdAt: Date.now(),
+      $updatedAt: Date.now(),
+    });
+    return this.db.prepare(stmts.select).get({ $id: id });
+  }
 }
