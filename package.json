@@ -32,7 +32,8 @@
     "typescript": "^4.7.4"
   },
   "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "node"
+    "moduleNameMapper": {
+      "bun:test": "<rootDir>/node_modules/$1"
+    }
   }
 }
