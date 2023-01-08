@@ -16,12 +16,12 @@ describe("Store", () => {
     });
     store.db.exec(
       `CREATE TABLE IF NOT EXISTS test
-             (
-                 id        TEXT PRIMARY KEY,
-                 name      TEXT,
-                 updatedAt INTEGER,
-                 createdAt INTEGER
-             )`
+       (
+           id        TEXT PRIMARY KEY,
+           name      TEXT,
+           updatedAt INTEGER,
+           createdAt INTEGER
+       )`
     );
   });
 
@@ -43,5 +43,22 @@ describe("Store", () => {
     expect(updateStatement).toEqual(
       "UPDATE test SET name = $name, updatedAt = $updatedAt WHERE id = $id"
     );
+  });
+
+  it("should be able to generate a select statement for schema", () => {
+    const selectStatement = store.getSelectStatementForModel("test");
+    expect(selectStatement).toEqual(
+      "SELECT * FROM test WHERE id = $id LIMIT 1"
+    );
+  });
+
+  it("should be able to prepare statements for all models", () => {
+    expect(store.stmts).toEqual({
+      test: {
+        insert: store.getInsertStatementForModel("test", testSchema),
+        update: store.getUpdateStatementForModel("test", testSchema),
+        select: store.getSelectStatementForModel("test"),
+      },
+    });
   });
 });
