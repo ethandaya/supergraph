@@ -77,4 +77,11 @@ export class SQLiteStore<K extends string> {
     });
     return this.db.prepare(stmts.select).get({ $id: id });
   }
+
+  get<T extends Record<string, any>>(
+    entity: K,
+    id: string | number
+  ): CrudEntity<T> {
+    return this.db.prepare(this.stmts[entity].select).get({ $id: id });
+  }
 }

@@ -77,4 +77,13 @@ describe("Store", () => {
     expect(createdAt).toBeLessThanOrEqual(Date.now());
     expect(updatedAt).toBeLessThanOrEqual(Date.now());
   });
+
+  it("should be able to get an entity", () => {
+    store.set("test", "1", { name: "test" });
+    const result = store.db
+      .query("SELECT * FROM test WHERE id = '1' LIMIT 1")
+      .get();
+    const dto = store.get("test", "1");
+    expect(dto).toEqual(result);
+  });
 });
