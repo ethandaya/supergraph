@@ -24,11 +24,22 @@ export class SQLiteStore<K extends string> {
   }
 
   getInsertStatementForModel(tableName: string, model: z.AnyZodObject): string {
-    const values = Object.keys(model.shape);
+    const values = Object.keys(model.shape).concat(["createdAt", "updatedAt"]);
     const cols = values.join(", ");
     const params = values.map((key) => `$${key}`).join(", ");
     return `INSERT INTO ${tableName} (${cols}) VALUES (${params})`;
   }
+
+  getUpdateStatementForModel(tableName: string, model: z.AnyZodObject): string {
+    const values = Object.keys(model.shape);
+    const sets = values
+      .filter((key) => key !== "id")
+      .map((key) => `${key} = $${key}`)
+      .concat(["updatedAt = $updatedAt"])
+      .join(", ");
+    return `UPDATE ${tableName} SET ${sets} WHERE id = $id`;
+  }
+
   //
   // private prepareInsertStmts(models: ModelLookup<K>) {
   //   const keys = Object.keys(models) as Array<keyof ModelLookup<K>>;

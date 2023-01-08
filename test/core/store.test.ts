@@ -15,7 +15,13 @@ describe("Store", () => {
       test: testSchema,
     });
     store.db.exec(
-      `CREATE TABLE IF NOT EXISTS test (id TEXT PRIMARY KEY, name TEXT)`
+      `CREATE TABLE IF NOT EXISTS test
+             (
+                 id        TEXT PRIMARY KEY,
+                 name      TEXT,
+                 updatedAt INTEGER,
+                 createdAt INTEGER
+             )`
     );
   });
 
@@ -25,7 +31,17 @@ describe("Store", () => {
       testSchema
     );
     expect(insertStatement).toEqual(
-      "INSERT INTO test (id, name) VALUES ($id, $name)"
+      "INSERT INTO test (id, name, createdAt, updatedAt) VALUES ($id, $name, $createdAt, $updatedAt)"
+    );
+  });
+
+  it("should be able to generate an update statement for schema", () => {
+    const updateStatement = store.getUpdateStatementForModel(
+      "test",
+      testSchema
+    );
+    expect(updateStatement).toEqual(
+      "UPDATE test SET name = $name, updatedAt = $updatedAt WHERE id = $id"
     );
   });
 });
