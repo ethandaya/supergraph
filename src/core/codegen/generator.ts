@@ -33,8 +33,8 @@ export class EntityGenerator {
       moduleSpecifier: "../models",
     });
     this.targetFile.addImportDeclaration({
-      namedImports: ["store"],
-      moduleSpecifier: "../store",
+      namedImports: ["SQLiteStore as Store"],
+      moduleSpecifier: "../../core/store",
     });
   }
 
@@ -114,8 +114,46 @@ export class EntityGenerator {
     this.generateClassForSchema(name, schema);
   }
 
+  public generateGlobalDefinitions() {
+    this.targetFile.addTypeAlias({
+      name: "SchemaNames",
+      type: Object.keys(this.models)
+        .map((key) => `"${key.toLowerCase().replace("schema", "")}"`)
+        .join(" | "),
+    });
+  }
+
+  public generateStore() {
+    this.targetFile.addStatements([
+      `export const store = new Store<SchemaNames>("", {`,
+      ...Object.keys(this.models).map(
+        (key) => `  ${key.replace("Schema", "").toLowerCase()}: ${key},`
+      ),
+      `});`,
+    ]);
+    // this.targetFile.addVariableStatement({
+    //   declarationKind: VariableDeclarationKind.Const,
+    //   declarations: [
+    //     {
+    //       name: "store",
+    //       initializer: `new Store<SchemaNames>("", schemaLookup)`,
+    //       // .reduce(
+    //       //   (acc, key) => ({
+    //       //     ...acc,
+    //       //     [key.replace("Schema", "").toLowerCase()]: key,
+    //       //   }),
+    //       //   {}
+    //       // )
+    //       // .toString()}})`,
+    //     },
+    //   ],
+    // });
+  }
+
   public generate() {
     this.generateImports();
+    this.generateGlobalDefinitions();
+    this.generateStore();
     for (const name in this.models) {
       this.generateDefinitionsForModel(
         name.replace("Schema", ""),

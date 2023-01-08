@@ -1,6 +1,6 @@
 import { Database } from "bun:sqlite";
 import { z } from "zod";
-import { CrudEntity } from "./engine";
+import { CrudEntity, Store } from "./engine";
 
 type ModelLookup<T extends string> = {
   [key in T]: z.AnyZodObject;
@@ -14,7 +14,7 @@ type StatementLookup<T extends string> = {
   };
 };
 
-export class SQLiteStore<K extends string> {
+export class SQLiteStore<K extends string> implements Store {
   public db: Database;
   public stmts: StatementLookup<K>;
 
