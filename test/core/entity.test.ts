@@ -5,14 +5,11 @@ import {
   Store,
 } from "../../src/core/engine";
 import { z, ZodError } from "zod";
+import { beforeEach, describe, expect, it } from "@jest/globals";
 
 class TestStore implements Store {
   repo: Record<string, any> = {};
-  async set<T>(
-    name: string,
-    pk: string | number,
-    value: T
-  ): Promise<CrudEntity<T>> {
+  set<T>(name: string, pk: string | number, value: T): CrudEntity<T> {
     const dto = {
       id: pk,
       ...value,
@@ -40,16 +37,16 @@ class TestStore implements Store {
 const store = new TestStore();
 
 const schema = z.object({
-  id: z.number(),
+  id: z.string(),
   name: z.string(),
 });
 type PersonModel = z.infer<typeof schema>;
 class Person extends Entity<PersonModel> {
-  constructor(id: number) {
+  constructor(id: string) {
     super(id, schema, store);
   }
 
-  get name(): string {
+  get name(): PersonModel["name"] {
     const value = this.get("name");
     if (!value) {
       throw new KeyAccessError<PersonModel>("name");
@@ -57,15 +54,15 @@ class Person extends Entity<PersonModel> {
     return value;
   }
 
-  set name(value: string) {
+  set name(value: PersonModel["name"]) {
     this.set("name", value);
   }
 }
 describe("Entity", () => {
-  const testEntity: Person;
+  let testEntity: Person;
 
   beforeEach(() => {
-    testEntity = new Person(1);
+    testEntity = new Person("1");
   });
   // it("should be able to set and get data on raw entity", () => {
   //   const entity = new Entity<{ name: string }>(1);
@@ -74,18 +71,19 @@ describe("Entity", () => {
   // });
   it("should be able to set implemented entity", () => {
     testEntity.name = "John";
-    expect(testEntity.name).toEqual("John");
+    expect(() => testEntity.name).toEqual("John");
   });
   it("should fail to access getter before set", () => {
-    expect(() => testEntity.name).toThrow(KeyAccessError);
+    expect(() => testEntity.name).toThrowError(KeyAccessError);
   });
   it("should fail to save entity before fields set", () => {
-    expect(testEntity.save()).rejects.toThrowError(ZodError);
+    expect(() => testEntity.save()).toThrowError(ZodError);
   });
   it("should be able to save entity after fields set", () => {
     testEntity.name = "John";
-    expect(testEntity.save()).resolves.toEqual({
-      id: 1,
+    const dto = testEntity.save();
+    expect(dto).toEqual({
+      id: "1",
       name: "John",
       updatedAt: expect.any(Number),
       createdAt: expect.any(Number),

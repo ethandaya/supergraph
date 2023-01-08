@@ -20,6 +20,7 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "resolveJsonModule": true,
+    "types": ["bun-types"]
   },
   "include": ["src"],
 }
