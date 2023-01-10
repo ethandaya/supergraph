@@ -13,7 +13,7 @@ const store = new SQLiteStore("", {
 
 type PersonModel = z.infer<typeof PersonSchema>;
 
-class Person extends Entity<PersonModel> {
+class Person extends Entity<PersonModel, typeof PersonSchema> {
   constructor(id: string) {
     super(id, PersonSchema, store);
   }
@@ -37,12 +37,12 @@ describe("Entity", () => {
   beforeAll(() => {
     store.db.exec(
       `CREATE TABLE IF NOT EXISTS person
-       (
-           id        TEXT PRIMARY KEY,
-           name      TEXT,
-           updatedAt INTEGER,
-           createdAt INTEGER
-       )`
+             (
+                 id        TEXT PRIMARY KEY,
+                 name      TEXT,
+                 updatedAt INTEGER,
+                 createdAt INTEGER
+             )`
     );
   });
 

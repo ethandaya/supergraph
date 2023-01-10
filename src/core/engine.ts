@@ -17,7 +17,15 @@ export interface Store {
   // setMany(values: { [key: string]: any }): void;
 }
 
+// class Value<T> {
+//   constructor(public readonly value: T) {}
+// }
+
 type TempData<T> = T | Partial<T>;
+
+// type TempDataMap<T> = {
+//   [key in keyof T]: Value<keyof T>;
+// };
 
 export class Entity<T extends { id: string }, K extends z.ZodTypeAny> {
   public data: TempData<T> = {};

@@ -1,26 +1,49 @@
-import { SQLiteStore } from "../../src/core/store";
+import { SQLiteStore, StoredEntity } from "../../src/core/store";
 import { z } from "zod";
 
 const testSchema = z.object({
   id: z.string(),
   name: z.string(),
+  createdAt: z.number(),
+  updatedAt: z.number(),
+});
+
+const secondTestSchema = z.object({
+  id: z.string(),
+  isTest: z.boolean(),
+  myNullableField: z.string().nullable(),
+  myBigInt: z.bigint(),
+  createdAt: z.number(),
+  updatedAt: z.number(),
 });
 
 describe("Store", () => {
-  let store: SQLiteStore<"test">;
+  let store: SQLiteStore<"test" | "secondTest">;
 
   beforeEach(() => {
     store = new SQLiteStore("", {
       test: testSchema,
+      secondTest: secondTestSchema,
     });
     store.db.exec(
       `CREATE TABLE IF NOT EXISTS test
-       (
-           id        TEXT PRIMARY KEY,
-           name      TEXT,
-           updatedAt INTEGER,
-           createdAt INTEGER
-       )`
+             (
+                 id        TEXT PRIMARY KEY,
+                 name      TEXT,
+                 updatedAt INTEGER,
+                 createdAt INTEGER
+             )`
+    );
+    store.db.exec(
+      `CREATE TABLE IF NOT EXISTS secondTest
+             (
+                 id              TEXT PRIMARY KEY,
+                 isTest          INTEGER,
+                 myNullableField TEXT,
+                 myBigInt        BIGINT,
+                 updatedAt       INTEGER,
+                 createdAt       INTEGER
+             )`
     );
   });
 
@@ -58,6 +81,17 @@ describe("Store", () => {
         update: store.getUpdateStatementForModel("test", testSchema),
         select: store.getSelectStatementForModel("test"),
       },
+      secondTest: {
+        insert: store.getInsertStatementForModel(
+          "secondTest",
+          secondTestSchema
+        ),
+        update: store.getUpdateStatementForModel(
+          "secondTest",
+          secondTestSchema
+        ),
+        select: store.getSelectStatementForModel("secondTest"),
+      },
     });
   });
 
@@ -84,5 +118,47 @@ describe("Store", () => {
       .get();
     const dto = store.get("test", "1");
     expect(dto).toEqual(result);
+  });
+
+  it("should transform a stored entity to a dto", () => {
+    const now = Date.now();
+    let dto: StoredEntity<z.infer<typeof secondTestSchema>> = {
+      id: "1",
+      isTest: 1,
+      myNullableField: null,
+      myBigInt: BigInt(123456789),
+      createdAt: now,
+      updatedAt: now,
+    };
+    dto = store.uncastEntity(secondTestSchema, dto);
+    expect(dto).toEqual({
+      id: "1",
+      isTest: true,
+      myNullableField: null,
+      myBigInt: BigInt(123456789),
+      createdAt: now,
+      updatedAt: now,
+    });
+  });
+
+  it("should transform an entity to a store safe dto", () => {
+    const now = Date.now();
+    const dto: z.infer<typeof secondTestSchema> = {
+      id: "1",
+      isTest: true,
+      myNullableField: null,
+      myBigInt: BigInt(123456789),
+      createdAt: now,
+      updatedAt: now,
+    };
+    const storedDto = store.castEntity(secondTestSchema, dto);
+    expect(storedDto).toEqual({
+      id: "1",
+      isTest: 1,
+      myNullableField: null,
+      myBigInt: BigInt(123456789),
+      createdAt: now,
+      updatedAt: now,
+    });
   });
 });
