@@ -1,9 +1,7 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Default",
   "compilerOptions": {
-    "strict": true,
-    "outDir": "./dist",
-    "target": "esnext",
-    "module": "esnext",
     "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
@@ -20,6 +18,15 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "resolveJsonModule": true,
+    "composite": false,
+    "declarationMap": true,
+    "inlineSources": false,
+    "isolatedModules": true,
+    "preserveWatchOutput": true,
+    "skipLibCheck": true,
+    "strict": true
   },
-  "include": ["src"],
+  "exclude": [
+    "node_modules"
+  ]
 }

@@ -133,4 +133,4 @@ dist
 .idea
 
 /.parcel-cache
-/fixtures/
+/.turbo

@@ -1,11 +1,9 @@
-import { SQLiteStore, StoredEntity } from "../../src/core/store";
-import { z } from "zod";
+import {SQLiteStore, StoredEntity} from "../../src/core/store";
+import {z} from "zod";
 
 const testSchema = z.object({
   id: z.string(),
   name: z.string(),
-  createdAt: z.number(),
-  updatedAt: z.number(),
 });
 
 const secondTestSchema = z.object({
@@ -13,8 +11,6 @@ const secondTestSchema = z.object({
   isTest: z.boolean(),
   myNullableField: z.string().nullable(),
   myBigInt: z.bigint(),
-  createdAt: z.number(),
-  updatedAt: z.number(),
 });
 
 describe("Store", () => {
@@ -121,14 +117,11 @@ describe("Store", () => {
   });
 
   it("should transform a stored entity to a dto", () => {
-    const now = Date.now();
     let dto: StoredEntity<z.infer<typeof secondTestSchema>> = {
       id: "1",
       isTest: 1,
       myNullableField: null,
       myBigInt: BigInt(123456789),
-      createdAt: now,
-      updatedAt: now,
     };
     dto = store.uncastEntity(secondTestSchema, dto);
     expect(dto).toEqual({
@@ -136,20 +129,15 @@ describe("Store", () => {
       isTest: true,
       myNullableField: null,
       myBigInt: BigInt(123456789),
-      createdAt: now,
-      updatedAt: now,
     });
   });
 
   it("should transform an entity to a store safe dto", () => {
-    const now = Date.now();
     const dto: z.infer<typeof secondTestSchema> = {
       id: "1",
       isTest: true,
       myNullableField: null,
       myBigInt: BigInt(123456789),
-      createdAt: now,
-      updatedAt: now,
     };
     const storedDto = store.castEntity(secondTestSchema, dto);
     expect(storedDto).toEqual({
@@ -157,8 +145,6 @@ describe("Store", () => {
       isTest: 1,
       myNullableField: null,
       myBigInt: BigInt(123456789),
-      createdAt: now,
-      updatedAt: now,
     });
   });
 });
