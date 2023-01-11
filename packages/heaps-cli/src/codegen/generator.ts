@@ -7,16 +7,37 @@ import {
 import { z } from "zod";
 import { makeGetterStatements, makeSetterStatements } from "./statements";
 
+type EntityGeneratorOptions =
+  | {
+      pathToModels: string;
+      outputPath: string;
+    }
+  | {
+      models: { [key: string]: z.AnyZodObject };
+      outputPath: string;
+    };
+
 export class EntityGenerator {
   private project: Project;
   public targetFile: SourceFile;
-  private readonly models: z.ZodObject<any>[];
-  constructor(private readonly pathToModels: string, outputPath: string) {
+  private readonly models: {
+    [key: string]: z.AnyZodObject;
+  };
+
+  constructor(options: EntityGeneratorOptions) {
     this.project = new Project();
-    this.targetFile = this.project.createSourceFile(outputPath, undefined, {
-      overwrite: true,
-    });
-    this.models = require(this.pathToModels);
+    this.targetFile = this.project.createSourceFile(
+      options.outputPath,
+      undefined,
+      {
+        overwrite: true,
+      }
+    );
+    if ("pathToModels" in options) {
+      this.models = require(options.pathToModels);
+    } else {
+      this.models = options.models;
+    }
   }
 
   public generateImports() {

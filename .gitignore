@@ -133,4 +133,5 @@ dist
 .idea
 
 /.parcel-cache
-/.turbo
+.turbo
+
