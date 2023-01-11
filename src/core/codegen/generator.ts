@@ -36,10 +36,6 @@ export class EntityGenerator {
       namedImports: ["SQLiteStore as Store"],
       moduleSpecifier: "../../core/store",
     });
-    this.targetFile.addImportDeclaration({
-      namedImports: ["formatModifiers"],
-      moduleSpecifier: "../../core/format",
-    });
   }
 
   public generateTypeForSchema(name: string) {
@@ -74,7 +70,6 @@ export class EntityGenerator {
     for (const key in schema.shape) {
       const type = `${name}Model["${key}"]`;
       const isNullable = schema.shape[key].isNullable();
-      const isBoolean = schema.shape[key].isBoolean();
       methods.push({
         name: `get ${key}`,
         returnType: type,
@@ -82,7 +77,6 @@ export class EntityGenerator {
           key,
           name,
           isNullable,
-          isBoolean,
         }),
       });
       methods.push({
@@ -141,23 +135,6 @@ export class EntityGenerator {
       ),
       `});`,
     ]);
-    // this.targetFile.addVariableStatement({
-    //   declarationKind: VariableDeclarationKind.Const,
-    //   declarations: [
-    //     {
-    //       name: "store",
-    //       initializer: `new Store<SchemaNames>("", schemaLookup)`,
-    //       // .reduce(
-    //       //   (acc, key) => ({
-    //       //     ...acc,
-    //       //     [key.replace("Schema", "").toLowerCase()]: key,
-    //       //   }),
-    //       //   {}
-    //       // )
-    //       // .toString()}})`,
-    //     },
-    //   ],
-    // });
   }
 
   public generate() {

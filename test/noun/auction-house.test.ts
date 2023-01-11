@@ -61,10 +61,12 @@ describe("Auction House", () => {
     handleAuctionCreated(event);
     const res = store.get("auction", "0");
     expect(res).toEqual({
+      id: "0",
       noun: "0",
       amount: "0",
       startTime: "0",
       endTime: "0",
+      bidder: null,
       settled: false,
       createdAt: expect.any(Number),
       updatedAt: expect.any(Number),

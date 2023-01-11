@@ -44,7 +44,7 @@ export class SQLiteStore<
   }
 
   getInsertStatementForModel(tableName: string, model: z.AnyZodObject): string {
-    const values = Object.keys(model.shape);
+    const values = Object.keys(model.shape).concat(["createdAt", "updatedAt"]);
     const cols = values.join(", ");
     const params = values.map((key) => `$${key}`).join(", ");
     return `INSERT INTO ${tableName} (${cols}) VALUES (${params})`;
@@ -53,8 +53,9 @@ export class SQLiteStore<
   getUpdateStatementForModel(tableName: string, model: z.AnyZodObject): string {
     const values = Object.keys(model.shape);
     const sets = values
-      .filter((key) => key !== "id" && key !== "createdAt")
+      .filter((key) => key !== "id")
       .map((key) => `${key} = $${key}`)
+      .concat(["updatedAt = $updatedAt"])
       .join(", ");
     return `UPDATE ${tableName} SET ${sets} WHERE id = $id`;
   }
@@ -94,7 +95,11 @@ export class SQLiteStore<
     T extends z.infer<O> = z.infer<O>,
     E extends StoredEntity<T> = StoredEntity<T>
   >(schema: O, data: E) {
-    const keys: (keyof E)[] = Object.keys(data);
+    // TODO - consolidate both cast & uncast
+    // TODO - also make these methods not trash
+    const keys: (keyof E)[] = Object.keys(data).filter(
+      (k) => k !== "createdAt" && k !== "updatedAt"
+    );
     return keys.reduce(
       (acc, key) => ({
         ...acc,
@@ -109,7 +114,9 @@ export class SQLiteStore<
     T extends z.infer<O> = z.infer<O>,
     E extends CrudEntity<T> = CrudEntity<T>
   >(schema: O, data: E) {
-    const keys: (keyof E)[] = Object.keys(data);
+    const keys: (keyof E)[] = Object.keys(data).filter(
+      (k) => k !== "createdAt" && k !== "updatedAt"
+    );
     return keys.reduce(
       (acc, key) => ({
         ...acc,

@@ -16,383 +16,383 @@ export const store = new Store<SchemaNames>("", {
 type NounModel = z.infer<typeof NounSchema>;
 
 export class Noun extends Entity<NounModel, typeof NounSchema> {
-  constructor(id: string, data?: NounModel) {
-    super(id, NounSchema, store);
-    this.data = { id, ...data } || {};
-  }
-
-  static load(id: string): Noun | null {
-    const data = store.get<NounModel>("noun", id);
-    if (!data) {
-      return new Noun(id);
+    constructor(id: string, data?: NounModel) {
+        super(id, NounSchema, store)
+        this.data = { id, ...data } || {};
     }
 
-    return new Noun(id, data);
-  }
+    static load(id: string): Noun | null {
+        const data = store.get<NounModel>("noun", id);
+        if (!data) {
+           return new Noun(id);
+        }
 
-  get id(): NounModel["id"] {
-    const value = this.get("id");
-    if (typeof value === "undefined") {
-      throw new KeyAccessError<Noun>("id");
+        return new Noun(id, data);
     }
 
-    return value;
-  }
+    get id(): NounModel["id"] {
+        const value = this.get("id")
+        if (typeof value === "undefined") {
+          throw new KeyAccessError<Noun>("id")
+        }
 
-  set id(value: NounModel["id"]) {
-    this.set("id", value);
-  }
-
-  get seed(): NounModel["seed"] {
-    const value = this.get("seed");
-    if (typeof value === "undefined" && value !== null) {
-      throw new KeyAccessError<Noun>("seed");
+        return value
     }
 
-    return value;
-  }
-
-  set seed(value: NounModel["seed"]) {
-    this.set("seed", value);
-  }
-
-  get owner(): NounModel["owner"] {
-    const value = this.get("owner");
-    if (typeof value === "undefined") {
-      throw new KeyAccessError<Noun>("owner");
+    set id(value: NounModel["id"]) {
+        this.set("id", value);
     }
 
-    return value;
-  }
+    get seed(): NounModel["seed"] {
+        const value = this.get("seed")
+        if (typeof value === "undefined" && value !== null) {
+          throw new KeyAccessError<Noun>("seed")
+        }
 
-  set owner(value: NounModel["owner"]) {
-    this.set("owner", value);
-  }
+        return value
+    }
+
+    set seed(value: NounModel["seed"]) {
+        this.set("seed", value);
+    }
+
+    get owner(): NounModel["owner"] {
+        const value = this.get("owner")
+        if (typeof value === "undefined") {
+          throw new KeyAccessError<Noun>("owner")
+        }
+
+        return value
+    }
+
+    set owner(value: NounModel["owner"]) {
+        this.set("owner", value);
+    }
 }
 
 type BidModel = z.infer<typeof BidSchema>;
 
 export class Bid extends Entity<BidModel, typeof BidSchema> {
-  constructor(id: string, data?: BidModel) {
-    super(id, BidSchema, store);
-    this.data = { id, ...data } || {};
-  }
-
-  static load(id: string): Bid | null {
-    const data = store.get<BidModel>("bid", id);
-    if (!data) {
-      return new Bid(id);
+    constructor(id: string, data?: BidModel) {
+        super(id, BidSchema, store)
+        this.data = { id, ...data } || {};
     }
 
-    return new Bid(id, data);
-  }
+    static load(id: string): Bid | null {
+        const data = store.get<BidModel>("bid", id);
+        if (!data) {
+           return new Bid(id);
+        }
 
-  get id(): BidModel["id"] {
-    const value = this.get("id");
-    if (typeof value === "undefined") {
-      throw new KeyAccessError<Bid>("id");
+        return new Bid(id, data);
     }
 
-    return value;
-  }
+    get id(): BidModel["id"] {
+        const value = this.get("id")
+        if (typeof value === "undefined") {
+          throw new KeyAccessError<Bid>("id")
+        }
 
-  set id(value: BidModel["id"]) {
-    this.set("id", value);
-  }
-
-  get noun(): BidModel["noun"] {
-    const value = this.get("noun");
-    if (typeof value === "undefined") {
-      throw new KeyAccessError<Bid>("noun");
+        return value
     }
 
-    return value;
-  }
-
-  set noun(value: BidModel["noun"]) {
-    this.set("noun", value);
-  }
-
-  get amount(): BidModel["amount"] {
-    const value = this.get("amount");
-    if (typeof value === "undefined") {
-      throw new KeyAccessError<Bid>("amount");
+    set id(value: BidModel["id"]) {
+        this.set("id", value);
     }
 
-    return value;
-  }
+    get noun(): BidModel["noun"] {
+        const value = this.get("noun")
+        if (typeof value === "undefined") {
+          throw new KeyAccessError<Bid>("noun")
+        }
 
-  set amount(value: BidModel["amount"]) {
-    this.set("amount", value);
-  }
-
-  get bidder(): BidModel["bidder"] {
-    const value = this.get("bidder");
-    if (typeof value === "undefined") {
-      throw new KeyAccessError<Bid>("bidder");
+        return value
     }
 
-    return value;
-  }
-
-  set bidder(value: BidModel["bidder"]) {
-    this.set("bidder", value);
-  }
-
-  get auction(): BidModel["auction"] {
-    const value = this.get("auction");
-    if (typeof value === "undefined") {
-      throw new KeyAccessError<Bid>("auction");
+    set noun(value: BidModel["noun"]) {
+        this.set("noun", value);
     }
 
-    return value;
-  }
+    get amount(): BidModel["amount"] {
+        const value = this.get("amount")
+        if (typeof value === "undefined") {
+          throw new KeyAccessError<Bid>("amount")
+        }
 
-  set auction(value: BidModel["auction"]) {
-    this.set("auction", value);
-  }
-
-  get txIndex(): BidModel["txIndex"] {
-    const value = this.get("txIndex");
-    if (typeof value === "undefined") {
-      throw new KeyAccessError<Bid>("txIndex");
+        return value
     }
 
-    return value;
-  }
-
-  set txIndex(value: BidModel["txIndex"]) {
-    this.set("txIndex", value);
-  }
-
-  get blockNumber(): BidModel["blockNumber"] {
-    const value = this.get("blockNumber");
-    if (typeof value === "undefined") {
-      throw new KeyAccessError<Bid>("blockNumber");
+    set amount(value: BidModel["amount"]) {
+        this.set("amount", value);
     }
 
-    return value;
-  }
+    get bidder(): BidModel["bidder"] {
+        const value = this.get("bidder")
+        if (typeof value === "undefined") {
+          throw new KeyAccessError<Bid>("bidder")
+        }
 
-  set blockNumber(value: BidModel["blockNumber"]) {
-    this.set("blockNumber", value);
-  }
-
-  get blockTimestamp(): BidModel["blockTimestamp"] {
-    const value = this.get("blockTimestamp");
-    if (typeof value === "undefined") {
-      throw new KeyAccessError<Bid>("blockTimestamp");
+        return value
     }
 
-    return value;
-  }
+    set bidder(value: BidModel["bidder"]) {
+        this.set("bidder", value);
+    }
 
-  set blockTimestamp(value: BidModel["blockTimestamp"]) {
-    this.set("blockTimestamp", value);
-  }
+    get auction(): BidModel["auction"] {
+        const value = this.get("auction")
+        if (typeof value === "undefined") {
+          throw new KeyAccessError<Bid>("auction")
+        }
+
+        return value
+    }
+
+    set auction(value: BidModel["auction"]) {
+        this.set("auction", value);
+    }
+
+    get txIndex(): BidModel["txIndex"] {
+        const value = this.get("txIndex")
+        if (typeof value === "undefined") {
+          throw new KeyAccessError<Bid>("txIndex")
+        }
+
+        return value
+    }
+
+    set txIndex(value: BidModel["txIndex"]) {
+        this.set("txIndex", value);
+    }
+
+    get blockNumber(): BidModel["blockNumber"] {
+        const value = this.get("blockNumber")
+        if (typeof value === "undefined") {
+          throw new KeyAccessError<Bid>("blockNumber")
+        }
+
+        return value
+    }
+
+    set blockNumber(value: BidModel["blockNumber"]) {
+        this.set("blockNumber", value);
+    }
+
+    get blockTimestamp(): BidModel["blockTimestamp"] {
+        const value = this.get("blockTimestamp")
+        if (typeof value === "undefined") {
+          throw new KeyAccessError<Bid>("blockTimestamp")
+        }
+
+        return value
+    }
+
+    set blockTimestamp(value: BidModel["blockTimestamp"]) {
+        this.set("blockTimestamp", value);
+    }
 }
 
 type AuctionModel = z.infer<typeof AuctionSchema>;
 
 export class Auction extends Entity<AuctionModel, typeof AuctionSchema> {
-  constructor(id: string, data?: AuctionModel) {
-    super(id, AuctionSchema, store);
-    this.data = { id, ...data } || {};
-  }
-
-  static load(id: string): Auction | null {
-    const data = store.get<AuctionModel>("auction", id);
-    if (!data) {
-      return new Auction(id);
+    constructor(id: string, data?: AuctionModel) {
+        super(id, AuctionSchema, store)
+        this.data = { id, ...data } || {};
     }
 
-    return new Auction(id, data);
-  }
+    static load(id: string): Auction | null {
+        const data = store.get<AuctionModel>("auction", id);
+        if (!data) {
+           return new Auction(id);
+        }
 
-  get id(): AuctionModel["id"] {
-    const value = this.get("id");
-    if (typeof value === "undefined") {
-      throw new KeyAccessError<Auction>("id");
+        return new Auction(id, data);
     }
 
-    return value;
-  }
+    get id(): AuctionModel["id"] {
+        const value = this.get("id")
+        if (typeof value === "undefined") {
+          throw new KeyAccessError<Auction>("id")
+        }
 
-  set id(value: AuctionModel["id"]) {
-    this.set("id", value);
-  }
-
-  get noun(): AuctionModel["noun"] {
-    const value = this.get("noun");
-    if (typeof value === "undefined") {
-      throw new KeyAccessError<Auction>("noun");
+        return value
     }
 
-    return value;
-  }
-
-  set noun(value: AuctionModel["noun"]) {
-    this.set("noun", value);
-  }
-
-  get amount(): AuctionModel["amount"] {
-    const value = this.get("amount");
-    if (typeof value === "undefined") {
-      throw new KeyAccessError<Auction>("amount");
+    set id(value: AuctionModel["id"]) {
+        this.set("id", value);
     }
 
-    return value;
-  }
+    get noun(): AuctionModel["noun"] {
+        const value = this.get("noun")
+        if (typeof value === "undefined") {
+          throw new KeyAccessError<Auction>("noun")
+        }
 
-  set amount(value: AuctionModel["amount"]) {
-    this.set("amount", value);
-  }
-
-  get startTime(): AuctionModel["startTime"] {
-    const value = this.get("startTime");
-    if (typeof value === "undefined") {
-      throw new KeyAccessError<Auction>("startTime");
+        return value
     }
 
-    return value;
-  }
-
-  set startTime(value: AuctionModel["startTime"]) {
-    this.set("startTime", value);
-  }
-
-  get endTime(): AuctionModel["endTime"] {
-    const value = this.get("endTime");
-    if (typeof value === "undefined") {
-      throw new KeyAccessError<Auction>("endTime");
+    set noun(value: AuctionModel["noun"]) {
+        this.set("noun", value);
     }
 
-    return value;
-  }
+    get amount(): AuctionModel["amount"] {
+        const value = this.get("amount")
+        if (typeof value === "undefined") {
+          throw new KeyAccessError<Auction>("amount")
+        }
 
-  set endTime(value: AuctionModel["endTime"]) {
-    this.set("endTime", value);
-  }
-
-  get settled(): AuctionModel["settled"] {
-    const value = this.get("settled");
-    if (typeof value === "undefined") {
-      throw new KeyAccessError<Auction>("settled");
+        return value
     }
 
-    return value;
-  }
-
-  set settled(value: AuctionModel["settled"]) {
-    this.set("settled", value);
-  }
-
-  get bidder(): AuctionModel["bidder"] {
-    const value = this.get("bidder");
-    if (typeof value === "undefined" && value !== null) {
-      throw new KeyAccessError<Auction>("bidder");
+    set amount(value: AuctionModel["amount"]) {
+        this.set("amount", value);
     }
 
-    return value;
-  }
+    get startTime(): AuctionModel["startTime"] {
+        const value = this.get("startTime")
+        if (typeof value === "undefined") {
+          throw new KeyAccessError<Auction>("startTime")
+        }
 
-  set bidder(value: AuctionModel["bidder"]) {
-    this.set("bidder", value);
-  }
+        return value
+    }
+
+    set startTime(value: AuctionModel["startTime"]) {
+        this.set("startTime", value);
+    }
+
+    get endTime(): AuctionModel["endTime"] {
+        const value = this.get("endTime")
+        if (typeof value === "undefined") {
+          throw new KeyAccessError<Auction>("endTime")
+        }
+
+        return value
+    }
+
+    set endTime(value: AuctionModel["endTime"]) {
+        this.set("endTime", value);
+    }
+
+    get settled(): AuctionModel["settled"] {
+        const value = this.get("settled")
+        if (typeof value === "undefined") {
+          throw new KeyAccessError<Auction>("settled")
+        }
+
+        return value
+    }
+
+    set settled(value: AuctionModel["settled"]) {
+        this.set("settled", value);
+    }
+
+    get bidder(): AuctionModel["bidder"] {
+        const value = this.get("bidder")
+        if (typeof value === "undefined" && value !== null) {
+          throw new KeyAccessError<Auction>("bidder")
+        }
+
+        return value
+    }
+
+    set bidder(value: AuctionModel["bidder"]) {
+        this.set("bidder", value);
+    }
 }
 
 type AccountModel = z.infer<typeof AccountSchema>;
 
 export class Account extends Entity<AccountModel, typeof AccountSchema> {
-  constructor(id: string, data?: AccountModel) {
-    super(id, AccountSchema, store);
-    this.data = { id, ...data } || {};
-  }
-
-  static load(id: string): Account | null {
-    const data = store.get<AccountModel>("account", id);
-    if (!data) {
-      return new Account(id);
+    constructor(id: string, data?: AccountModel) {
+        super(id, AccountSchema, store)
+        this.data = { id, ...data } || {};
     }
 
-    return new Account(id, data);
-  }
+    static load(id: string): Account | null {
+        const data = store.get<AccountModel>("account", id);
+        if (!data) {
+           return new Account(id);
+        }
 
-  get id(): AccountModel["id"] {
-    const value = this.get("id");
-    if (typeof value === "undefined") {
-      throw new KeyAccessError<Account>("id");
+        return new Account(id, data);
     }
 
-    return value;
-  }
+    get id(): AccountModel["id"] {
+        const value = this.get("id")
+        if (typeof value === "undefined") {
+          throw new KeyAccessError<Account>("id")
+        }
 
-  set id(value: AccountModel["id"]) {
-    this.set("id", value);
-  }
-
-  get delegate(): AccountModel["delegate"] {
-    const value = this.get("delegate");
-    if (typeof value === "undefined") {
-      throw new KeyAccessError<Account>("delegate");
+        return value
     }
 
-    return value;
-  }
-
-  set delegate(value: AccountModel["delegate"]) {
-    this.set("delegate", value);
-  }
-
-  get tokenBalanceRaw(): AccountModel["tokenBalanceRaw"] {
-    const value = this.get("tokenBalanceRaw");
-    if (typeof value === "undefined") {
-      throw new KeyAccessError<Account>("tokenBalanceRaw");
+    set id(value: AccountModel["id"]) {
+        this.set("id", value);
     }
 
-    return value;
-  }
+    get delegate(): AccountModel["delegate"] {
+        const value = this.get("delegate")
+        if (typeof value === "undefined") {
+          throw new KeyAccessError<Account>("delegate")
+        }
 
-  set tokenBalanceRaw(value: AccountModel["tokenBalanceRaw"]) {
-    this.set("tokenBalanceRaw", value);
-  }
-
-  get tokenBalance(): AccountModel["tokenBalance"] {
-    const value = this.get("tokenBalance");
-    if (typeof value === "undefined") {
-      throw new KeyAccessError<Account>("tokenBalance");
+        return value
     }
 
-    return value;
-  }
-
-  set tokenBalance(value: AccountModel["tokenBalance"]) {
-    this.set("tokenBalance", value);
-  }
-
-  get totalTokensHeldRaw(): AccountModel["totalTokensHeldRaw"] {
-    const value = this.get("totalTokensHeldRaw");
-    if (typeof value === "undefined") {
-      throw new KeyAccessError<Account>("totalTokensHeldRaw");
+    set delegate(value: AccountModel["delegate"]) {
+        this.set("delegate", value);
     }
 
-    return value;
-  }
+    get tokenBalanceRaw(): AccountModel["tokenBalanceRaw"] {
+        const value = this.get("tokenBalanceRaw")
+        if (typeof value === "undefined") {
+          throw new KeyAccessError<Account>("tokenBalanceRaw")
+        }
 
-  set totalTokensHeldRaw(value: AccountModel["totalTokensHeldRaw"]) {
-    this.set("totalTokensHeldRaw", value);
-  }
-
-  get totalTokensHeld(): AccountModel["totalTokensHeld"] {
-    const value = this.get("totalTokensHeld");
-    if (typeof value === "undefined") {
-      throw new KeyAccessError<Account>("totalTokensHeld");
+        return value
     }
 
-    return value;
-  }
+    set tokenBalanceRaw(value: AccountModel["tokenBalanceRaw"]) {
+        this.set("tokenBalanceRaw", value);
+    }
 
-  set totalTokensHeld(value: AccountModel["totalTokensHeld"]) {
-    this.set("totalTokensHeld", value);
-  }
+    get tokenBalance(): AccountModel["tokenBalance"] {
+        const value = this.get("tokenBalance")
+        if (typeof value === "undefined") {
+          throw new KeyAccessError<Account>("tokenBalance")
+        }
+
+        return value
+    }
+
+    set tokenBalance(value: AccountModel["tokenBalance"]) {
+        this.set("tokenBalance", value);
+    }
+
+    get totalTokensHeldRaw(): AccountModel["totalTokensHeldRaw"] {
+        const value = this.get("totalTokensHeldRaw")
+        if (typeof value === "undefined") {
+          throw new KeyAccessError<Account>("totalTokensHeldRaw")
+        }
+
+        return value
+    }
+
+    set totalTokensHeldRaw(value: AccountModel["totalTokensHeldRaw"]) {
+        this.set("totalTokensHeldRaw", value);
+    }
+
+    get totalTokensHeld(): AccountModel["totalTokensHeld"] {
+        const value = this.get("totalTokensHeld")
+        if (typeof value === "undefined") {
+          throw new KeyAccessError<Account>("totalTokensHeld")
+        }
+
+        return value
+    }
+
+    set totalTokensHeld(value: AccountModel["totalTokensHeld"]) {
+        this.set("totalTokensHeld", value);
+    }
 }
