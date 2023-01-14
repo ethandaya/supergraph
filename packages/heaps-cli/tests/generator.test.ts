@@ -1,6 +1,7 @@
-import { EntityGenerator } from "../src/codegen/generator";
+import { EntityGenerator } from "../src/commands/codegen/generator";
 import os from "os";
 import { z } from "zod";
+import * as fs from "fs";
 
 const TestSchema = z.object({
   id: z.string(),
@@ -11,9 +12,10 @@ const TestSchema = z.object({
 
 describe("Generator", () => {
   let generator: EntityGenerator;
+  let outputPath: string;
 
   beforeEach(() => {
-    const outputPath = os.tmpdir() + "/schema.ts";
+    outputPath = os.tmpdir() + "/schema.ts";
     generator = new EntityGenerator({
       models: { test: TestSchema },
       outputPath,
@@ -30,7 +32,17 @@ describe("Generator", () => {
     expect(generator.targetFile.getFullText()).toMatchSnapshot();
   });
   it("should generate the full type set", () => {
-    generator.generate();
+    generator.generate({
+      shouldSave: true,
+    });
     expect(generator.targetFile.getFullText()).toMatchSnapshot();
+  });
+  it("should generate the full type set with a custom output path", () => {
+    generator.generate({
+      shouldSave: true,
+    });
+    expect(generator.targetFile.getFullText()).toMatch(
+      fs.readFileSync(outputPath, "utf-8")
+    );
   });
 });

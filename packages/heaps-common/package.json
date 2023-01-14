@@ -1,0 +1,26 @@
+{
+  "name": "@heaps/common",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "type": "module",
+  "files": [
+    "/dist"
+  ],
+  "scripts": {
+    "build": "rm -rf dist && tsup src/**/*.ts --dts --format esm,cjs",
+    "pre:dev": "rm -rf dist && tsup src/**/*.ts --dts --format esm,cjs",
+    "lint": "TIMING=1 eslint src/**/*.ts* --fix",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+  },
+  "devDependencies": {
+    "@heaps/tsconfig": "workspace:*",
+    "@types/node": "^18.11.11",
+    "tslib": "^2.4.1",
+    "tsup": "^6.5.0",
+    "typescript": "4.9.3"
+  }
+}

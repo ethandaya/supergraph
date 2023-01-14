@@ -1,0 +1,5 @@
+{
+  "extends": "@heaps/tsconfig/node.json",
+  "include": ["src"],
+  "exclude": ["dist", "node_modules"]
+}

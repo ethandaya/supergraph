@@ -6,8 +6,6 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
     "lint": "TIMING=1 eslint packages/engine/src/**/*.ts* --fix",
     "clean": "rm -rf dist",
     "test": "jest"
@@ -18,8 +16,8 @@
     "graphql": "^16.6.0"
   },
   "devDependencies": {
-    "@heaps/tsconfig": "*",
-    "@heaps/cli": "*",
+    "@heaps/tsconfig": "workspace:*",
+    "@heaps/cli": "workspace:*",
     "@jest/globals": "^29.3.1",
     "@types/better-sqlite3": "^7.6.3",
     "@types/jest": "^29.2.4",

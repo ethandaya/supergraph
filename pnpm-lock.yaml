@@ -23,14 +23,15 @@ importers:
       eslint-config-turbo: latest
       eslint-plugin-react: 7.28.0
     dependencies:
-      eslint-config-next: 13.1.1_iukboom6ndih5an6iafl45j2fe
+      eslint-config-next: 13.1.2_iukboom6ndih5an6iafl45j2fe
       eslint-config-prettier: 8.6.0_eslint@8.31.0
       eslint-config-turbo: 0.0.7_eslint@8.31.0
       eslint-plugin-react: 7.28.0_eslint@8.31.0
 
   packages/heaps-cli:
     specifiers:
-      '@heaps/tsconfig': '*'
+      '@heaps/common': workspace:*
+      '@heaps/tsconfig': workspace:*
       '@jest/globals': ^29.3.1
       '@types/jest': ^29.2.4
       '@types/node': ^18.11.11
@@ -45,8 +46,8 @@ importers:
       zod: ^3.20.2
     dependencies:
       ts-morph: 17.0.1
-      zod: 3.20.2
     devDependencies:
+      '@heaps/common': link:../heaps-common
       '@heaps/tsconfig': link:../heaps-tsconfig
       '@jest/globals': 29.3.1
       '@types/jest': 29.2.5
@@ -58,12 +59,27 @@ importers:
       tslib: 2.4.1
       tsup: 6.5.0_typescript@4.9.3
       typescript: 4.9.3
+      zod: 3.20.2
+
+  packages/heaps-common:
+    specifiers:
+      '@heaps/tsconfig': workspace:*
+      '@types/node': ^18.11.11
+      tslib: ^2.4.1
+      tsup: ^6.5.0
+      typescript: 4.9.3
+    devDependencies:
+      '@heaps/tsconfig': link:../heaps-tsconfig
+      '@types/node': 18.11.18
+      tslib: 2.4.1
+      tsup: 6.5.0_typescript@4.9.3
+      typescript: 4.9.3
 
   packages/heaps-engine:
     specifiers:
       '@ethersproject/bignumber': ^5.7.0
-      '@heaps/cli': '*'
-      '@heaps/tsconfig': '*'
+      '@heaps/cli': workspace:*
+      '@heaps/tsconfig': workspace:*
       '@jest/globals': ^29.3.1
       '@types/better-sqlite3': ^7.6.3
       '@types/jest': ^29.2.4
@@ -877,8 +893,8 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.14
     dev: true
 
-  /@next/eslint-plugin-next/13.1.1:
-    resolution: {integrity: sha512-SBrOFS8PC3nQ5aeZmawJkjKkWjwK9RoxvBSv/86nZp0ubdoVQoko8r8htALd9ufp16NhacCdqhu9bzZLDWtALQ==}
+  /@next/eslint-plugin-next/13.1.2:
+    resolution: {integrity: sha512-WGaNVvIYphdriesP6r7jq/8l7u38tzotnVQuxc1RYKLqYYApSsrebti3OCPoT3Gx0pw2smPIFHH98RzcsgW5GQ==}
     dependencies:
       glob: 7.1.7
     dev: false
@@ -2104,8 +2120,8 @@ packages:
     resolution: {integrity: sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==}
     engines: {node: '>=10'}
 
-  /eslint-config-next/13.1.1_iukboom6ndih5an6iafl45j2fe:
-    resolution: {integrity: sha512-/5S2XGWlGaiqrRhzpn51ux5JUSLwx8PVK2keLi5xk7QmhfYB8PqE6R6SlVw6hgnf/VexvUXSrlNJ/su00NhtHQ==}
+  /eslint-config-next/13.1.2_iukboom6ndih5an6iafl45j2fe:
+    resolution: {integrity: sha512-zdRAQOr8v69ZwJRtBrGqAqm160ONqKxU/pV1FB1KlgfyqveGsLZmlQ7l31otwtw763901J7xdiTVkj2y3YxXZA==}
     peerDependencies:
       eslint: ^7.23.0 || ^8.0.0
       typescript: '>=3.3.1'
@@ -2113,7 +2129,7 @@ packages:
       typescript:
         optional: true
     dependencies:
-      '@next/eslint-plugin-next': 13.1.1
+      '@next/eslint-plugin-next': 13.1.2
       '@rushstack/eslint-patch': 1.2.0
       '@typescript-eslint/parser': 5.48.1_iukboom6ndih5an6iafl45j2fe
       eslint: 8.31.0
@@ -5121,3 +5137,4 @@ packages:
 
   /zod/3.20.2:
     resolution: {integrity: sha512-1MzNQdAvO+54H+EaK5YpyEy0T+Ejo/7YLHS93G3RnYWh5gaotGHwGeN/ZO687qEDU2y4CdStQYXVHIgrUl5UVQ==}
+    dev: true
