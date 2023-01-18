@@ -1,5 +1,5 @@
 import { codegen } from "../src/commands/codegen";
-import { getFullPath } from "@heaps/common/src";
+import { getFullPath } from "@heaps/common";
 import os from "os";
 import * as fs from "fs";
 

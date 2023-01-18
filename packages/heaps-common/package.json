@@ -6,13 +6,12 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "sideEffects": false,
-  "type": "module",
   "files": [
-    "/dist"
+    "dist/**"
   ],
   "scripts": {
-    "build": "rm -rf dist && tsup src/**/*.ts --dts --format esm,cjs",
-    "pre:dev": "rm -rf dist && tsup src/**/*.ts --dts --format esm,cjs",
+    "build": "rm -rf dist && tsup src/**/*.ts --format esm,cjs --dts",
+    "dev": "rm -rf dist && tsup src/**/*.ts --format esm,cjs --dts",
     "lint": "TIMING=1 eslint src/**/*.ts* --fix",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },

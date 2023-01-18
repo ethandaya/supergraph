@@ -6,12 +6,11 @@
   "module": "dist/cli-default.mjs",
   "types": "dist/cli-default.d.ts",
   "sideEffects": false,
-  "type": "module",
   "bin": {
     "heaps": "dist/cli-default.js"
   },
   "files": [
-    "/dist"
+    "/dist/**"
   ],
   "scripts": {
     "build": "rm -rf dist && tsup src/cli-*.ts --dts --format esm,cjs",
