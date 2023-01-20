@@ -1,5 +1,5 @@
-import {SQLiteStore, StoredEntity} from "../../src/core/store";
-import {z} from "zod";
+import { SQLiteStore, StoredEntity } from "../../src";
+import { z } from "zod";
 
 const testSchema = z.object({
   id: z.string(),

@@ -4,7 +4,13 @@
   "private": true,
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "/dist/**"
+  ],
   "scripts": {
+    "build": "rm -rf dist && tsup src/index.ts --dts",
+    "dev": "rm -rf dist && tsup src/index.ts --watch",
     "lint": "TIMING=1 eslint packages/engine/src/**/*.ts* --fix",
     "clean": "rm -rf dist",
     "test": "jest"
@@ -12,7 +18,7 @@
   "dependencies": {
     "@ethersproject/bignumber": "^5.7.0",
     "better-sqlite3": "^8.0.1",
-    "graphql": "^16.6.0"
+    "zod": "^3.20.2"
   },
   "devDependencies": {
     "@heaps/tsconfig": "workspace:*",
@@ -26,8 +32,8 @@
     "ts-jest": "^29.0.3",
     "ts-node": "^10.9.1",
     "tslib": "^2.4.1",
-    "typescript": "^4.7.4",
-    "zod": "^3.20.2"
+    "tsup": "^6.5.0",
+    "typescript": "^4.7.4"
   },
   "jest": {
     "preset": "ts-jest",

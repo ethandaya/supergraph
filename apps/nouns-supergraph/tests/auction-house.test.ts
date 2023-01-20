@@ -1,5 +1,5 @@
-import {handleAuctionCreated} from "../../src/mapping/nouns-auction-house";
-import {store} from "../../src/mapping/types/schema";
+import { handleAuctionCreated } from "../src/mapping/nouns-auction-house";
+import { store } from "../src/types/schema";
 
 function range(start: number, end: number) {
   return [...Array(end - start + 1)].map((_, idx) => idx);

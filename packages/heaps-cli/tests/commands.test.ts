@@ -1,11 +1,10 @@
-import { codegen } from "../src/commands/codegen";
+import { codegen } from "../src/commands/codegen/command";
 import { getFullPath } from "@heaps/common";
-import os from "os";
 import * as fs from "fs";
 
 describe("Commands", () => {
-  it("should lol", async () => {
-    const outputPath = `${os.tmpdir()}/mySchemaFile.ts`;
+  it("should be able to codegen model entities", async () => {
+    const outputPath = `./.heaps/test-schema.ts`;
     await codegen({
       pathToModels: getFullPath("./tests/stubs/models.ts"),
       outputPath,

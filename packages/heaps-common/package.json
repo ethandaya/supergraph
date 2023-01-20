@@ -3,15 +3,14 @@
   "version": "0.0.1",
   "private": true,
   "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "sideEffects": false,
   "files": [
     "dist/**"
   ],
   "scripts": {
-    "build": "rm -rf dist && tsup src/**/*.ts --format esm,cjs --dts",
-    "dev": "rm -rf dist && tsup src/**/*.ts --format esm,cjs --dts",
+    "build": "rm -rf dist && tsup src/**/*.ts --dts",
+    "dev": "rm -rf dist && tsup src/**/*.ts --dts",
     "lint": "TIMING=1 eslint src/**/*.ts* --fix",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },

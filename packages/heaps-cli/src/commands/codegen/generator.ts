@@ -19,7 +19,7 @@ type EntityGeneratorOptions = {
 export class EntityGenerator {
   private project: Project;
   public targetFile: SourceFile;
-  private models: {
+  private readonly models: {
     [key: string]: z.AnyZodObject;
   } = {};
 
@@ -41,16 +41,12 @@ export class EntityGenerator {
       moduleSpecifier: "zod",
     });
     this.targetFile.addImportDeclaration({
-      namedImports: ["Entity", "KeyAccessError"],
-      moduleSpecifier: "../../core/engine",
+      namedImports: ["Entity", "KeyAccessError", "SQLiteStore as Store"],
+      moduleSpecifier: "@heaps/engine",
     });
     this.targetFile.addImportDeclaration({
       namedImports: [...Object.keys(this.models)],
       moduleSpecifier: "../models",
-    });
-    this.targetFile.addImportDeclaration({
-      namedImports: ["SQLiteStore as Store"],
-      moduleSpecifier: "../../core/store",
     });
   }
 

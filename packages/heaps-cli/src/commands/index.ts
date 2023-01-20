@@ -1,5 +1,5 @@
 import { CAC } from "cac";
-import { codegen } from "./codegen";
+import { codegen } from "./codegen/command";
 
 export function registerCommands(cli: CAC) {
   cli
@@ -8,14 +8,14 @@ export function registerCommands(cli: CAC) {
       "--pathToModels [path]",
       "Path to file containing model schemas for entities",
       {
-        default: "models.ts",
+        default: "./src/models.ts",
       }
     )
     .option(
       "--outputPath [path]",
       "Path where cli should output generated entity",
       {
-        default: "types/schema.ts",
+        default: "./src/types/schema.ts",
       }
     )
     .action(codegen);

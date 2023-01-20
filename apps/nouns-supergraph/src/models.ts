@@ -25,7 +25,6 @@ export const AuctionSchema = z.object({
   endTime: z.string(),
   settled: z.boolean(),
   bidder: z.string().nullable().default(null),
-  // bids: z.string().array(),
 });
 
 export const AccountSchema = z.object({

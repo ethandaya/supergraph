@@ -1,5 +1,5 @@
-import { Auction, Bid, Noun } from "./types/schema";
-import { getOrCreateAccount } from "./utils/helpers";
+import { Auction, Bid, Noun } from "../types/schema";
+import { getOrCreateAccount } from "../utils/helpers";
 
 type AuctionBid = any;
 type AuctionCreated = any;

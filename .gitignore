@@ -136,3 +136,5 @@ dist
 .turbo
 
 fixtures
+/.heap
+/packages/heaps-cli/.heaps/

@@ -1,0 +1,28 @@
+{
+  "name": "@heaps/nouns-supergraph",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "codegen": "heaps codegen --pathToModels src/models.ts"
+  },
+  "dependencies": {
+    "@heaps/engine": "workspace:*",
+    "zod": "^3.20.2"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.2.4",
+    "@types/node": "^17.0.12",
+    "@heaps/cli": "workspace:*",
+    "@heaps/tsconfig": "workspace:*",
+    "eslint-config-heaps": "workspace:*",
+    "jest": "^29.3.1",
+    "tslib": "^2.4.1",
+    "ts-jest": "^29.0.3",
+    "typescript": "^4.5.4"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "maxWorkers": 1
+  }
+}

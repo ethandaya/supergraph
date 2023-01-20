@@ -1,6 +1,6 @@
-import { Entity, KeyAccessError } from "../../src/core/engine";
+import { Entity, KeyAccessError } from "../../src";
 import { z, ZodError } from "zod";
-import { SQLiteStore } from "../../src/core/store";
+import { SQLiteStore } from "../../src";
 
 const PersonSchema = z.object({
   id: z.string(),
