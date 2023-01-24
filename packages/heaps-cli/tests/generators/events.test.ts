@@ -1,0 +1,88 @@
+import { EventGenerator } from "../../src/commands/codegen/generators/event.generator";
+import { testAbi } from "../stubs/abi";
+import os from "os";
+import fs from "fs";
+
+describe("Entity Generator", () => {
+  let generator: EventGenerator;
+  let outputPath: string;
+
+  beforeEach(() => {
+    outputPath = os.tmpdir() + "/schema.ts";
+    generator = new EventGenerator({
+      abi: testAbi,
+      outputPath,
+    });
+  });
+
+  it("should generate inline abi event variables", () => {
+    generator.inlineAbiEvents();
+    expect(generator.targetFile.getFullText()).toMatchInlineSnapshot(`
+      "const abi = narrow([
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": true,
+                  "internalType": "uint256",
+                  "name": "nounId",
+                  "type": "uint256"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "address",
+                  "name": "sender",
+                  "type": "address"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "uint256",
+                  "name": "value",
+                  "type": "uint256"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "bool",
+                  "name": "extended",
+                  "type": "bool"
+                }
+              ],
+              "name": "AuctionBid",
+              "type": "event"
+            }
+          ]);
+      "
+    `);
+  });
+
+  it("should be able to generate type signature for event type", () => {
+    generator.generateTypesForEvent("AuctionCreated");
+    expect(generator.targetFile.getFullText()).toMatchInlineSnapshot(`
+      "export type RawAuctionCreatedEvent = ExtractAbiEvent<typeof abi, "AuctionCreated">;
+      export type AuctionCreatedEventKeyType = RawAuctionCreatedEvent["inputs"][number]["name"];
+      export type AuctionCreatedEventParamType = AbiParametersToPrimitiveTypes<RawAuctionCreatedEvent["inputs"]>;
+      export type AuctionCreatedEvent = SuperGraphEventType<{ [key in AuctionCreatedEventKeyType]: AuctionCreatedEventParamType[number] }>;
+      "
+    `);
+  });
+
+  it("should be able to generate types for all events", () => {
+    generator.generateEventTypes();
+    expect(generator.targetFile.getFullText()).toMatchInlineSnapshot(`
+      "export type RawAuctionBidEvent = ExtractAbiEvent<typeof abi, "AuctionCreated">;
+      export type AuctionBidEventKeyType = RawAuctionBidEvent["inputs"][number]["name"];
+      export type AuctionBidEventParamType = AbiParametersToPrimitiveTypes<RawAuctionBidEvent["inputs"]>;
+      export type AuctionBidEvent = SuperGraphEventType<{ [key in AuctionBidEventKeyType]: AuctionBidEventParamType[number] }>;
+      "
+    `);
+  });
+
+  it("should generate the full type set with a custom output path", () => {
+    generator.generate({
+      shouldSave: true,
+    });
+    expect(generator.targetFile.getFullText()).toMatch(
+      fs.readFileSync(outputPath, "utf-8")
+    );
+  });
+});

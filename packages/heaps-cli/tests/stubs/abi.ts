@@ -1,0 +1,35 @@
+import { Abi } from "abitype";
+
+export const testAbi: Abi = [
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "nounId",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "sender",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "value",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "bool",
+        name: "extended",
+        type: "bool",
+      },
+    ],
+    name: "AuctionBid",
+    type: "event",
+  },
+];

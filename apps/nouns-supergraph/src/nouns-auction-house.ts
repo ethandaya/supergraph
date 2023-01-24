@@ -1,10 +1,11 @@
-import { Auction, Bid, Noun } from "../types/schema";
-import { getOrCreateAccount } from "../utils/helpers";
-
-type AuctionBid = any;
-type AuctionCreated = any;
-type AuctionExtended = any;
-type AuctionSettled = any;
+import {
+  AuctionBid,
+  AuctionCreated,
+  AuctionExtended,
+  AuctionSettled,
+} from "./types/NounsAuctionHouse/NounsAuctionHouse";
+import { Auction, Noun, Bid } from "./types/schema";
+import { getOrCreateAccount } from "./utils/helpers";
 
 const log = console;
 
@@ -22,7 +23,7 @@ export function handleAuctionCreated(event: AuctionCreated): void {
 
   let auction = new Auction(nounId);
   auction.noun = noun.id;
-  auction.amount = "0";
+  auction.amount = BigInt.fromI32(0);
   auction.startTime = event.params.startTime;
   auction.endTime = event.params.endTime;
   auction.settled = false;

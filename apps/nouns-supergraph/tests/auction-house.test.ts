@@ -1,4 +1,4 @@
-import { handleAuctionCreated } from "../src/mapping/nouns-auction-house";
+import { handleAuctionCreated } from "../src/nouns-auction-house";
 import { store } from "../src/types/schema";
 
 function range(start: number, end: number) {

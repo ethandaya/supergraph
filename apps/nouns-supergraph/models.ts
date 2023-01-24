@@ -21,8 +21,8 @@ export const AuctionSchema = z.object({
   id: z.string(),
   noun: z.string(),
   amount: z.string(),
-  startTime: z.string(),
-  endTime: z.string(),
+  startTime: z.bigint(),
+  endTime: z.bigint(),
   settled: z.boolean(),
   bidder: z.string().nullable().default(null),
 });

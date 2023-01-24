@@ -1,0 +1,38 @@
+{
+  "version": "0.0.0",
+  "description": "Nouns Supergraph",
+  "sources": [
+    {
+      "name": "NounsAuctionHouse",
+      "network": "mainnet",
+      "kind": "contract",
+      "abi": "./abis/NounsAuctionHouse.json",
+      "addresses": [
+        "0xDAF873A2Ae77D570da094B52A8eC50Ef8885b2c4"
+      ],
+      "events": [
+        {
+          "name": "AuctionCreated",
+          "interface": "AuctionCreated(indexed uint256,uint256,uint256)",
+          "handler": "handleAuctionCreated"
+        },
+        {
+          "name": "AuctionBid",
+          "interface": "AuctionBid(indexed uint256,address,uint256,bool)",
+          "handler": "handleAuctionBid"
+        },
+        {
+          "name": "AuctionExtended",
+          "interface": "AuctionExtended(indexed uint256,uint256)",
+          "handler": "handleAuctionExtended"
+        },
+        {
+          "name": "AuctionSettled",
+          "interface": "AuctionSettled(indexed uint256,address,uint256)",
+          "handler": "handleAuctionSettled"
+        }
+      ],
+      "mapping": "./src/nouns-auction-house.ts"
+    }
+  ]
+}

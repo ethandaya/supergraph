@@ -1,7 +1,7 @@
 import * as swc from "@swc/core";
 import * as path from "path";
 import * as fs from "fs";
-import { getFullPath } from "@heaps/common/src";
+import os from "os";
 
 // TODO - this is bad, fix later
 export function transformTS(path: string) {
@@ -13,23 +13,15 @@ export function transformTS(path: string) {
       },
     },
     module: {
-      type: "nodenext",
+      type: "commonjs",
     },
   });
   return module.code;
 }
 
-export function prepBuildDir() {
-  const buildDir = getFullPath(".heaps");
-  if (!fs.existsSync(buildDir)) {
-    fs.mkdirSync(buildDir);
-  }
-}
-
 export function build(pathToSource: string): string {
-  prepBuildDir();
   const buildPath = path.join(
-    ".heaps",
+    os.tmpdir(),
     path.basename(pathToSource, ".ts") + ".js"
   );
   const code = transformTS(pathToSource);

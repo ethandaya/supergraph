@@ -5,7 +5,7 @@ import {
   SourceFile,
 } from "ts-morph";
 import { z } from "zod";
-import { makeGetterStatements, makeSetterStatements } from "./statements";
+import { makeGetterStatements, makeSetterStatements } from "../statements";
 
 type GenerateOptions = {
   shouldSave: boolean;

@@ -12,10 +12,17 @@ export function registerCommands(cli: CAC) {
       }
     )
     .option(
-      "--outputPath [path]",
+      "--pathToConfig [path]",
+      "Path to config containing supergraph options",
+      {
+        default: "./supergraph.json",
+      }
+    )
+    .option(
+      "--outputDir [path]",
       "Path where cli should output generated entity",
       {
-        default: "./src/types/schema.ts",
+        default: "./src/types/",
       }
     )
     .action(codegen);
