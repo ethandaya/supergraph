@@ -111,6 +111,7 @@ importers:
   packages/heaps-engine:
     specifiers:
       '@ethersproject/bignumber': ^5.7.0
+      '@ethersproject/bytes': ^5.7.0
       '@heaps/cli': workspace:*
       '@heaps/tsconfig': workspace:*
       '@jest/globals': ^29.3.1
@@ -128,6 +129,7 @@ importers:
       zod: ^3.20.2
     dependencies:
       '@ethersproject/bignumber': 5.7.0
+      '@ethersproject/bytes': 5.7.0
       better-sqlite3: 8.0.1
       zod: 3.20.2
     devDependencies:

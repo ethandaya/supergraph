@@ -1,5 +1,6 @@
-import { SQLiteStore, StoredEntity } from "../../src";
+import { SQLiteStore } from "../../src";
 import { z } from "zod";
+import { expect } from "@jest/globals";
 
 const testSchema = z.object({
   id: z.string(),
@@ -8,7 +9,8 @@ const testSchema = z.object({
 
 const secondTestSchema = z.object({
   id: z.string(),
-  isTest: z.boolean(),
+  // TODO - new thought is user should respect allowed end store type
+  isTest: z.number(),
   myNullableField: z.string().nullable(),
   myBigInt: z.bigint(),
 });
@@ -34,7 +36,7 @@ describe("Store", () => {
       `CREATE TABLE IF NOT EXISTS secondTest
              (
                  id              TEXT PRIMARY KEY,
-                 isTest          INTEGER,
+                 isTest          BOOLEAN,
                  myNullableField TEXT,
                  myBigInt        BIGINT,
                  updatedAt       INTEGER,
@@ -94,17 +96,11 @@ describe("Store", () => {
   it("should be able to set an entity", () => {
     const dto = store.set("test", "1", { name: "test" });
 
-    const createdAt = dto.createdAt;
-    const updatedAt = dto.updatedAt;
-
     const result = store.db
       .prepare("SELECT * FROM test WHERE id = '1' LIMIT 1")
       .get();
 
     expect(dto).toEqual(result);
-
-    expect(createdAt).toBeLessThanOrEqual(Date.now());
-    expect(updatedAt).toBeLessThanOrEqual(Date.now());
   });
 
   it("should be able to get an entity", () => {
@@ -116,35 +112,45 @@ describe("Store", () => {
     expect(dto).toEqual(result);
   });
 
-  it("should transform a stored entity to a dto", () => {
-    let dto: StoredEntity<z.infer<typeof secondTestSchema>> = {
-      id: "1",
+  it("should be able to set an entity with a bigint", () => {
+    store.set("secondTest", "1", {
       isTest: 1,
       myNullableField: null,
-      myBigInt: BigInt(123456789),
-    };
-    dto = store.uncastEntity(secondTestSchema, dto);
-    expect(dto).toEqual({
-      id: "1",
-      isTest: true,
-      myNullableField: null,
-      myBigInt: BigInt(123456789),
+      myBigInt: 1152735103331642317n,
     });
+    const res = store.get("secondTest", "1");
+    expect(res.myBigInt).toEqual(1152735103331642317n);
   });
-
-  it("should transform an entity to a store safe dto", () => {
-    const dto: z.infer<typeof secondTestSchema> = {
-      id: "1",
-      isTest: true,
-      myNullableField: null,
-      myBigInt: BigInt(123456789),
-    };
-    const storedDto = store.castEntity(secondTestSchema, dto);
-    expect(storedDto).toEqual({
-      id: "1",
-      isTest: 1,
-      myNullableField: null,
-      myBigInt: BigInt(123456789),
-    });
-  });
+  //
+  // it("should transform a stored entity to a dto", () => {
+  //   let dto: StoredEntity<z.infer<typeof secondTestSchema>> = {
+  //     id: "1",
+  //     isTest: 1,
+  //     myNullableField: null,
+  //     myBigInt: BigInt(123456789),
+  //   };
+  //   dto = store.uncastEntity(secondTestSchema, dto);
+  //   expect(dto).toEqual({
+  //     id: "1",
+  //     isTest: true,
+  //     myNullableField: null,
+  //     myBigInt: BigInt(123456789),
+  //   });
+  // });
+  //
+  // it("should transform an entity to a store safe dto", () => {
+  //   const dto: z.infer<typeof secondTestSchema> = {
+  //     id: "1",
+  //     isTest: true,
+  //     myNullableField: null,
+  //     myBigInt: BigInt(123456789),
+  //   };
+  //   const storedDto = store.castEntity(secondTestSchema, dto);
+  //   expect(storedDto).toEqual({
+  //     id: "1",
+  //     isTest: 1,
+  //     myNullableField: null,
+  //     myBigInt: BigInt(123456789),
+  //   });
+  // });
 });

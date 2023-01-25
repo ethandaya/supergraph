@@ -58,10 +58,10 @@ describe("Entity Generator", () => {
   it("should be able to generate type signature for event type", () => {
     generator.generateTypesForEvent("AuctionCreated");
     expect(generator.targetFile.getFullText()).toMatchInlineSnapshot(`
-      "export type RawAuctionCreatedEvent = ExtractAbiEvent<typeof abi, "AuctionCreated">;
-      export type AuctionCreatedEventKeyType = RawAuctionCreatedEvent["inputs"][number]["name"];
-      export type AuctionCreatedEventParamType = AbiParametersToPrimitiveTypes<RawAuctionCreatedEvent["inputs"]>;
-      export type AuctionCreatedEvent = SuperGraphEventType<{ [key in AuctionCreatedEventKeyType]: AuctionCreatedEventParamType[number] }>;
+      "export type AuctionCreatedEvent = ExtractAbiEvent<typeof abi, "AuctionCreated">;
+      export type AuctionCreatedEventKeyType = AuctionCreatedEvent["inputs"][number]["name"];
+      export type AuctionCreatedEventParamType = AbiParametersToPrimitiveTypes<AuctionCreatedEvent["inputs"]>;
+      export type AuctionCreated = SuperGraphEventType<{ [key in AuctionCreatedEventKeyType]: AuctionCreatedEventParamType[number] }>;
       "
     `);
   });
@@ -69,10 +69,10 @@ describe("Entity Generator", () => {
   it("should be able to generate types for all events", () => {
     generator.generateEventTypes();
     expect(generator.targetFile.getFullText()).toMatchInlineSnapshot(`
-      "export type RawAuctionBidEvent = ExtractAbiEvent<typeof abi, "AuctionCreated">;
-      export type AuctionBidEventKeyType = RawAuctionBidEvent["inputs"][number]["name"];
-      export type AuctionBidEventParamType = AbiParametersToPrimitiveTypes<RawAuctionBidEvent["inputs"]>;
-      export type AuctionBidEvent = SuperGraphEventType<{ [key in AuctionBidEventKeyType]: AuctionBidEventParamType[number] }>;
+      "export type AuctionBidEvent = ExtractAbiEvent<typeof abi, "AuctionCreated">;
+      export type AuctionBidEventKeyType = AuctionBidEvent["inputs"][number]["name"];
+      export type AuctionBidEventParamType = AbiParametersToPrimitiveTypes<AuctionBidEvent["inputs"]>;
+      export type AuctionBid = SuperGraphEventType<{ [key in AuctionBidEventKeyType]: AuctionBidEventParamType[number] }>;
       "
     `);
   });

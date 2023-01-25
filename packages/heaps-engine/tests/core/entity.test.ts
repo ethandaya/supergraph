@@ -70,8 +70,8 @@ describe("Entity", () => {
     expect(dto).toEqual({
       id: "1",
       name: "John",
-      updatedAt: expect.any(Number),
-      createdAt: expect.any(Number),
+      updatedAt: expect.any(BigInt),
+      createdAt: expect.any(BigInt),
     });
   });
 });

@@ -4,7 +4,7 @@ import {
   AuctionExtended,
   AuctionSettled,
 } from "./types/NounsAuctionHouse/NounsAuctionHouse";
-import { Auction, Noun, Bid } from "./types/schema";
+import { Auction, Bid, Noun } from "./types/schema";
 import { getOrCreateAccount } from "./utils/helpers";
 
 const log = console;
@@ -16,23 +16,24 @@ export function handleAuctionCreated(event: AuctionCreated): void {
   if (noun == null) {
     log.error("[handleAuctionCreated] Noun #{} not found. Hash: {}", [
       nounId,
-      event.transaction.hash.toHex(),
+      event.transaction.hash,
     ]);
     return;
   }
 
   let auction = new Auction(nounId);
   auction.noun = noun.id;
-  auction.amount = BigInt.fromI32(0);
+  auction.amount = 0n;
   auction.startTime = event.params.startTime;
   auction.endTime = event.params.endTime;
-  auction.settled = false;
+  // TODO - this doesn't feel ideal, this plays into respect the store but needs work
+  auction.settled = 0;
   auction.save();
 }
 
 export function handleAuctionBid(event: AuctionBid): void {
   let nounId = event.params.nounId.toString();
-  let bidderAddress = event.params.sender.toHex();
+  let bidderAddress = event.params.sender;
 
   let bidder = getOrCreateAccount(bidderAddress);
 
@@ -40,7 +41,7 @@ export function handleAuctionBid(event: AuctionBid): void {
   if (auction == null) {
     log.error("[handleAuctionBid] Auction not found for Noun #{}. Hash: {}", [
       nounId,
-      event.transaction.hash.toHex(),
+      event.transaction.hash,
     ]);
     return;
   }
@@ -50,7 +51,7 @@ export function handleAuctionBid(event: AuctionBid): void {
   auction.save();
 
   // Save Bid
-  let bid = new Bid(event.transaction.hash.toHex());
+  let bid = new Bid(event.transaction.hash);
   bid.bidder = bidder.id;
   bid.amount = auction.amount;
   bid.noun = auction.noun;
@@ -68,7 +69,7 @@ export function handleAuctionExtended(event: AuctionExtended): void {
   if (auction == null) {
     log.error(
       "[handleAuctionExtended] Auction not found for Noun #{}. Hash: {}",
-      [nounId, event.transaction.hash.toHex()]
+      [nounId, event.transaction.hash]
     );
     return;
   }
@@ -84,11 +85,11 @@ export function handleAuctionSettled(event: AuctionSettled): void {
   if (auction == null) {
     log.error(
       "[handleAuctionSettled] Auction not found for Noun #{}. Hash: {}",
-      [nounId, event.transaction.hash.toHex()]
+      [nounId, event.transaction.hash]
     );
     return;
   }
 
-  auction.settled = true;
+  auction.settled = 1;
   auction.save();
 }

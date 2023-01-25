@@ -14,10 +14,6 @@ export type StatementLookup<T extends string> = {
   };
 };
 
-export type StoredEntity<K, T extends keyof K = keyof K> = {
-  [key in T]: string | number | bigint | null;
-};
-
 export class SQLiteStore<
   K extends string,
   T extends ModelLookup<K> = ModelLookup<K>
@@ -28,6 +24,7 @@ export class SQLiteStore<
 
   constructor(pathToDb: string, public readonly models: T) {
     this.db = new Database(pathToDb);
+    this.db.defaultSafeIntegers();
     this.stmts = this.prepareStatements(models);
   }
 
@@ -47,6 +44,7 @@ export class SQLiteStore<
     const values = Object.keys(model.shape).concat(["createdAt", "updatedAt"]);
     const cols = values.join(", ");
     const params = values.map((key) => `$${key}`).join(", ");
+    // language=SQL format=false
     return `INSERT INTO ${tableName} (${cols}) VALUES (${params})`;
   }
 
@@ -57,10 +55,12 @@ export class SQLiteStore<
       .map((key) => `${key} = $${key}`)
       .concat(["updatedAt = $updatedAt"])
       .join(", ");
+    // language=SQL format=false
     return `UPDATE ${tableName} SET ${sets} WHERE id = $id`;
   }
 
   getSelectStatementForModel(tableName: string): string {
+    // language=SQL format=false
     return `SELECT * FROM ${tableName} WHERE id = $id LIMIT 1`;
   }
 
@@ -70,104 +70,20 @@ export class SQLiteStore<
     data: T
   ): CrudEntity<T> {
     const stmts = this.stmts[entity];
-    const dto = this.castEntity(this.models[entity], {
+    const dto = {
+      id,
       ...data,
-      id: id,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    });
+      createdAt: BigInt(Date.now()),
+      updatedAt: BigInt(Date.now()),
+    };
     this.db.prepare(stmts.insert).run(dto);
-    return this.db.prepare(stmts.select).get({ id: id });
+    return dto;
   }
 
   get<J extends Record<string, any>>(
     entity: K,
     id: string | number
   ): CrudEntity<J> {
-    const model = this.models[entity];
-    const stored = this.db.prepare(this.stmts[entity].select).get({ id: id });
-    const hydrated = this.uncastEntity(model, stored);
-    return { ...stored, ...hydrated };
+    return this.db.prepare(this.stmts[entity].select).get({ id });
   }
-
-  uncastEntity<
-    O extends z.AnyZodObject,
-    T extends z.infer<O> = z.infer<O>,
-    E extends StoredEntity<T> = StoredEntity<T>
-  >(schema: O, data: E) {
-    // TODO - consolidate both cast & uncast
-    // TODO - also make these methods not trash
-    const keys: (keyof E)[] = Object.keys(data).filter(
-      (k) => k !== "createdAt" && k !== "updatedAt"
-    );
-    return keys.reduce(
-      (acc, key) => ({
-        ...acc,
-        [key]: hydrateKeyPair<E[keyof E], O>(data[key], schema.shape[key]),
-      }),
-      data
-    );
-  }
-
-  castEntity<
-    O extends z.AnyZodObject,
-    T extends z.infer<O> = z.infer<O>,
-    E extends CrudEntity<T> = CrudEntity<T>
-  >(schema: O, data: E) {
-    const keys: (keyof E)[] = Object.keys(data).filter(
-      (k) => k !== "createdAt" && k !== "updatedAt"
-    );
-    return keys.reduce(
-      (acc, key) => ({
-        ...acc,
-        [key]: castKeyPair<E[keyof E], O>(data[key], schema.shape[key]),
-      }),
-      data
-    );
-  }
-}
-
-function castKeyPair<
-  T extends string | number | bigint | null,
-  K extends z.ZodTypeAny
->(data: T, target: K) {
-  // TODO - handle more types more maturely
-  const typename = target._def.typeName;
-  switch (typeof data) {
-    case "string":
-    case "number":
-    case "bigint":
-    case "object":
-      if (data === null) {
-        return data;
-      }
-      return data;
-    case "boolean":
-      if (typename === z.ZodFirstPartyTypeKind.ZodBoolean) {
-        return data ? 1 : 0;
-      }
-  }
-  return data;
-}
-
-function hydrateKeyPair<
-  T extends string | number | bigint | null,
-  K extends z.ZodTypeAny
->(data: T, target: K) {
-  // TODO - handle more types more maturely
-  const typename = target._def.typeName;
-  switch (typeof data) {
-    case "string":
-    case "number":
-      if (typename === z.ZodFirstPartyTypeKind.ZodBoolean) {
-        return data === 1;
-      }
-      return data;
-    case "bigint":
-    case "object":
-      if (data === null) {
-        return data;
-      }
-  }
-  return data;
 }

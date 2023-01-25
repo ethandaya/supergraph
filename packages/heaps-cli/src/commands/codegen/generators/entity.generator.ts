@@ -46,7 +46,7 @@ export class EntityGenerator {
     });
     this.targetFile.addImportDeclaration({
       namedImports: [...Object.keys(this.models)],
-      moduleSpecifier: "../models",
+      moduleSpecifier: "../../models",
     });
   }
 

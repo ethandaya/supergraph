@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 export type CrudEntity<T> = T & {
-  createdAt?: number;
-  updatedAt?: number;
+  createdAt?: bigint;
+  updatedAt?: bigint;
 };
 
 export class KeyAccessError<T> extends Error {
@@ -13,19 +13,9 @@ export class KeyAccessError<T> extends Error {
 
 export interface Store {
   set<T extends {}>(table: string, id: string | number, dto: T): CrudEntity<T>;
-  // get<T>(table: string, pk: string | number): Promise<CrudEntity<T>>;
-  // setMany(values: { [key: string]: any }): void;
 }
 
-// class Value<T> {
-//   constructor(public readonly value: T) {}
-// }
-
 type TempData<T> = T | Partial<T>;
-
-// type TempDataMap<T> = {
-//   [key in keyof T]: Value<keyof T>;
-// };
 
 export class Entity<T extends { id: string }, K extends z.ZodTypeAny> {
   public data: TempData<T> = {};

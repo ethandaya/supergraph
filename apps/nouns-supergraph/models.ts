@@ -9,21 +9,21 @@ export const NounSchema = z.object({
 export const BidSchema = z.object({
   id: z.string(),
   noun: z.string(),
-  amount: z.string(),
+  amount: z.bigint(),
   bidder: z.string(),
   auction: z.string(),
-  txIndex: z.number(),
-  blockNumber: z.number(),
+  txIndex: z.bigint(),
+  blockNumber: z.bigint(),
   blockTimestamp: z.bigint(),
 });
 
 export const AuctionSchema = z.object({
   id: z.string(),
   noun: z.string(),
-  amount: z.string(),
+  amount: z.bigint(),
   startTime: z.bigint(),
   endTime: z.bigint(),
-  settled: z.boolean(),
+  settled: z.union([z.literal(1), z.literal(0)]),
   bidder: z.string().nullable().default(null),
 });
 

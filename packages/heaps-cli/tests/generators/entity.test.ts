@@ -114,7 +114,7 @@ describe("Entity Generator", () => {
 
       import { z } from "zod";
       import { Entity, KeyAccessError, SQLiteStore as Store } from "@heaps/engine";
-      import { test } from "../models";
+      import { test } from "../../models";
 
       type SchemaNames = "test";
       export const store = new Store<SchemaNames>("", {
