@@ -1,5 +1,5 @@
 import { CAC } from "cac";
-import { codegen } from "./codegen/command";
+import { codegen } from "./codegen";
 
 export function registerCommands(cli: CAC) {
   cli

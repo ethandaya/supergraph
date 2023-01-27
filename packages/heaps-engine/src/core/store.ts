@@ -22,8 +22,8 @@ export class SQLiteStore<
   public db: Database.Database;
   public stmts: StatementLookup<K>;
 
-  constructor(pathToDb: string, public readonly models: T) {
-    this.db = new Database(pathToDb);
+  constructor(public readonly models: T) {
+    this.db = new Database(process.env.STORE_PATH || ":memory:");
     this.db.defaultSafeIntegers();
     this.stmts = this.prepareStatements(models);
   }
@@ -33,7 +33,7 @@ export class SQLiteStore<
     for (const [tableName, model] of Object.entries<z.AnyZodObject>(models)) {
       stmts[tableName as K] = {
         insert: this.getInsertStatementForModel(tableName, model),
-        update: this.getUpdateStatementForModel(tableName, model),
+        update: this.getUpdateStatementForModel(model),
         select: this.getSelectStatementForModel(tableName),
       };
     }
@@ -48,7 +48,7 @@ export class SQLiteStore<
     return `INSERT INTO ${tableName} (${cols}) VALUES (${params})`;
   }
 
-  getUpdateStatementForModel(tableName: string, model: z.AnyZodObject): string {
+  getUpdateStatementForModel(model: z.AnyZodObject): string {
     const values = Object.keys(model.shape);
     const sets = values
       .filter((key) => key !== "id")
@@ -56,7 +56,7 @@ export class SQLiteStore<
       .concat(["updatedAt = $updatedAt"])
       .join(", ");
     // language=SQL format=false
-    return `UPDATE ${tableName} SET ${sets} WHERE id = $id`;
+    return `UPDATE SET ${sets} WHERE id = $id`;
   }
 
   getSelectStatementForModel(tableName: string): string {
@@ -76,7 +76,9 @@ export class SQLiteStore<
       createdAt: BigInt(Date.now()),
       updatedAt: BigInt(Date.now()),
     };
-    this.db.prepare(stmts.insert).run(dto);
+    this.db
+      .prepare(`${stmts.insert} ON CONFLICT (id) DO ${stmts.update}`)
+      .run(dto);
     return dto;
   }
 

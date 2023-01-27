@@ -18,6 +18,7 @@ importers:
 
   apps/nouns-supergraph:
     specifiers:
+      '@ethersproject/bignumber': ^5.7.0
       '@heaps/cli': workspace:*
       '@heaps/engine': workspace:*
       '@heaps/tsconfig': workspace:*
@@ -31,6 +32,7 @@ importers:
       typescript: ^4.9.4
       zod: ^3.20.2
     dependencies:
+      '@ethersproject/bignumber': 5.7.0
       '@heaps/engine': link:../../packages/heaps-engine
       abitype: 0.3.0_4umapwpw55xijlh2mknjgcn4rq
       zod: 3.20.2

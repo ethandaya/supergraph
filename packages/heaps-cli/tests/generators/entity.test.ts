@@ -117,7 +117,7 @@ describe("Entity Generator", () => {
       import { test } from "../../models";
 
       type SchemaNames = "test";
-      export const store = new Store<SchemaNames>("", {
+      export const store = new Store<SchemaNames>({
         test: test,
       });
 

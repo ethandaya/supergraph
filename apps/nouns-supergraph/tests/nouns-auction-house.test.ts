@@ -1,11 +1,18 @@
-import { handleAuctionCreated } from "../src/nouns-auction-house";
-import { AuctionCreated } from "../src/types/NounsAuctionHouse/NounsAuctionHouse";
+import {
+  handleAuctionBid,
+  handleAuctionCreated,
+} from "../src/nouns-auction-house";
+import {
+  AuctionBid,
+  AuctionCreated,
+} from "../src/types/NounsAuctionHouse/NounsAuctionHouse";
 import { store } from "../src/types/schema";
 
 const migrations = [
   `DROP TABLE IF EXISTS auction`,
   `DROP TABLE IF EXISTS noun`,
   `DROP TABLE IF EXISTS account`,
+  `DROP TABLE IF EXISTS bid`,
   `CREATE TABLE IF NOT EXISTS auction
    (
        id        TEXT PRIMARY KEY,
@@ -33,9 +40,62 @@ const migrations = [
        tokenBalanceRaw    TEXT,
        tokenBalance       TEXT,
        totalTokensHeldRaw TEXT,
-       totalTokensHeld    TEXT
+       totalTokensHeld    TEXT,
+       createdAt INTEGER,
+       updatedAt INTEGER
    )`,
+  `
+    CREATE TABLE IF NOT EXISTS bid
+    (
+        id        TEXT PRIMARY KEY,
+        noun   TEXT,
+        amount    INTEGER,
+        bidder    TEXT,
+        auction   TEXT,
+        txIndex   INTEGER,
+        blockNumber INTEGER,
+        blockTimestamp INTEGER,
+        createdAt INTEGER,
+        updatedAt INTEGER
+    )
+    `,
 ];
+
+const createEvent: AuctionCreated = {
+  params: {
+    nounId: 0n,
+    startTime: 0n,
+    endTime: 0n,
+    sender: "0x000000",
+    value: 0n,
+  },
+  transaction: {
+    hash: "0x0",
+    index: 0n,
+  },
+  block: {
+    number: 0n,
+    timestamp: 0n,
+  },
+};
+
+const bidEvent: AuctionBid = {
+  params: {
+    nounId: 0n,
+    startTime: 1n,
+    endTime: 2n,
+    sender: "0x000000",
+    value: 1n,
+  },
+  transaction: {
+    hash: "0x0",
+    index: 0n,
+  },
+  block: {
+    number: 1n,
+    timestamp: 0n,
+  },
+};
 
 describe("Auction House", () => {
   beforeEach(() => {
@@ -50,24 +110,8 @@ describe("Auction House", () => {
       createdAt: 0,
       updatedAt: 0,
     });
-    const event: AuctionCreated = {
-      params: {
-        nounId: 0n,
-        startTime: 9223372036854775807n,
-        endTime: 0n,
-        sender: "0x000000",
-        value: 0n,
-      },
-      transaction: {
-        hash: "0x0",
-        index: 0n,
-      },
-      block: {
-        number: 0n,
-        timestamp: 0n,
-      },
-    };
-    handleAuctionCreated(event);
+
+    handleAuctionCreated(createEvent);
     const res = store.get("auction", "0");
     expect(res).toEqual({
       id: "0",
@@ -76,9 +120,26 @@ describe("Auction House", () => {
       startTime: 9223372036854775807n,
       endTime: 0n,
       bidder: null,
-      settled: false,
-      createdAt: expect.any(Number),
-      updatedAt: expect.any(Number),
+      // TODO - ok not a fan, need a cast function in the store
+      settled: 0n,
+      createdAt: expect.any(BigInt),
+      updatedAt: expect.any(BigInt),
+    });
+  });
+
+  it("should handle auction bid", () => {
+    handleAuctionCreated(createEvent);
+    handleAuctionBid(bidEvent);
+    expect(store.get("auction", "0")).toEqual({
+      id: "0",
+      noun: "0",
+      amount: 1n,
+      startTime: 0n,
+      endTime: 0n,
+      bidder: "0x000000",
+      settled: 0n,
+      createdAt: expect.any(BigInt),
+      updatedAt: expect.any(BigInt),
     });
   });
 });

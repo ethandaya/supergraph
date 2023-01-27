@@ -6,7 +6,6 @@ import {
 } from "./types/NounsAuctionHouse/NounsAuctionHouse";
 import { Auction, Bid, Noun } from "./types/schema";
 import { getOrCreateAccount } from "./utils/helpers";
-
 const log = console;
 
 export function handleAuctionCreated(event: AuctionCreated): void {

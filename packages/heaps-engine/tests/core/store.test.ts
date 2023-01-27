@@ -19,7 +19,7 @@ describe("Store", () => {
   let store: SQLiteStore<"test" | "secondTest">;
 
   beforeEach(() => {
-    store = new SQLiteStore("", {
+    store = new SQLiteStore({
       test: testSchema,
       secondTest: secondTestSchema,
     });
@@ -56,12 +56,9 @@ describe("Store", () => {
   });
 
   it("should be able to generate an update statement for schema", () => {
-    const updateStatement = store.getUpdateStatementForModel(
-      "test",
-      testSchema
-    );
+    const updateStatement = store.getUpdateStatementForModel(testSchema);
     expect(updateStatement).toEqual(
-      "UPDATE test SET name = $name, updatedAt = $updatedAt WHERE id = $id"
+      "UPDATE SET name = $name, updatedAt = $updatedAt WHERE id = $id"
     );
   });
 
@@ -76,7 +73,7 @@ describe("Store", () => {
     expect(store.stmts).toEqual({
       test: {
         insert: store.getInsertStatementForModel("test", testSchema),
-        update: store.getUpdateStatementForModel("test", testSchema),
+        update: store.getUpdateStatementForModel(testSchema),
         select: store.getSelectStatementForModel("test"),
       },
       secondTest: {
@@ -84,10 +81,7 @@ describe("Store", () => {
           "secondTest",
           secondTestSchema
         ),
-        update: store.getUpdateStatementForModel(
-          "secondTest",
-          secondTestSchema
-        ),
+        update: store.getUpdateStatementForModel(secondTestSchema),
         select: store.getSelectStatementForModel("secondTest"),
       },
     });

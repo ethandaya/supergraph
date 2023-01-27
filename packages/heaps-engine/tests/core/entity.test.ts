@@ -7,7 +7,7 @@ const PersonSchema = z.object({
   name: z.string(),
 });
 
-const store = new SQLiteStore("", {
+const store = new SQLiteStore({
   person: PersonSchema,
 });
 

@@ -141,7 +141,7 @@ export class EntityGenerator {
 
   public generateStore() {
     this.targetFile.addStatements([
-      `export const store = new Store<SchemaNames>("", {`,
+      `export const store = new Store<SchemaNames>({`,
       ...Object.keys(this.models).map(
         (key) => `  ${key.replace("Schema", "").toLowerCase()}: ${key},`
       ),
