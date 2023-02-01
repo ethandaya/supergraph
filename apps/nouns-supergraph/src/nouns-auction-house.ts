@@ -6,12 +6,13 @@ import {
 } from "./types/NounsAuctionHouse/NounsAuctionHouse";
 import { Auction, Bid, Noun } from "./types/schema";
 import { getOrCreateAccount } from "./utils/helpers";
+
 const log = console;
 
 export function handleAuctionCreated(event: AuctionCreated): void {
   let nounId = event.params.nounId.toString();
 
-  let noun = Noun.load(nounId);
+  let noun = Noun.load(nounId.toString());
   if (noun == null) {
     log.error("[handleAuctionCreated] Noun #{} not found. Hash: {}", [
       nounId,
@@ -22,11 +23,10 @@ export function handleAuctionCreated(event: AuctionCreated): void {
 
   let auction = new Auction(nounId);
   auction.noun = noun.id;
-  auction.amount = 0n;
+  auction.amount = "0";
   auction.startTime = event.params.startTime;
   auction.endTime = event.params.endTime;
-  auction.settled = false;
-  auction.myNewField = "lol";
+  auction.settled = 0n;
   auction.save();
 }
 
@@ -45,14 +45,15 @@ export function handleAuctionBid(event: AuctionBid): void {
     return;
   }
 
-  auction.amount = event.params.value;
+  auction.amount = event.params.value.toString();
   auction.bidder = bidder.id;
   auction.save();
 
   // Save Bid
   let bid = new Bid(event.transaction.hash);
   bid.bidder = bidder.id;
-  bid.amount = auction.amount;
+  // TODO - SQLITE does not support UINT256
+  bid.amount = auction.amount.toString();
   bid.noun = auction.noun;
   bid.txIndex = event.transaction.index;
   bid.blockNumber = event.block.number;
@@ -89,6 +90,6 @@ export function handleAuctionSettled(event: AuctionSettled): void {
     return;
   }
 
-  auction.settled = true;
+  auction.settled = 1n;
   auction.save();
 }

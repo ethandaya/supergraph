@@ -1,3 +1,5 @@
 /src/types/
 .heaps/
 store.db
+store.db-shm
+store.db-wal

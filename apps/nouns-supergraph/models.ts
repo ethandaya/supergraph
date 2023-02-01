@@ -9,22 +9,24 @@ export const NounSchema = z.object({
 export const BidSchema = z.object({
   id: z.string(),
   noun: z.string(),
-  amount: z.bigint(),
+  // TODO - add alt store to support bigint
+  amount: z.string(),
   bidder: z.string(),
   auction: z.string(),
   txIndex: z.bigint(),
   blockNumber: z.bigint(),
-  blockTimestamp: z.bigint(),
+  blockTimestamp: z.string(),
 });
 
 export const AuctionSchema = z.object({
   id: z.string(),
   noun: z.string(),
-  amount: z.bigint(),
+  // TODO - add alt store to support bigint
+  amount: z.string(),
   startTime: z.bigint(),
   endTime: z.bigint(),
-  settled: z.boolean(),
-  myNewField: z.string(),
+  // TODO - add sqlite casting for booleans
+  settled: z.bigint(),
   bidder: z.string().nullable().default(null),
 });
 
