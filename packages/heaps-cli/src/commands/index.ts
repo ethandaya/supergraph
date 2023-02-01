@@ -1,5 +1,6 @@
 import { CAC } from "cac";
 import { codegen } from "./codegen";
+import { backfill } from "./backfill";
 
 export function registerCommands(cli: CAC) {
   cli
@@ -29,6 +30,19 @@ export function registerCommands(cli: CAC) {
       default: false,
     })
     .action(codegen);
+
+  cli
+    .command("backfill", "Backfill data from a snapshot")
+    .option("--pathToSnapshot [path]", "Path to snapshot file", {
+      default: "./snapshot.json",
+    })
+    .option("--pathToSetupFile [path]", "Path to setup file", {
+      default: "./store.setup.ts",
+    })
+    .option("--watch", "Watch for changes and rebuild", {
+      default: false,
+    })
+    .action(backfill);
 
   cli.help();
   cli.version("0.0.1");

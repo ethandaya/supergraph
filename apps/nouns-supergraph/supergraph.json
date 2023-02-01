@@ -8,7 +8,7 @@
       "kind": "contract",
       "abi": "./abis/NounsAuctionHouse.json",
       "addresses": [
-        "0xDAF873A2Ae77D570da094B52A8eC50Ef8885b2c4"
+        "0x830BD73E4184ceF73443C15111a1DF14e495C706"
       ],
       "events": [
         {

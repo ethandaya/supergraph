@@ -1,8 +1,9 @@
-import { build } from "./service";
+import { build } from "../../utils/build";
 import { EntityGenerator } from "./generators/entity.generator";
 import * as fs from "fs";
 import { SuperGraphConfig } from "./types";
 import { EventGenerator } from "./generators/event.generator";
+import { uncachedRequire } from "@heaps/common";
 
 type CodegenOptions = {
   pathToModels: string;
@@ -19,8 +20,7 @@ function loadConfig(pathToConfig: string): SuperGraphConfig {
 function buildSchema({ pathToModels, outputDir }: CodegenOptions) {
   // TODO - this is bad but works for now
   const buildPath = build(pathToModels);
-  delete require.cache[require.resolve(buildPath)];
-  const models = require(buildPath);
+  const models = uncachedRequire(buildPath);
   const entityGenerator = new EntityGenerator({
     models,
     outputPath: outputDir + "/schema.ts",

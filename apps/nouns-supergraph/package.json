@@ -6,7 +6,7 @@
     "codegen": "heaps codegen --pathToModels models.ts --outputDir src/types",
     "codegen:watch": "heaps codegen --pathToModels models.ts --outputDir src/types --watch",
     "build": "tsup ./backfill.ts --format cjs,esm --dts --watch",
-    "backfill": "STORE_PATH=./store.db node ./dist/backfill.js"
+    "backfill:watch": "STORE_PATH=./store.db heaps backfill --watch"
   },
   "dependencies": {
     "@ethersproject/abi": "^5.7.0",
