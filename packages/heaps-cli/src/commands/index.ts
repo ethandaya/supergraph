@@ -25,6 +25,9 @@ export function registerCommands(cli: CAC) {
         default: "./src/types/",
       }
     )
+    .option("--watch", "Watch for changes and rebuild", {
+      default: false,
+    })
     .action(codegen);
 
   cli.help();

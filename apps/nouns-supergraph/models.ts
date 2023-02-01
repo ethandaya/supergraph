@@ -23,8 +23,8 @@ export const AuctionSchema = z.object({
   amount: z.bigint(),
   startTime: z.bigint(),
   endTime: z.bigint(),
-  // TODO - terrible fix the casting
-  settled: z.union([z.number(), z.bigint()]),
+  settled: z.boolean(),
+  myNewField: z.string(),
   bidder: z.string().nullable().default(null),
 });
 

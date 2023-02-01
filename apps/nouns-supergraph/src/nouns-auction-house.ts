@@ -25,8 +25,8 @@ export function handleAuctionCreated(event: AuctionCreated): void {
   auction.amount = 0n;
   auction.startTime = event.params.startTime;
   auction.endTime = event.params.endTime;
-  // TODO - this doesn't feel ideal, this plays into respect the store but needs work
-  auction.settled = 0;
+  auction.settled = false;
+  auction.myNewField = "lol";
   auction.save();
 }
 
@@ -89,6 +89,6 @@ export function handleAuctionSettled(event: AuctionSettled): void {
     return;
   }
 
-  auction.settled = 1;
+  auction.settled = true;
   auction.save();
 }

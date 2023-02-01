@@ -8,6 +8,7 @@ type CodegenOptions = {
   pathToModels: string;
   pathToConfig: string;
   outputDir: string;
+  watch: boolean;
 };
 
 function loadConfig(pathToConfig: string): SuperGraphConfig {
@@ -18,6 +19,7 @@ function loadConfig(pathToConfig: string): SuperGraphConfig {
 function buildSchema({ pathToModels, outputDir }: CodegenOptions) {
   // TODO - this is bad but works for now
   const buildPath = build(pathToModels);
+  delete require.cache[require.resolve(buildPath)];
   const models = require(buildPath);
   const entityGenerator = new EntityGenerator({
     models,
@@ -39,7 +41,20 @@ function buildEvents({ outputDir }: CodegenOptions, config: SuperGraphConfig) {
 }
 
 export async function codegen(options: CodegenOptions) {
-  const config = loadConfig(options.pathToConfig);
-  buildSchema(options);
-  buildEvents(options, config);
+  if (options.watch) {
+    console.log("Watching for changes...");
+    fs.watch(options.pathToModels, () => {
+      console.log("Change detected, rebuilding...");
+      buildSchema(options);
+    });
+    fs.watch(options.pathToConfig, () => {
+      console.log("Change detected, rebuilding...");
+      const config = loadConfig(options.pathToConfig);
+      buildEvents(options, config);
+    });
+  } else {
+    const config = loadConfig(options.pathToConfig);
+    buildSchema(options);
+    buildEvents(options, config);
+  }
 }
