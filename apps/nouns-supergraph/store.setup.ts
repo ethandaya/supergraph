@@ -1,11 +1,11 @@
 import { store } from "./src/types/schema";
 
 const migrations = [
-  `DROP TABLE IF EXISTS auction`,
-  `DROP TABLE IF EXISTS noun`,
-  `DROP TABLE IF EXISTS account`,
-  `DROP TABLE IF EXISTS bid`,
-  `CREATE TABLE IF NOT EXISTS auction
+    `DROP TABLE IF EXISTS auction`,
+    `DROP TABLE IF EXISTS noun`,
+    `DROP TABLE IF EXISTS account`,
+    `DROP TABLE IF EXISTS bid`,
+    `CREATE TABLE IF NOT EXISTS auction
    (
        id        TEXT PRIMARY KEY,
        noun      TEXT,
@@ -17,7 +17,7 @@ const migrations = [
        createdAt INTEGER,
        updatedAt INTEGER
    )`,
-  `CREATE TABLE IF NOT EXISTS noun
+    `CREATE TABLE IF NOT EXISTS noun
    (
        id        TEXT PRIMARY KEY,
        seed      TEXT, 
@@ -25,7 +25,7 @@ const migrations = [
        createdAt INTEGER,
        updatedAt INTEGER
    )`,
-  `CREATE TABLE IF NOT EXISTS account
+    `CREATE TABLE IF NOT EXISTS account
    (
        id                 TEXT PRIMARY KEY,
        delegate           TEXT,
@@ -36,7 +36,7 @@ const migrations = [
        createdAt INTEGER,
        updatedAt INTEGER
    )`,
-  `
+    `
     CREATE TABLE IF NOT EXISTS bid
     (
       id             TEXT PRIMARY KEY,
@@ -53,9 +53,9 @@ const migrations = [
   `,
 ];
 function setup() {
-  migrations.forEach((migration) => {
-    store.db.exec(migration);
-  });
+    migrations.forEach((migration) => {
+        store.db.exec(migration);
+    });
 }
 
 export default setup;
