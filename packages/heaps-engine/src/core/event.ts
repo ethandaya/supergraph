@@ -1,6 +1,6 @@
 export type Block = {
   number: bigint;
-  timestamp: bigint;
+  timestamp: string;
 };
 
 export type Transaction = {
@@ -9,6 +9,7 @@ export type Transaction = {
 };
 
 export type SuperGraphEventType<T> = {
+  backfill?: boolean;
   params: T & {
     sender: string;
     value: bigint;

@@ -22,7 +22,7 @@ export function handleAuctionCreated(event: AuctionCreated): void {
   }
 
   let auction = new Auction(nounId);
-  auction.noun = "noun-" + noun.id;
+  auction.noun = noun.id;
   auction.amount = "0";
   auction.startTime = event.params.startTime;
   auction.endTime = event.params.endTime;

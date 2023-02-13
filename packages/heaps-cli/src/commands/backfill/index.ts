@@ -1,45 +1,114 @@
 import * as path from "path";
 import { bundle } from "../../utils/build";
 import { uncachedRequire } from "@heaps/common";
-import { watch } from "chokidar";
 import fs from "fs";
+import csv from "csv-parser";
+import { parseEther } from "@ethersproject/units";
+import { isBigNumberish } from "@ethersproject/bignumber/lib/bignumber";
+import { watch } from "chokidar";
+import { loadConfig } from "../../utils/load";
+import { SuperGraphConfig } from "../codegen/types";
 
 type BackfillOptions = {
   watch: boolean;
   pathToSnapshot: string;
-  pathToSetupFile: string;
+  pathToSetupScript: string;
+  pathToConfig: string;
 };
 
-function loadSnapshot(pathToSnapshot: string) {
-  console.log("Loading snapshot...");
-  const raw = fs.readFileSync(pathToSnapshot, "utf-8");
-  const events = JSON.parse(raw);
-  console.log(`Loaded ${events.length} events`);
-  return events;
+async function loadSnapshot(pathToSnapshot: string): Promise<any[]> {
+  return new Promise((resolve, reject) => {
+    const results: any = [];
+    fs.createReadStream(pathToSnapshot)
+      .pipe(csv())
+      .on("data", (data) =>
+        results.push({ ...data, params: JSON.parse(data.params) })
+      )
+      .on("end", () => {
+        resolve(results);
+      })
+      .on("error", (error) => reject(error));
+  });
 }
 
 async function setup(options: BackfillOptions) {
-  if (!options.pathToSetupFile) return;
-  console.log("Running Setup");
-  const outputPath = await bundle(options.pathToSetupFile);
+  if (!options.pathToSetupScript) return;
+  const outputPath = await bundle(options.pathToSetupScript);
   const setup = uncachedRequire(path.resolve(outputPath));
   if (setup.default && typeof setup.default === "function") {
+    console.log("Running Setup Script...");
     setup.default();
   }
 }
 
+async function loadHandlersFromConfig(config: SuperGraphConfig): Promise<{
+  // TODO - add explicit types for handlers
+  [key: string]: (dto: any) => Promise<void> | void;
+}> {
+  const mappings = config.sources.map((source) => source.mapping);
+  const bundledHandlers = await Promise.all(mappings.map(bundle));
+  const handlers = bundledHandlers.reduce((acc, handler) => {
+    const module = uncachedRequire(path.resolve(handler));
+    return { ...acc, ...module };
+  }, {});
+  console.log(
+    `Loaded ${Object.keys(handlers).length} handlers from config: ${Object.keys(
+      handlers
+    ).join(", ")}`
+  );
+  return handlers;
+}
+
 async function runHandlers(options: BackfillOptions) {
-  const events = loadSnapshot(options.pathToSnapshot);
-  console.log(`Running ${events.length} events`);
+  console.log("Running Backfill...");
+  const config = loadConfig(options);
+  const events = await loadSnapshot(options.pathToSnapshot);
+  const handlers = await loadHandlersFromConfig(config);
+  for (const event of events) {
+    if (handlers[`handle${event.event}`]) {
+      const dto = {
+        params: {
+          ...Object.keys(event.params).reduce<any>((acc, key) => {
+            if (isBigNumberish(event.params[key])) {
+              acc[key] = BigInt(event.params[key]);
+              return acc;
+            }
+            acc[key] = event.params[key];
+            return acc;
+          }, {}),
+          sender: event.sender,
+          value: parseEther(event.value).toBigInt(),
+        },
+        block: {
+          number: BigInt(event.block_number),
+          timestamp: event.block_timestamp,
+        },
+        transaction: {
+          hash: event.tx_hash,
+          index: BigInt(event.tx_index),
+        },
+        backfill: true,
+      };
+      await handlers[`handle${event.event}`](dto);
+    }
+  }
+  console.log("Backfill Complete!");
 }
 
 export async function backfill(options: BackfillOptions) {
   await setup(options);
+  await runHandlers(options);
+
   if (options.watch) {
     console.log("Watching for changes...");
     watch("./src").on("change", async () => {
-      await setup(options);
-      await runHandlers(options);
+      try {
+        await setup(options);
+        await runHandlers(options);
+      } catch (e) {
+        console.error(e);
+      }
     });
+  } else {
   }
 }

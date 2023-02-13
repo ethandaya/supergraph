@@ -36,7 +36,14 @@ export function registerCommands(cli: CAC) {
     .option("--pathToSnapshot [path]", "Path to snapshot file", {
       default: "./snapshot.json",
     })
-    .option("--pathToSetupFile [path]", "Path to setup file", {
+    .option(
+      "--pathToConfig [path]",
+      "Path to config containing supergraph options",
+      {
+        default: "./supergraph.json",
+      }
+    )
+    .option("--pathToSetupScript [path]", "Path to setup file", {
       default: "./store.setup.ts",
     })
     .option("--watch", "Watch for changes and rebuild", {

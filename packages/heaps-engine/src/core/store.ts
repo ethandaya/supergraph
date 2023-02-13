@@ -24,6 +24,7 @@ export class SQLiteStore<
 
   constructor(public readonly models: T) {
     this.db = new Database(process.env.STORE_PATH || ":memory:");
+    this.db.pragma("journal_mode = WAL");
     this.db.defaultSafeIntegers();
     this.stmts = this.prepareStatements(models);
   }
@@ -86,6 +87,7 @@ export class SQLiteStore<
     entity: K,
     id: string | number
   ): CrudEntity<J> {
-    return this.db.prepare(this.stmts[entity].select).get({ id });
+    const dto = this.db.prepare(this.stmts[entity].select).get({ id });
+    return dto;
   }
 }

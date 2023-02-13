@@ -5,7 +5,6 @@
   "scripts": {
     "codegen": "heaps codegen --pathToModels models.ts --outputDir src/types",
     "codegen:watch": "heaps codegen --pathToModels models.ts --outputDir src/types --watch",
-    "build": "tsup ./backfill.ts --format cjs,esm --dts --watch",
     "backfill:watch": "STORE_PATH=./store.db heaps backfill --pathToSnapshot ./fixtures/events.csv --watch"
   },
   "dependencies": {

@@ -1,9 +1,11 @@
-import { build } from "../../utils/build";
+import { bundle } from "../../utils/build";
 import { EntityGenerator } from "./generators/entity.generator";
 import * as fs from "fs";
 import { SuperGraphConfig } from "./types";
 import { EventGenerator } from "./generators/event.generator";
 import { uncachedRequire } from "@heaps/common";
+import path from "path";
+import { loadConfig } from "../../utils/load";
 
 type CodegenOptions = {
   pathToModels: string;
@@ -12,15 +14,9 @@ type CodegenOptions = {
   watch: boolean;
 };
 
-function loadConfig(pathToConfig: string): SuperGraphConfig {
-  const resp = fs.readFileSync(pathToConfig, "utf-8");
-  return JSON.parse(resp);
-}
-
-function buildSchema({ pathToModels, outputDir }: CodegenOptions) {
-  // TODO - this is bad but works for now
-  const buildPath = build(pathToModels);
-  const models = uncachedRequire(buildPath);
+async function buildSchema({ pathToModels, outputDir }: CodegenOptions) {
+  const buildPath = await bundle(pathToModels);
+  const models = uncachedRequire(path.resolve(buildPath));
   const entityGenerator = new EntityGenerator({
     models,
     outputPath: outputDir + "/schema.ts",
@@ -43,18 +39,18 @@ function buildEvents({ outputDir }: CodegenOptions, config: SuperGraphConfig) {
 export async function codegen(options: CodegenOptions) {
   if (options.watch) {
     console.log("Watching for changes...");
-    fs.watch(options.pathToModels, () => {
+    fs.watch(options.pathToModels, async () => {
       console.log("Change detected, rebuilding...");
-      buildSchema(options);
+      await buildSchema(options);
     });
     fs.watch(options.pathToConfig, () => {
       console.log("Change detected, rebuilding...");
-      const config = loadConfig(options.pathToConfig);
+      const config = loadConfig(options);
       buildEvents(options, config);
     });
   } else {
-    const config = loadConfig(options.pathToConfig);
-    buildSchema(options);
+    const config = loadConfig(options);
+    await buildSchema(options);
     buildEvents(options, config);
   }
 }
