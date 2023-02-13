@@ -75,7 +75,7 @@ const createEvent: AuctionCreated = {
   },
   block: {
     number: 0n,
-    timestamp: 0n,
+    timestamp: "0",
   },
 };
 
@@ -93,7 +93,7 @@ const bidEvent: AuctionBid = {
   },
   block: {
     number: 1n,
-    timestamp: 0n,
+    timestamp: "0",
   },
 };
 

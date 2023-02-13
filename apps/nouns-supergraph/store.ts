@@ -1,4 +1,4 @@
-import { SQLiteStore } from "@heaps/engine/src";
+import { SQLiteStore } from "@heaps/engine";
 import { AccountSchema, AuctionSchema, BidSchema, NounSchema } from "./models";
 
 export const store = new SQLiteStore({
