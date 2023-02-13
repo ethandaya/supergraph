@@ -14,8 +14,7 @@
     "eslint-config-heaps": "workspace:*",
     "husky": "^8.0.0",
     "prettier": "^2.5.1",
-    "turbo": "latest"
+    "turbo": "^1.7.4"
   },
   "packageManager": "pnpm@7.15.0"
 }
-
