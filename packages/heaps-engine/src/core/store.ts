@@ -16,30 +16,56 @@ export type CrudData<T> = T & {
   createdAt?: bigint;
   updatedAt?: bigint;
 };
+
+export type CrudDto<T> = Omit<T, "id" | "updatedAt" | "createdAt">;
+
 export interface SyncStore<
   H extends string,
   E extends ModelLookup<H>,
   A extends keyof E = keyof E
 > {
   type: StoreType;
-  get(entity: H, id: string | number): CrudData<E[A]["type"]> | null;
+  get(entity: H, id: string | number): CrudData<E[A]["type"]>;
   set(
     entity: H,
     id: string | number,
-    data: E[A]["type"]
+    data: CrudDto<E[A]["type"]>
   ): CrudData<E[A]["type"]>;
 }
-export interface AsyncStore {
+export interface AsyncStore<
+  H extends string,
+  E extends ModelLookup<H>,
+  A extends keyof E = keyof E
+> {
   type: StoreType;
-  set<T extends {}>(
-    table: string,
+  get(entity: H, id: string | number): Promise<CrudData<E[A]["type"]>>;
+  set(
+    entity: H,
     id: string | number,
-    dto: T
-  ): Promise<CrudData<T>>;
+    data: CrudDto<E[A]["type"]>
+  ): Promise<CrudData<E[A]["type"]>>;
 }
 
 export type Store<
   H extends string,
   E extends ModelLookup<H>,
   A extends keyof E = keyof E
-> = SyncStore<H, E, A> | AsyncStore;
+> = SyncStore<H, E, A> | AsyncStore<H, E, A>;
+
+export class BaseStore<
+  H extends string,
+  E extends ModelLookup<H>,
+  A extends keyof E = keyof E
+> {
+  protected prepForSave(data: CrudDto<E[A]["type"]>): CrudData<E[A]["type"]> {
+    const now = BigInt(Date.now());
+    const _data = data as CrudData<E[A]["type"]>;
+    if (_data.createdAt) {
+      _data.updatedAt = now;
+    } else {
+      _data.createdAt = now;
+      _data.updatedAt = now;
+    }
+    return _data;
+  }
+}

@@ -40,31 +40,21 @@ export class BaseCrudEntity<T extends {}, K extends z.ZodTypeAny> {
   public get<K extends keyof LocalData<T>>(key: K): LocalData<T>[typeof key] {
     return this._data[key];
   }
-
-  protected prepForSave(data: LocalData<T>): LocalData<T> {
-    const now = BigInt(Date.now());
-    if (data.createdAt) {
-      data.updatedAt = now;
-    } else {
-      data.createdAt = now;
-      data.updatedAt = now;
-    }
-    return data;
-  }
 }
 
 export class SyncCrudEntity<
   T extends {},
   K extends z.ZodTypeAny
 > extends BaseCrudEntity<T, K> {
-  constructor(id: string, schema: K, private readonly _store: SyncStore) {
+  constructor(
+    id: string,
+    schema: K,
+    private readonly _store: SyncStore<any, any, any>
+  ) {
     super(id, schema);
   }
   save() {
-    const dto: T = this._schema.parse(
-      this.prepForSave({ id: this._id, ...this._data })
-    );
-    const res = this._store.set<CrudData<T>>(this._name, this._id, dto);
+    const res = this._store.set(this._name, this._id, this._data);
     this._data = res;
     return res;
   }
@@ -78,10 +68,10 @@ export class AsyncCrudEntity<
     super(id, schema);
   }
   async save() {
-    const dto: T = this._schema.parse(
-      this.prepForSave({ id: this._id, ...this._data })
-    );
-    const res = await this._store.set<CrudData<T>>(this._name, this._id, dto);
+    // const dto: T = this._schema.parse(
+    //   this.prepForSave({ id: this._id, ...this._data })
+    // );
+    const res = await this._store.set(this._name, this._id, this._data);
     this._data = res;
     return res;
   }

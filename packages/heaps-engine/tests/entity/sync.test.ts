@@ -11,7 +11,15 @@ type TestModel = z.infer<typeof testSchema>;
 
 describe("Entity", () => {
   let entity: SyncCrudEntity<TestModel, typeof testSchema>;
-  let testStore: TestStore;
+  let testStore: TestStore<
+    "synccrudentity",
+    {
+      synccrudentity: {
+        type: z.infer<typeof testSchema>;
+        schema: typeof testSchema;
+      };
+    }
+  >;
 
   beforeEach(() => {
     vi.useFakeTimers();
@@ -28,7 +36,7 @@ describe("Entity", () => {
       name: "test",
     };
     entity.save();
-    const saved = testStore.get<TestModel>("synccrudentity", "1");
+    const saved = testStore.get("synccrudentity", "1");
     expect(saved.name).toBe("test");
   });
 
@@ -37,7 +45,7 @@ describe("Entity", () => {
       name: "test",
     };
     entity.save();
-    const saved = testStore.get<TestModel>("synccrudentity", "1");
+    const saved = testStore.get("synccrudentity", "1");
     expect(saved.name).toBe("test");
     entity._data = {
       ...entity._data,
@@ -45,7 +53,7 @@ describe("Entity", () => {
     };
     vi.advanceTimersByTime(100);
     entity.save();
-    const saved2 = testStore.get<TestModel>("synccrudentity", "1");
+    const saved2 = testStore.get("synccrudentity", "1");
     expect(saved2.name).toBe("test2");
     expect(saved2.createdAt).toBe(saved.createdAt);
     expect(saved2.updatedAt).not.toBe(saved.updatedAt);
