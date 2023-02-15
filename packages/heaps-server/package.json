@@ -32,6 +32,7 @@
     "maxWorkers": 1
   },
   "dependencies": {
+    "fastify": "^4.13.0",
     "next": "^13.1.6"
   }
 }

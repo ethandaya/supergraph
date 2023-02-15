@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "infra:up": "docker-compose up -d",
     "codegen": "heaps codegen --pathToModels models.ts --outputDir src/types",
     "codegen:watch": "heaps codegen --pathToModels models.ts --outputDir src/types --watch",
     "backfill:watch": "STORE_PATH=./store.db heaps backfill --pathToSnapshot ./fixtures/events.csv --watch"

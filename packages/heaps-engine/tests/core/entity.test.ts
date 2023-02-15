@@ -2,6 +2,8 @@ import { Entity, KeyAccessError } from "../../src";
 import { z, ZodError } from "zod";
 import { SQLiteStore } from "../../src";
 
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
+
 const PersonSchema = z.object({
   id: z.string(),
   name: z.string(),

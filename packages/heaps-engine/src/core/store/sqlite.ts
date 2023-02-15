@@ -1,18 +1,7 @@
 import Database from "better-sqlite3";
 import { z } from "zod";
-import { CrudEntity, Store } from "./engine";
-
-export type ModelLookup<T extends string> = {
-  [key in T]: z.AnyZodObject;
-};
-
-export type StatementLookup<T extends string> = {
-  [key in T]: {
-    insert: string;
-    update: string;
-    select: string;
-  };
-};
+import { CrudEntity, Store } from "../engine";
+import { ModelLookup, StatementLookup } from "./common";
 
 export class SQLiteStore<
   K extends string,
@@ -20,7 +9,7 @@ export class SQLiteStore<
 > implements Store
 {
   public db: Database.Database;
-  public stmts: StatementLookup<K>;
+  public stmts: StatementLookup<K, string>;
 
   constructor(public readonly models: T) {
     this.db = new Database(process.env.STORE_PATH || ":memory:");
@@ -30,23 +19,24 @@ export class SQLiteStore<
   }
 
   prepareStatements(models: T) {
-    const stmts: StatementLookup<K> = {} as StatementLookup<K>;
+    const stmts: StatementLookup<K, string> = {} as StatementLookup<K, string>;
     for (const [tableName, model] of Object.entries<z.AnyZodObject>(models)) {
       stmts[tableName as K] = {
-        insert: this.getInsertStatementForModel(tableName, model),
-        update: this.getUpdateStatementForModel(model),
+        upsert: this.getUpsertStatementForModel(tableName, model),
         select: this.getSelectStatementForModel(tableName),
       };
     }
     return stmts;
   }
 
-  getInsertStatementForModel(tableName: string, model: z.AnyZodObject): string {
+  getUpsertStatementForModel(tableName: string, model: z.AnyZodObject): string {
     const values = Object.keys(model.shape).concat(["createdAt", "updatedAt"]);
     const cols = values.join(", ");
     const params = values.map((key) => `$${key}`).join(", ");
     // language=SQL format=false
-    return `INSERT INTO ${tableName} (${cols}) VALUES (${params})`;
+    return `INSERT INTO ${tableName} (${cols}) VALUES (${params}) ON CONFLICT (id) DO ${this.getUpdateStatementForModel(
+      model
+    )}`;
   }
 
   getUpdateStatementForModel(model: z.AnyZodObject): string {
@@ -77,9 +67,7 @@ export class SQLiteStore<
       createdAt: BigInt(Date.now()),
       updatedAt: BigInt(Date.now()),
     };
-    this.db
-      .prepare(`${stmts.insert} ON CONFLICT (id) DO ${stmts.update}`)
-      .run(dto);
+    this.db.prepare(stmts.upsert).run(dto);
     return dto;
   }
 

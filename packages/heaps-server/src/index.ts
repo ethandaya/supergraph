@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+
 export function heapsNextAdaptor(req: NextApiRequest, res: NextApiResponse) {
   const method = req.method;
   const { network, event } = req.query;

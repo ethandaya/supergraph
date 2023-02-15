@@ -13,6 +13,11 @@ export class KeyAccessError<T> extends Error {
 
 export interface Store {
   set<T extends {}>(table: string, id: string | number, dto: T): CrudEntity<T>;
+  set<T extends {}>(
+    table: string,
+    id: string | number,
+    dto: T
+  ): Promise<CrudEntity<T>>;
 }
 
 type TempData<T> = T | Partial<T>;

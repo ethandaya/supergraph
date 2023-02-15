@@ -1,6 +1,6 @@
-import { SQLiteStore } from "../../src";
+import { SQLiteStore } from "../../../src";
 import { z } from "zod";
-import { expect } from "@jest/globals";
+import { beforeEach, describe, expect, it } from "vitest";
 
 const testSchema = z.object({
   id: z.string(),
@@ -45,20 +45,20 @@ describe("Store", () => {
     );
   });
 
-  it("should be able to generate an insert statement for schema", () => {
-    const insertStatement = store.getInsertStatementForModel(
+  it("should be able to generate an upsert statement for schema", () => {
+    const upsertStatement = store.getUpsertStatementForModel(
       "test",
       testSchema
     );
-    expect(insertStatement).toEqual(
-      "INSERT INTO test (id, name, createdAt, updatedAt) VALUES ($id, $name, $createdAt, $updatedAt)"
+    expect(upsertStatement).toMatchInlineSnapshot(
+      '"INSERT INTO test (id, name, createdAt, updatedAt) VALUES ($id, $name, $createdAt, $updatedAt) ON CONFLICT (id) DO UPDATE SET name = $name, updatedAt = $updatedAt WHERE id = $id"'
     );
   });
 
   it("should be able to generate an update statement for schema", () => {
     const updateStatement = store.getUpdateStatementForModel(testSchema);
-    expect(updateStatement).toEqual(
-      "UPDATE SET name = $name, updatedAt = $updatedAt WHERE id = $id"
+    expect(updateStatement).toMatchInlineSnapshot(
+      '"UPDATE SET name = $name, updatedAt = $updatedAt WHERE id = $id"'
     );
   });
 
@@ -72,16 +72,14 @@ describe("Store", () => {
   it("should be able to prepare statements for all models", () => {
     expect(store.stmts).toEqual({
       test: {
-        insert: store.getInsertStatementForModel("test", testSchema),
-        update: store.getUpdateStatementForModel(testSchema),
+        upsert: store.getUpsertStatementForModel("test", testSchema),
         select: store.getSelectStatementForModel("test"),
       },
       secondTest: {
-        insert: store.getInsertStatementForModel(
+        upsert: store.getUpsertStatementForModel(
           "secondTest",
           secondTestSchema
         ),
-        update: store.getUpdateStatementForModel(secondTestSchema),
         select: store.getSelectStatementForModel("secondTest"),
       },
     });
@@ -89,7 +87,6 @@ describe("Store", () => {
 
   it("should be able to set an entity", () => {
     const dto = store.set("test", "1", { name: "test" });
-
     const result = store.db
       .prepare("SELECT * FROM test WHERE id = '1' LIMIT 1")
       .get();
@@ -115,36 +112,4 @@ describe("Store", () => {
     const res = store.get("secondTest", "1");
     expect(res.myBigInt).toEqual(1152735103331642317n);
   });
-  //
-  // it("should transform a stored entity to a dto", () => {
-  //   let dto: StoredEntity<z.infer<typeof secondTestSchema>> = {
-  //     id: "1",
-  //     isTest: 1,
-  //     myNullableField: null,
-  //     myBigInt: BigInt(123456789),
-  //   };
-  //   dto = store.uncastEntity(secondTestSchema, dto);
-  //   expect(dto).toEqual({
-  //     id: "1",
-  //     isTest: true,
-  //     myNullableField: null,
-  //     myBigInt: BigInt(123456789),
-  //   });
-  // });
-  //
-  // it("should transform an entity to a store safe dto", () => {
-  //   const dto: z.infer<typeof secondTestSchema> = {
-  //     id: "1",
-  //     isTest: true,
-  //     myNullableField: null,
-  //     myBigInt: BigInt(123456789),
-  //   };
-  //   const storedDto = store.castEntity(secondTestSchema, dto);
-  //   expect(storedDto).toEqual({
-  //     id: "1",
-  //     isTest: 1,
-  //     myNullableField: null,
-  //     myBigInt: BigInt(123456789),
-  //   });
-  // });
 });

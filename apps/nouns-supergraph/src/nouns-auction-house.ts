@@ -60,6 +60,11 @@ export function handleAuctionBid(event: AuctionBid): void {
   bid.blockTimestamp = event.block.timestamp;
   bid.auction = auction.id;
   bid.save();
+
+  // TODO - do notification
+  if (!event.backfill) {
+    console.log("DO NOTIFICATION");
+  }
 }
 
 export function handleAuctionExtended(event: AuctionExtended): void {
