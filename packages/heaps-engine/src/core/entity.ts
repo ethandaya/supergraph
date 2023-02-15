@@ -96,6 +96,8 @@ export class AsyncCrudEntity<
     const dto: T = this._schema.parse(
       this.prepForSave({ id: this._id, ...this._data })
     );
-    return this._store.set<T>(this._name, this._id, dto);
+    const res = await this._store.set<CrudData<T>>(this._name, this._id, dto);
+    this._data = res;
+    return res;
   }
 }

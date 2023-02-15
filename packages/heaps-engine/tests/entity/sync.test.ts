@@ -4,7 +4,7 @@ import {
   StoreType,
   SyncCrudEntity,
   SyncStore,
-} from "../src/core/entity";
+} from "../../src/core/entity";
 import { z } from "zod";
 
 const testSchema = baseSchema.extend({
