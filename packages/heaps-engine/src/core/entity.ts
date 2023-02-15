@@ -1,20 +1,9 @@
 import { z } from "zod";
+import { AsyncStore, CrudData, SyncStore } from "./store";
 
 export enum StoreType {
   SYNC = "sync",
   ASYNC = "async",
-}
-export interface SyncStore {
-  type: StoreType;
-  set<T extends {}>(table: string, id: string | number, dto: T): CrudData<T>;
-}
-export interface AsyncStore {
-  type: StoreType;
-  set<T extends {}>(
-    table: string,
-    id: string | number,
-    dto: T
-  ): Promise<CrudData<T>>;
 }
 
 export const baseSchema = z.object({
@@ -23,10 +12,6 @@ export const baseSchema = z.object({
   createdAt: z.bigint(),
 });
 
-type CrudData<T> = T & {
-  createdAt?: bigint;
-  updatedAt?: bigint;
-};
 type LocalData<T, K = CrudData<T>> = K | Partial<K>;
 
 export class BaseCrudEntity<T extends {}, K extends z.ZodTypeAny> {
