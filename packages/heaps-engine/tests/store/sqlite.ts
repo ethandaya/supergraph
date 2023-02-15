@@ -1,33 +1,42 @@
 import { beforeEach, describe, it } from "vitest";
-import { CrudData, SyncStore } from "../../src/core/store";
+import {
+  CrudData,
+  ModelLookup,
+  SchemaLookup,
+  SyncStore,
+} from "../../src/core/store";
 import { StoreType } from "../../src/core/entity";
 import { z } from "zod";
-
-export type ModelLookup<T extends string> = {
-  [key in T]: z.infer<z.AnyZodObject>;
-};
+import Database from "better-sqlite3";
 
 class SqliteStore<
-  T extends string,
-  J extends ModelLookup<T>,
-  K extends keyof J = keyof J
-> implements SyncStore<T, J, K>
+  H extends string,
+  E extends ModelLookup<H>,
+  A extends keyof E = keyof E
+> implements SyncStore<H, E, A>
 {
   type = StoreType.SYNC;
+  public db: Database.Database;
 
-  get(entity: K, id: string | number): CrudData<J[K]> | null {
+  constructor(public readonly models: SchemaLookup<H, E>) {
+    this.db = new Database(process.env.STORE_PATH || ":memory:");
+    this.db.pragma("journal_mode = WAL");
+    this.db.defaultSafeIntegers();
+  }
+
+  get(entity: H, id: string | number): CrudData<E[A]["type"]> | null {
     console.log(entity, id);
     return null;
   }
-  set(entity: K, id: string | number, data: J[K]): CrudData<J[K]> {
+  set(
+    entity: H,
+    id: string | number,
+    data: E[A]["type"]
+  ): CrudData<E[A]["type"]> {
     console.log(entity, id, data);
-    const dto = {
-      id,
-      ...data,
-      createdAt: BigInt(Date.now()),
-      updatedAt: BigInt(Date.now()),
-    };
-    return dto;
+    const model = this.models[entity];
+    model.parse(data);
+    return data;
   }
 }
 
@@ -36,10 +45,15 @@ const testSchema = z.object({
 });
 
 describe("Entity", () => {
-  let sqliteStore: SqliteStore<"test", { test: z.infer<typeof testSchema> }>;
+  let sqliteStore: SqliteStore<
+    "test",
+    { test: { type: z.infer<typeof testSchema>; schema: typeof testSchema } }
+  >;
 
   beforeEach(() => {
-    sqliteStore = new SqliteStore();
+    sqliteStore = new SqliteStore({
+      test: testSchema,
+    });
   });
 
   it("should be able to create a new entity", () => {

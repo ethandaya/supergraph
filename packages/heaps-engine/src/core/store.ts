@@ -1,5 +1,16 @@
 import { StoreType } from "./entity";
-import { ModelLookup } from "../../tests/store/sqlite";
+import { z } from "zod";
+
+export type ModelLookup<T extends string> = {
+  [key in T]: {
+    type: CrudData<z.infer<z.AnyZodObject>>;
+    schema: z.AnyZodObject;
+  };
+};
+
+export type SchemaLookup<T extends string, K extends ModelLookup<T>> = {
+  [key in T]: K[key]["schema"];
+};
 
 export type CrudData<T> = T & {
   createdAt?: bigint;
@@ -11,8 +22,12 @@ export interface SyncStore<
   A extends keyof E = keyof E
 > {
   type: StoreType;
-  get(entity: A, id: string | number): CrudData<E[A]> | null;
-  set(entity: A, id: string | number, data: E[A]): CrudData<E[A]>;
+  get(entity: H, id: string | number): CrudData<E[A]["type"]> | null;
+  set(
+    entity: H,
+    id: string | number,
+    data: E[A]["type"]
+  ): CrudData<E[A]["type"]>;
 }
 export interface AsyncStore {
   type: StoreType;
