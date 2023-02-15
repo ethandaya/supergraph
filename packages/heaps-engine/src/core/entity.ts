@@ -14,14 +14,19 @@ export const baseSchema = z.object({
 
 type LocalData<T, K = CrudData<T>> = K | Partial<K>;
 
-export class BaseCrudEntity<T extends {}, K extends z.ZodTypeAny> {
+export class BaseCrudEntity<
+  J extends string,
+  T extends {},
+  K extends z.ZodTypeAny
+> {
   public _id: string;
   public _data: LocalData<T> = {};
-  public _name: string = this.constructor.name.toLowerCase();
+  public _name: J;
   public _schema: K;
 
-  constructor(id: string, schema: K) {
+  constructor(id: string, name: J, schema: K) {
     this._id = id;
+    this._name = name;
     this._schema = schema;
   }
 
@@ -43,15 +48,17 @@ export class BaseCrudEntity<T extends {}, K extends z.ZodTypeAny> {
 }
 
 export class SyncCrudEntity<
+  J extends string,
   T extends {},
   K extends z.ZodTypeAny
-> extends BaseCrudEntity<T, K> {
+> extends BaseCrudEntity<J, T, K> {
   constructor(
     id: string,
+    name: J,
     schema: K,
-    private readonly _store: SyncStore<any, any, any>
+    private readonly _store: SyncStore<J, any>
   ) {
-    super(id, schema);
+    super(id, name, schema);
   }
   save() {
     const res = this._store.set(this._name, this._id, this._data);
@@ -61,16 +68,19 @@ export class SyncCrudEntity<
 }
 
 export class AsyncCrudEntity<
+  J extends string,
   T extends {},
-  K extends z.ZodTypeAny
-> extends BaseCrudEntity<T, K> {
-  constructor(id: string, schema: K, private readonly _store: AsyncStore) {
-    super(id, schema);
+  K extends z.AnyZodObject
+> extends BaseCrudEntity<J, T, K> {
+  constructor(
+    id: string,
+    name: J,
+    schema: K,
+    private readonly _store: AsyncStore<J, any>
+  ) {
+    super(id, name, schema);
   }
   async save() {
-    // const dto: T = this._schema.parse(
-    //   this.prepForSave({ id: this._id, ...this._data })
-    // );
     const res = await this._store.set(this._name, this._id, this._data);
     this._data = res;
     return res;

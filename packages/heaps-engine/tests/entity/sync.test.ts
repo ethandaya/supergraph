@@ -10,7 +10,7 @@ const testSchema = baseSchema.extend({
 type TestModel = z.infer<typeof testSchema>;
 
 describe("Entity", () => {
-  let entity: SyncCrudEntity<TestModel, typeof testSchema>;
+  let entity: SyncCrudEntity<"synccrudentity", TestModel, typeof testSchema>;
   let testStore: TestStore<
     "synccrudentity",
     {
@@ -24,8 +24,9 @@ describe("Entity", () => {
   beforeEach(() => {
     vi.useFakeTimers();
     testStore = new TestStore();
-    entity = new SyncCrudEntity<TestModel, typeof testSchema>(
+    entity = new SyncCrudEntity<"synccrudentity", TestModel, typeof testSchema>(
       "1",
+      "synccrudentity",
       testSchema,
       testStore
     );

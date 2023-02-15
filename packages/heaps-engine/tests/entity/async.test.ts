@@ -10,17 +10,29 @@ const asyncTestSchema = baseSchema.extend({
 type AsyncTestModel = z.infer<typeof asyncTestSchema>;
 
 describe("Entity", () => {
-  let entity: AsyncCrudEntity<AsyncTestModel, typeof asyncTestSchema>;
-  let testStore: AsyncTestStore;
+  let entity: AsyncCrudEntity<
+    "asynccrudentity",
+    AsyncTestModel,
+    typeof asyncTestSchema
+  >;
+  let testStore: AsyncTestStore<
+    "asynccrudentity",
+    {
+      asynccrudentity: {
+        type: z.infer<typeof asyncTestSchema>;
+        schema: typeof asyncTestSchema;
+      };
+    }
+  >;
 
   beforeEach(() => {
     vi.useFakeTimers();
     testStore = new AsyncTestStore();
-    entity = new AsyncCrudEntity<AsyncTestModel, typeof asyncTestSchema>(
-      "1",
-      asyncTestSchema,
-      testStore
-    );
+    entity = new AsyncCrudEntity<
+      "asynccrudentity",
+      AsyncTestModel,
+      typeof asyncTestSchema
+    >("1", "asynccrudentity", asyncTestSchema, testStore);
   });
 
   it("should be able to save an initial object with crud", async () => {
@@ -28,7 +40,7 @@ describe("Entity", () => {
       name: "test",
     };
     await entity.save();
-    const saved = await testStore.get<AsyncTestModel>("asynccrudentity", "1");
+    const saved = await testStore.get("asynccrudentity", "1");
     expect(saved.name).toBe("test");
   });
 
@@ -37,7 +49,7 @@ describe("Entity", () => {
       name: "test",
     };
     await entity.save();
-    const saved = await testStore.get<AsyncTestModel>("asynccrudentity", "1");
+    const saved = await testStore.get("asynccrudentity", "1");
     expect(saved.name).toBe("test");
     entity._data = {
       ...entity._data,
@@ -45,7 +57,7 @@ describe("Entity", () => {
     };
     vi.advanceTimersByTime(100);
     await entity.save();
-    const saved2 = await testStore.get<AsyncTestModel>("asynccrudentity", "1");
+    const saved2 = await testStore.get("asynccrudentity", "1");
     expect(saved2.name).toBe("test2");
     expect(saved2.createdAt).toBe(saved.createdAt);
     expect(saved2.updatedAt).not.toBe(saved.updatedAt);
