@@ -1,4 +1,4 @@
-import { ModelLookup, StatementLookup } from "./common";
+import { ModelLookup, StatementLookup, StoreMeta } from "./common";
 import { CrudEntity, Store } from "../engine";
 import postgres, { PendingQuery } from "postgres";
 import { z } from "zod";
@@ -13,12 +13,19 @@ export class PostgresStore<
   public sql: postgres.Sql;
   public stmts: StatementLookup<K, Statement>;
 
+  public meta: StoreMeta = {
+    name: "postgres",
+    description: "Postgres store",
+    isAsync: true,
+  };
+
   constructor(url: string, public readonly models: T) {
     this.sql = postgres(url, {
       debug: false,
       types: {
         bigint: postgres.BigInt,
       },
+      transform: postgres.camel,
     });
     this.stmts = this.prepareStatements(models);
   }

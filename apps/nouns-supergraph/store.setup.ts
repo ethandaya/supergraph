@@ -1,61 +1,62 @@
-import { store } from "./src/types/schema";
+import { store } from "./store";
 
-const migrations = [
-    `DROP TABLE IF EXISTS auction`,
-    `DROP TABLE IF EXISTS noun`,
-    `DROP TABLE IF EXISTS account`,
-    `DROP TABLE IF EXISTS bid`,
-    `CREATE TABLE IF NOT EXISTS auction
-   (
-       id        TEXT PRIMARY KEY,
-       noun      TEXT,
-       amount    TEXT,
-       startTime BIGINT,
-       endTime   BIGINT,
-       settled   BOOLEAN,
-       bidder    TEXT DEFAULT NULL,
-       createdAt INTEGER,
-       updatedAt INTEGER
-   )`,
-    `CREATE TABLE IF NOT EXISTS noun
-   (
-       id        TEXT PRIMARY KEY,
-       seed      TEXT, 
-       owner     TEXT,
-       createdAt INTEGER,
-       updatedAt INTEGER
-   )`,
-    `CREATE TABLE IF NOT EXISTS account
-   (
-       id                 TEXT PRIMARY KEY,
-       delegate           TEXT,
-       tokenBalanceRaw    TEXT,
-       tokenBalance       TEXT,
-       totalTokensHeldRaw TEXT,
-       totalTokensHeld    TEXT,
-       createdAt INTEGER,
-       updatedAt INTEGER
-   )`,
-    `
-    CREATE TABLE IF NOT EXISTS bid
-    (
-      id             TEXT PRIMARY KEY,
-      noun           TEXT,
-      amount         TEXT,
-      bidder         TEXT,
-      auction        TEXT,
-      txIndex        INTEGER,
-      blockNumber    INTEGER,
-      blockTimestamp INTEGER,
-      createdAt      INTEGER,
-      updatedAt      INTEGER
-    )
-  `,
-];
-function setup() {
-    migrations.forEach((migration) => {
-        store.db.exec(migration);
-    });
+async function run() {
+  console.log("Running setup script...");
+  await store.sql.begin((sql) => [
+    sql`DROP TABLE IF EXISTS auction`,
+    sql`DROP TABLE IF EXISTS noun`,
+    sql`DROP TABLE IF EXISTS account`,
+    sql`DROP TABLE IF EXISTS bid`,
+    // TODO - add bids
+    sql`CREATE TABLE IF NOT EXISTS auction
+        (
+          id         VARCHAR(255) PRIMARY KEY,
+          noun       VARCHAR(255),
+          amount     DECIMAL(78, 0),
+          start_time BIGINT,
+          end_time   BIGINT,
+          bidder     VARCHAR(42) DEFAULT NULL,
+          settled    BOOLEAN,
+          created_at BIGINT,
+          updated_at BIGINT
+        )`,
+    // TODO - add votes
+    sql`CREATE TABLE IF NOT EXISTS noun
+        (
+          id         VARCHAR(255) PRIMARY KEY,
+          seed       TEXT,
+          owner      VARCHAR(42),
+          created_at BIGINT,
+          updated_at BIGINT
+        )`,
+    // TODO - add nouns
+    sql`CREATE TABLE IF NOT EXISTS account
+        (
+            id                    VARCHAR(255) PRIMARY KEY,
+            delegate              VARCHAR(255),
+            token_balance_raw     DECIMAL(78, 0),
+            token_balance         DECIMAL(78, 0),
+            total_tokens_held_raw DECIMAL(78, 0),
+            total_tokens_held     DECIMAL(78, 0),
+            created_at            BIGINT,
+            updated_at            BIGINT
+        )`,
+    sql`CREATE TABLE IF NOT EXISTS bid
+        (
+          id              TEXT PRIMARY KEY,
+          noun            VARCHAR(255),
+          amount          DECIMAL(78, 0),
+          bidder          VARCHAR(42),
+          auction         VARCHAR(255),
+          tx_index        BIGINT,
+          block_number    BIGINT,
+          block_timestamp BIGINT,
+          created_at      BIGINT,
+          updated_at      BIGINT
+        )
+    `,
+  ]);
+  await store.sql.end();
 }
 
-export default setup;
+export default run;

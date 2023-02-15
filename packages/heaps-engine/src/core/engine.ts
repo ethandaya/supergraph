@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { StoreMeta } from "./store/common";
 
 export type CrudEntity<T> = T & {
   createdAt?: bigint;
@@ -12,6 +13,7 @@ export class KeyAccessError<T> extends Error {
 }
 
 export interface Store {
+  meta: StoreMeta;
   set<T extends {}>(table: string, id: string | number, dto: T): CrudEntity<T>;
   set<T extends {}>(
     table: string,

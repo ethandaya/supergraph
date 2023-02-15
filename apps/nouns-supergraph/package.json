@@ -6,7 +6,7 @@
     "infra:up": "docker-compose up -d",
     "codegen": "heaps codegen --pathToModels models.ts --outputDir src/types",
     "codegen:watch": "heaps codegen --pathToModels models.ts --outputDir src/types --watch",
-    "backfill:watch": "STORE_PATH=./store.db heaps backfill --pathToSnapshot ./fixtures/events.csv --watch"
+    "backfill": "dotenv -e .env.local -- heaps backfill --pathToSnapshot ./fixtures/events.csv"
   },
   "dependencies": {
     "@ethersproject/abi": "^5.7.0",
@@ -21,6 +21,7 @@
     "@heaps/tsconfig": "workspace:*",
     "@types/jest": "^29.2.4",
     "@types/node": "^17.0.12",
+    "dotenv-cli": "^7.0.0",
     "eslint-config-heaps": "workspace:*",
     "jest": "^29.3.1",
     "nodemon": "^2.0.20",

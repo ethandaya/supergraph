@@ -27,10 +27,10 @@ async function initializeDB(store: PostgresStore<any>) {
   await store.sql`
           CREATE TABLE IF NOT EXISTS test
           (
-              "id"        VARCHAR(255) PRIMARY KEY,
-              "name"      VARCHAR(255),
-              "createdAt" BIGINT,
-              "updatedAt" BIGINT
+              id        VARCHAR(255) PRIMARY KEY,
+              name      VARCHAR(255),
+              created_at BIGINT,
+              updated_at BIGINT
           );
       `.execute();
 }
@@ -58,8 +58,8 @@ describe("Postgres Store", () => {
     };
     const statement = store.getUpsertStatementForModel("test", testSchema);
     const query = await statement(dto).describe();
-    expect(query.string).toEqual(
-      'INSERT INTO "test" ("id","createdAt","updatedAt","name")values($1,$2,$3,$4) ON CONFLICT (id) DO UPDATE SET "updatedAt"=$5,"name"=$6 WHERE "test".id = $7'
+    expect(query.string).toMatchInlineSnapshot(
+      '"INSERT INTO \\"test\\" (\\"id\\",\\"created_at\\",\\"updated_at\\",\\"name\\")values($1,$2,$3,$4) ON CONFLICT (id) DO UPDATE SET \\"updated_at\\"=$5,\\"name\\"=$6 WHERE \\"test\\".id = $7"'
     );
   });
 
@@ -73,7 +73,9 @@ describe("Postgres Store", () => {
     };
     const statement = store.getSelectStatementForModel("test");
     const res = await statement(dto).describe();
-    expect(res.string).toEqual('select * from "test" where id = $1 limit 1');
+    expect(res.string).toMatchInlineSnapshot(
+      '"select * from \\"test\\" where id = $1 limit 1"'
+    );
   });
 
   it("should be able to set and get a record", async () => {

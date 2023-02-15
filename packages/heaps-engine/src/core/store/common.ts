@@ -10,3 +10,11 @@ export type StatementLookup<T extends string, K> = {
     select: K;
   };
 };
+
+export type StoreType = "sync" | "async";
+
+export type StoreMeta = {
+  type: StoreType;
+  name: string;
+  description: string;
+};

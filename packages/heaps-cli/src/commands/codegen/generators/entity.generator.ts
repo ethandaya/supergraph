@@ -41,12 +41,16 @@ export class EntityGenerator {
       moduleSpecifier: "zod",
     });
     this.targetFile.addImportDeclaration({
-      namedImports: ["Entity", "KeyAccessError", "SQLiteStore as Store"],
+      namedImports: ["Entity", "KeyAccessError"],
       moduleSpecifier: "@heaps/engine",
     });
     this.targetFile.addImportDeclaration({
       namedImports: [...Object.keys(this.models)],
       moduleSpecifier: "../../models",
+    });
+    this.targetFile.addImportDeclaration({
+      namedImports: ["store"],
+      moduleSpecifier: "../../store",
     });
   }
 
@@ -132,6 +136,7 @@ export class EntityGenerator {
 
   public generateGlobalDefinitions() {
     this.targetFile.addTypeAlias({
+      isExported: true,
       name: "SchemaNames",
       type: Object.keys(this.models)
         .map((key) => `"${key.toLowerCase().replace("schema", "")}"`)
@@ -152,7 +157,7 @@ export class EntityGenerator {
   public generate(options: GenerateOptions = { shouldSave: true }) {
     this.generateImports();
     this.generateGlobalDefinitions();
-    this.generateStore();
+    // this.generateStore();
     for (const name in this.models) {
       this.generateDefinitionsForModel(
         name.replace("Schema", ""),

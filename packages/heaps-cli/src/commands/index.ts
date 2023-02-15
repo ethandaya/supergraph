@@ -34,7 +34,7 @@ export function registerCommands(cli: CAC) {
   cli
     .command("backfill", "Backfill data from a snapshot")
     .option("--pathToSnapshot [path]", "Path to snapshot file", {
-      default: "./snapshot.json",
+      default: "./events.csv",
     })
     .option(
       "--pathToConfig [path]",

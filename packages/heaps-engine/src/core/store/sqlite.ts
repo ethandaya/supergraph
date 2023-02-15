@@ -1,7 +1,7 @@
 import Database from "better-sqlite3";
 import { z } from "zod";
 import { CrudEntity, Store } from "../engine";
-import { ModelLookup, StatementLookup } from "./common";
+import { ModelLookup, StatementLookup, StoreMeta } from "./common";
 
 export class SQLiteStore<
   K extends string,
@@ -10,6 +10,12 @@ export class SQLiteStore<
 {
   public db: Database.Database;
   public stmts: StatementLookup<K, string>;
+
+  public meta: StoreMeta = {
+    name: "sqlite",
+    description: "SQLite store",
+    type: "sync",
+  };
 
   constructor(public readonly models: T) {
     this.db = new Database(process.env.STORE_PATH || ":memory:");

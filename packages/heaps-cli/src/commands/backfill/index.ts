@@ -5,9 +5,9 @@ import fs from "fs";
 import csv from "csv-parser";
 import { parseEther } from "@ethersproject/units";
 import { isBigNumberish } from "@ethersproject/bignumber/lib/bignumber";
-import { watch } from "chokidar";
 import { loadConfig } from "../../utils/load";
 import { SuperGraphConfig } from "../codegen/types";
+import * as console from "console";
 
 type BackfillOptions = {
   watch: boolean;
@@ -29,16 +29,6 @@ async function loadSnapshot(pathToSnapshot: string): Promise<any[]> {
       })
       .on("error", (error) => reject(error));
   });
-}
-
-async function setup(options: BackfillOptions) {
-  if (!options.pathToSetupScript) return;
-  const outputPath = await bundle(options.pathToSetupScript);
-  const setup = uncachedRequire(path.resolve(outputPath));
-  if (setup.default && typeof setup.default === "function") {
-    console.log("Running Setup Script...");
-    setup.default();
-  }
 }
 
 async function loadHandlersFromConfig(config: SuperGraphConfig): Promise<{
@@ -95,20 +85,34 @@ async function runHandlers(options: BackfillOptions) {
   console.log("Backfill Complete!");
 }
 
+async function setup(options: BackfillOptions) {
+  if (!options.pathToSetupScript) return;
+  const outputPath = await bundle(options.pathToSetupScript);
+  console.log(`Setup Script Bundled to ${outputPath}`);
+  const script = uncachedRequire(path.resolve(outputPath));
+  if (script.default && typeof script.default === "function") {
+    await script.default();
+  }
+}
+
 export async function backfill(options: BackfillOptions) {
+  // try {
   await setup(options);
   await runHandlers(options);
-
-  if (options.watch) {
-    console.log("Watching for changes...");
-    watch("./src").on("change", async () => {
-      try {
-        await setup(options);
-        await runHandlers(options);
-      } catch (e) {
-        console.error(e);
-      }
-    });
-  } else {
-  }
+  // } catch (e) {
+  //   console.error(e);
+  //   throw e;
+  // }
+  //
+  // if (options.watch) {
+  //   console.log("Watching for changes...");
+  //   watch("./src").on("change", async () => {
+  //     try {
+  //       await setup(options);
+  //       await runHandlers(options);
+  //     } catch (e) {
+  //       console.error(e);
+  //     }
+  //   });
+  // }
 }
