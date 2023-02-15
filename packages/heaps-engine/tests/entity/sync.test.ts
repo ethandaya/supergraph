@@ -1,33 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import {
-  baseSchema,
-  StoreType,
-  SyncCrudEntity,
-  SyncStore,
-} from "../../src/core/entity";
+import { baseSchema, SyncCrudEntity } from "../../src/core/entity";
 import { z } from "zod";
+import { TestStore } from "../utils/store";
 
 const testSchema = baseSchema.extend({
   name: z.string(),
 });
 
 type TestModel = z.infer<typeof testSchema>;
-
-class TestStore implements SyncStore {
-  type: StoreType = StoreType.SYNC;
-  data: Record<string, Record<string, any>> = {};
-  set<T>(name: string, id: string, data: T): T {
-    console.log(`set ${name} ${id}`);
-    this.data[name] = this.data[name] || {};
-    this.data[name][id] = data;
-    return this.data[name][id];
-  }
-  get<T>(name: string, id: string): T {
-    console.log(`get ${name} ${id}`);
-    this.data[name] = this.data[name] || {};
-    return this.data[name][id];
-  }
-}
 
 describe("Entity", () => {
   let entity: SyncCrudEntity<TestModel, typeof testSchema>;
