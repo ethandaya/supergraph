@@ -1,33 +1,41 @@
 import Database from "better-sqlite3";
 import { z } from "zod";
-import { CrudEntity, Store } from "../engine";
-import { ModelLookup, StatementLookup, StoreMeta } from "./common";
+import {
+  BaseStore,
+  CrudData,
+  CrudDto,
+  ModelLookup,
+  SchemaLookup,
+  SyncStore,
+} from "../store";
+import { StoreType } from "../entity";
+import { StatementLookup } from "./common";
 
-export class SQLiteStore<
-  K extends string,
-  T extends ModelLookup<K> = ModelLookup<K>
-> implements Store
+export class SqliteStore<
+    H extends string,
+    E extends ModelLookup<H>,
+    A extends keyof E = keyof E
+  >
+  extends BaseStore<H, E, A>
+  implements SyncStore<H, E, A>
 {
+  type = StoreType.SYNC;
   public db: Database.Database;
-  public stmts: StatementLookup<K, string>;
 
-  public meta: StoreMeta = {
-    name: "sqlite",
-    description: "SQLite store",
-    type: "sync",
-  };
+  public stmts: StatementLookup<H, string>;
 
-  constructor(public readonly models: T) {
+  constructor(public readonly models: SchemaLookup<H, E>) {
+    super();
     this.db = new Database(process.env.STORE_PATH || ":memory:");
     this.db.pragma("journal_mode = WAL");
     this.db.defaultSafeIntegers();
     this.stmts = this.prepareStatements(models);
   }
 
-  prepareStatements(models: T) {
-    const stmts: StatementLookup<K, string> = {} as StatementLookup<K, string>;
+  prepareStatements(models: SchemaLookup<H, E>) {
+    const stmts: StatementLookup<H, string> = {} as StatementLookup<H, string>;
     for (const [tableName, model] of Object.entries<z.AnyZodObject>(models)) {
-      stmts[tableName as K] = {
+      stmts[tableName as H] = {
         upsert: this.getUpsertStatementForModel(tableName, model),
         select: this.getSelectStatementForModel(tableName),
       };
@@ -61,27 +69,18 @@ export class SQLiteStore<
     return `SELECT * FROM ${tableName} WHERE id = $id LIMIT 1`;
   }
 
-  set<T extends Record<string, any>>(
-    entity: K,
-    id: string | number,
-    data: T
-  ): CrudEntity<T> {
-    const stmts = this.stmts[entity];
-    const dto = {
-      id,
-      ...data,
-      createdAt: BigInt(Date.now()),
-      updatedAt: BigInt(Date.now()),
-    };
-    this.db.prepare(stmts.upsert).run(dto);
-    return dto;
+  get(entity: H, id: string | number): CrudData<E[A]["type"]> {
+    return this.db.prepare(this.stmts[entity].select).get({ id });
   }
-
-  get<J extends Record<string, any>>(
-    entity: K,
-    id: string | number
-  ): CrudEntity<J> {
-    const dto = this.db.prepare(this.stmts[entity].select).get({ id });
-    return dto;
+  set(
+    entity: H,
+    id: string | number,
+    data: CrudDto<E[A]["type"]>
+  ): CrudData<E[A]["type"]> {
+    const stmts = this.stmts[entity];
+    const model = this.models[entity];
+    model.omit({ id: true, createdAt: true, updatedAt: true }).parse(data);
+    this.db.prepare(stmts.upsert).run(this.prepForSave({ id, ...data }));
+    return data;
   }
 }
