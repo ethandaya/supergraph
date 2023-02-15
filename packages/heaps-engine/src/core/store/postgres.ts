@@ -16,7 +16,7 @@ export class PostgresStore<
   public meta: StoreMeta = {
     name: "postgres",
     description: "Postgres store",
-    isAsync: true,
+    type: "async",
   };
 
   constructor(url: string, public readonly models: T) {
@@ -49,14 +49,16 @@ export class PostgresStore<
     const updates = inserts.filter(
       (key) => key !== "id" && key !== "createdAt"
     );
-    return (dto: any) =>
-      this.sql`INSERT INTO ${this.sql(tableName)} ${this.sql(
+    return (dto: any) => {
+      console.log("Upserting: ", dto);
+      return this.sql`INSERT INTO ${this.sql(tableName)} ${this.sql(
         dto,
         ...inserts
       )} ON CONFLICT (id) DO UPDATE SET ${this.sql(
         dto,
         ...updates
       )} WHERE ${this.sql(tableName)}.id = ${dto.id}`;
+    };
   }
 
   getSelectStatementForModel(tableName: string) {
@@ -78,14 +80,15 @@ export class PostgresStore<
       createdAt: BigInt(Date.now()),
       updatedAt: BigInt(Date.now()),
     };
-    await stmts.upsert(dto);
+    await stmts.upsert(dto).execute();
     return dto;
   }
 
-  get<J extends Record<string, any>>(
+  async get<J extends Record<string, any>>(
     entity: K,
     id: string | number
   ): Promise<CrudEntity<J>> {
-    return this.stmts[entity].select({ id });
+    const [data] = await this.stmts[entity].select({ id }).execute();
+    return data;
   }
 }

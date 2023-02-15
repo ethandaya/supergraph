@@ -1,5 +1,9 @@
-import { AuctionCreated } from "./types/NounsAuctionHouse/NounsAuctionHouse";
-import { Auction, Noun } from "./types/schema";
+import {
+  AuctionBid,
+  AuctionCreated,
+} from "./types/NounsAuctionHouse/NounsAuctionHouse";
+import { Auction, Bid, Noun } from "./types/schema";
+import { getOrCreateAccount } from "./utils/helpers";
 
 const log = console;
 
@@ -8,7 +12,7 @@ export async function handleAuctionCreated(
 ): Promise<void> {
   let nounId = event.params.nounId.toString();
 
-  let noun = Noun.load(nounId.toString());
+  let noun = await Noun.load(nounId.toString());
   if (noun == null) {
     log.error("[handleAuctionCreated] Noun #{} not found. Hash: {}", [
       nounId,
@@ -23,45 +27,41 @@ export async function handleAuctionCreated(
   auction.startTime = event.params.startTime;
   auction.endTime = event.params.endTime;
   auction.settled = false;
-  auction.save();
+  await auction.save();
 }
-//
-// export function handleAuctionBid(event: AuctionBid): void {
-//   let nounId = event.params.nounId.toString();
-//   let bidderAddress = event.params.sender;
-//
-//   let bidder = getOrCreateAccount(bidderAddress);
-//
-//   let auction = Auction.load(nounId);
-//   if (auction == null) {
-//     log.error("[handleAuctionBid] Auction not found for Noun #{}. Hash: {}", [
-//       nounId,
-//       event.transaction.hash,
-//     ]);
-//     return;
-//   }
-//
-//   auction.amount = event.params.value.toString();
-//   auction.bidder = bidder.id;
-//   auction.save();
-//
-//   // Save Bid
-//   let bid = new Bid(event.transaction.hash);
-//   bid.bidder = bidder.id;
-//   // TODO - SQLITE does not support UINT256
-//   bid.amount = auction.amount.toString();
-//   bid.noun = auction.noun;
-//   bid.txIndex = event.transaction.index;
-//   bid.blockNumber = event.block.number;
-//   bid.blockTimestamp = event.block.timestamp;
-//   bid.auction = auction.id;
-//   bid.save();
-//
-//   // TODO - do notification
-//   if (!event.backfill) {
-//     console.log("DO NOTIFICATION");
-//   }
-// }
+
+export async function handleAuctionBid(event: AuctionBid): Promise<void> {
+  let nounId = event.params.nounId.toString();
+  let bidderAddress = event.params.sender;
+
+  let bidder = await getOrCreateAccount(bidderAddress);
+  let auction = await Auction.load(nounId);
+
+  if (auction == null) {
+    log.error("[handleAuctionBid] Auction not found for Noun #{}. Hash: {}", [
+      nounId,
+      event.transaction.hash,
+    ]);
+    return;
+  }
+
+  auction.amount = event.params.value;
+  auction.bidder = bidder.id;
+
+  await auction.save();
+
+  // Save Bid
+  let bid = new Bid(event.transaction.hash);
+  bid.bidder = bidder.id;
+  bid.amount = auction.amount;
+  bid.noun = auction.noun;
+  bid.txIndex = event.transaction.index;
+  bid.blockNumber = event.block.number;
+  bid.blockTimestamp = new Date(event.block.timestamp);
+  bid.auction = auction.id;
+
+  await bid.save();
+}
 //
 // export function handleAuctionExtended(event: AuctionExtended): void {
 //   let nounId = event.params.nounId.toString();

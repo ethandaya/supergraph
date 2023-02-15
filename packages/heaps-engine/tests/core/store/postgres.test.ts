@@ -21,19 +21,30 @@ const secondTestSchema = baseSchema.extend({
 async function initializeDB(store: PostgresStore<any>) {
   // language=PostgreSQL
   await store.sql`
-          DROP TABLE IF EXISTS test;
-      `.execute();
+        DROP TABLE IF EXISTS test;
+    `.execute();
   // language=PostgreSQL
   await store.sql`
-          CREATE TABLE IF NOT EXISTS test
-          (
-              id        VARCHAR(255) PRIMARY KEY,
-              name      VARCHAR(255),
-              created_at BIGINT,
-              updated_at BIGINT
-          );
-      `.execute();
+        CREATE TABLE IF NOT EXISTS test
+        (
+            id         VARCHAR(255) PRIMARY KEY,
+            name       VARCHAR(255),
+            created_at BIGINT,
+            updated_at BIGINT
+        );
+    `.execute();
+  // language=PostgreSQL
+  await store.sql`
+      CREATE TABLE IF NOT EXISTS second_test
+      (
+          id                VARCHAR(255) PRIMARY KEY,
+          is_test           BOOLEAN,
+          my_nullable_field TEXT,
+          my_big_int        NUMERIC(78, 0)
+      );
+  `.execute();
 }
+
 describe("Postgres Store", () => {
   let store: PostgresStore<"test" | "secondTest">;
 
@@ -87,7 +98,10 @@ describe("Postgres Store", () => {
       updatedAt: BigInt(Date.now()),
     };
     await store.set("test", "1", dto);
-    const res = store.sql`select * from "test" where id = ${dto.id} limit 1`;
+    const res = store.sql`select *
+                              from "test"
+                              where id = ${dto.id}
+                              limit 1`;
     const result = await res.execute();
     expect(result[0]).toEqual(dto);
   });

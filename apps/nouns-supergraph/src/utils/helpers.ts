@@ -1,23 +1,23 @@
 import { Account } from "../types/schema";
 
-export function getOrCreateAccount(id: string): Account;
-export function getOrCreateAccount(
+export async function getOrCreateAccount(id: string): Promise<Account>;
+export async function getOrCreateAccount(
   id: string,
   createIfNotFound: boolean = true,
   save: boolean = true
-): Account | null {
-  let tokenHolder = Account.load(id);
+): Promise<Account | null> {
+  let tokenHolder = await Account.load(id);
 
   if (tokenHolder == null && createIfNotFound) {
     tokenHolder = new Account(id);
-    tokenHolder.tokenBalanceRaw = "0";
-    tokenHolder.tokenBalance = "0";
-    tokenHolder.totalTokensHeldRaw = "0";
-    tokenHolder.totalTokensHeld = "0";
+    tokenHolder.tokenBalanceRaw = BigInt(0);
+    tokenHolder.tokenBalance = BigInt(0);
+    tokenHolder.totalTokensHeldRaw = BigInt(0);
+    tokenHolder.totalTokensHeld = BigInt(0);
     // tokenHolder.nouns = [];
 
     if (save) {
-      tokenHolder.save();
+      await tokenHolder.save();
       return tokenHolder;
     }
   }

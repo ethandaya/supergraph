@@ -50,7 +50,7 @@ async function run() {
           auction         VARCHAR(255),
           tx_index        BIGINT,
           block_number    BIGINT,
-          block_timestamp BIGINT,
+          block_timestamp TIMESTAMPTZ,
           created_at      BIGINT,
           updated_at      BIGINT
         )

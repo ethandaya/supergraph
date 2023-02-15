@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "infra:up": "docker-compose up -d",
-    "codegen": "heaps codegen --pathToModels models.ts --outputDir src/types",
+    "codegen": "dotenv -e .env.local -- heaps codegen --pathToModels models.ts --outputDir src/types",
     "codegen:watch": "heaps codegen --pathToModels models.ts --outputDir src/types --watch",
-    "backfill": "dotenv -e .env.local -- heaps backfill --pathToSnapshot ./fixtures/events.csv"
+    "backfill": "dotenv -e .env.local -- heaps backfill --pathToSnapshot ./fixtures/events.csv",
+    "backfill:watch": "dotenv -e .env.local -- heaps backfill --pathToSnapshot ./fixtures/events.csv --watch"
   },
   "dependencies": {
     "@ethersproject/abi": "^5.7.0",

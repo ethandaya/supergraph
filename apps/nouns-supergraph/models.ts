@@ -1,24 +1,29 @@
 import { z } from "zod";
 
-export const NounSchema = z.object({
+const baseSchema = z.object({
+  id: z.string(),
+  createdAt: z.bigint(),
+  updatedAt: z.bigint(),
+});
+
+export const NounSchema = baseSchema.extend({
   id: z.string(),
   seed: z.nullable(z.number()),
   owner: z.string(),
 });
 
-export const BidSchema = z.object({
+export const BidSchema = baseSchema.extend({
   id: z.string(),
-  noun: z.string(),
-  // TODO - add alt store to support bigint
-  amount: z.string(),
+  noun: z.string().nullable(),
+  amount: z.bigint(),
   bidder: z.string(),
   auction: z.string(),
   txIndex: z.bigint(),
   blockNumber: z.bigint(),
-  blockTimestamp: z.string(),
+  blockTimestamp: z.date(),
 });
 
-export const AuctionSchema = z.object({
+export const AuctionSchema = baseSchema.extend({
   id: z.string(),
   noun: z.string(),
   amount: z.bigint(),
@@ -28,11 +33,11 @@ export const AuctionSchema = z.object({
   bidder: z.string().nullable().default(null),
 });
 
-export const AccountSchema = z.object({
+export const AccountSchema = baseSchema.extend({
   id: z.string(),
   delegate: z.string(),
-  tokenBalanceRaw: z.string(),
-  tokenBalance: z.string(),
-  totalTokensHeldRaw: z.string(),
-  totalTokensHeld: z.string(),
+  tokenBalanceRaw: z.bigint(),
+  tokenBalance: z.bigint(),
+  totalTokensHeldRaw: z.bigint(),
+  totalTokensHeld: z.bigint(),
 });

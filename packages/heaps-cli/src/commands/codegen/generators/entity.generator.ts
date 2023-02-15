@@ -76,10 +76,10 @@ export class EntityGenerator {
           type: "string",
         },
       ],
-      returnType: `${name} | null`,
+      returnType: this.isAsync ? `Promise<${name} | null>` : `${name} | null`,
       statements: [
         `const data =${
-          this.isAsync ? " async" : ""
+          this.isAsync ? " await" : ""
         } store.get<${name}Model>("${name.toLowerCase()}", id);`,
         `if (!data) {`,
         `   return new ${name}(id);`,

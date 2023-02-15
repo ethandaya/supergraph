@@ -228,8 +228,8 @@ describe("Entity Generator", () => {
               this.data = { id, ...data } || {};
           }
 
-          static async load(id: string): test | null {
-              const data = async store.get<testModel>(\\"test\\", id);
+          static async load(id: string): Promise<test | null> {
+              const data = await store.get<testModel>(\\"test\\", id);
               if (!data) {
                  return new test(id);
               }

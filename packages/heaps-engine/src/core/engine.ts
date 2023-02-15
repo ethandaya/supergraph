@@ -24,7 +24,7 @@ export interface Store {
 
 type TempData<T> = T | Partial<T>;
 
-export class Entity<T extends { id: string }, K extends z.ZodTypeAny> {
+export class Entity<T extends { id: string }, K extends z.AnyZodObject> {
   public data: TempData<T> = {};
 
   constructor(
@@ -64,7 +64,9 @@ export class Entity<T extends { id: string }, K extends z.ZodTypeAny> {
   }
 
   save(): CrudEntity<T> | Promise<CrudEntity<T>> {
-    const dto = this.schema.parse({ id: this.id, ...this.data });
+    const schema = this.schema.omit({ createdAt: true, updatedAt: true });
+    // TODO - fix zod inference types
+    const dto = schema.parse({ id: this.id, ...this.data }) as T;
     return this.store.set<T>(
       this.constructor.name.valueOf().toLowerCase(),
       this.id,

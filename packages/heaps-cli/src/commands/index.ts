@@ -19,6 +19,9 @@ export function registerCommands(cli: CAC) {
         default: "./supergraph.json",
       }
     )
+    .option("--pathToStore [path]", "Path to store definition", {
+      default: "./store.ts",
+    })
     .option(
       "--outputDir [path]",
       "Path where cli should output generated entity",

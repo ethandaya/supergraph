@@ -6,7 +6,6 @@ import { EventGenerator } from "./generators/event.generator";
 import { uncachedRequire } from "@heaps/common";
 import path from "path";
 import { loadConfig } from "../../utils/load";
-import { Store } from "@heaps/engine/src";
 
 type CodegenOptions = {
   pathToStore: string;
@@ -24,11 +23,11 @@ async function buildSchema({
   const storePath = await bundle(pathToStore);
   const buildPath = await bundle(pathToModels);
   const models = uncachedRequire(path.resolve(buildPath));
-  const store: Store = uncachedRequire(path.resolve(storePath));
+  const storeModule = uncachedRequire(path.resolve(storePath));
   const entityGenerator = new EntityGenerator({
     models,
     outputPath: outputDir + "/schema.ts",
-    storeType: store.meta.type,
+    storeType: storeModule.store.meta.type,
   });
   entityGenerator.generate();
 }

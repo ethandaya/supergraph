@@ -8,6 +8,7 @@ import { isBigNumberish } from "@ethersproject/bignumber/lib/bignumber";
 import { loadConfig } from "../../utils/load";
 import { SuperGraphConfig } from "../codegen/types";
 import * as console from "console";
+import { watch } from "chokidar";
 
 type BackfillOptions = {
   watch: boolean;
@@ -54,7 +55,12 @@ async function runHandlers(options: BackfillOptions) {
   const config = loadConfig(options);
   const events = await loadSnapshot(options.pathToSnapshot);
   const handlers = await loadHandlersFromConfig(config);
-  for (const event of events) {
+  for (const event of events.slice(0, 100)) {
+    console.log(
+      "Percent backfilled: ",
+      (events.indexOf(event) / events.length) * 100,
+      "%"
+    );
     if (handlers[`handle${event.event}`]) {
       const dto = {
         params: {
@@ -96,23 +102,18 @@ async function setup(options: BackfillOptions) {
 }
 
 export async function backfill(options: BackfillOptions) {
-  // try {
   await setup(options);
   await runHandlers(options);
-  // } catch (e) {
-  //   console.error(e);
-  //   throw e;
-  // }
-  //
-  // if (options.watch) {
-  //   console.log("Watching for changes...");
-  //   watch("./src").on("change", async () => {
-  //     try {
-  //       await setup(options);
-  //       await runHandlers(options);
-  //     } catch (e) {
-  //       console.error(e);
-  //     }
-  //   });
-  // }
+
+  if (options.watch) {
+    console.log("Watching for changes...");
+    watch(["./src"]).on("change", async () => {
+      try {
+        await setup(options);
+        await runHandlers(options);
+      } catch (e) {
+        console.error(e);
+      }
+    });
+  }
 }
