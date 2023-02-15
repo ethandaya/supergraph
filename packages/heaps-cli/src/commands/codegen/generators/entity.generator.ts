@@ -14,6 +14,7 @@ type GenerateOptions = {
 type EntityGeneratorOptions = {
   models: { [key: string]: z.AnyZodObject };
   outputPath: string;
+  storeType: string;
 };
 
 export class EntityGenerator {
@@ -23,16 +24,17 @@ export class EntityGenerator {
     [key: string]: z.AnyZodObject;
   } = {};
 
+  private isAsync: boolean = false;
+
   constructor(options: EntityGeneratorOptions) {
     this.project = new Project();
     this.targetFile = this.project.createSourceFile(
       options.outputPath,
       undefined,
-      {
-        overwrite: true,
-      }
+      { overwrite: true }
     );
     this.models = options.models;
+    this.isAsync = options.storeType === "async";
   }
 
   public generateImports() {
@@ -67,6 +69,7 @@ export class EntityGenerator {
     methods.push({
       name: "load",
       isStatic: true,
+      isAsync: this.isAsync,
       parameters: [
         {
           name: "id",
@@ -75,7 +78,9 @@ export class EntityGenerator {
       ],
       returnType: `${name} | null`,
       statements: [
-        `const data = store.get<${name}Model>("${name.toLowerCase()}", id);`,
+        `const data =${
+          this.isAsync ? " async" : ""
+        } store.get<${name}Model>("${name.toLowerCase()}", id);`,
         `if (!data) {`,
         `   return new ${name}(id);`,
         `}`,

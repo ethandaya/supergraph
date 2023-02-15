@@ -63,7 +63,7 @@ export class Entity<T extends { id: string }, K extends z.ZodTypeAny> {
     return this.data[key];
   }
 
-  save(): CrudEntity<T> {
+  save(): CrudEntity<T> | Promise<CrudEntity<T>> {
     const dto = this.schema.parse({ id: this.id, ...this.data });
     return this.store.set<T>(
       this.constructor.name.valueOf().toLowerCase(),
