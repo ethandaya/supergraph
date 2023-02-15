@@ -40,6 +40,22 @@ export class BaseCrudEntity<T extends {}, K extends z.ZodTypeAny> {
     this._schema = schema;
   }
 
+  public set<K extends keyof LocalData<T>>(
+    key: K,
+    value: LocalData<T>[typeof key]
+  ) {
+    this._data = { ...this._data, [key]: value };
+    return value;
+  }
+
+  public unset<K extends keyof LocalData<T>>(key: K) {
+    this._data = { ...this._data, [key]: null };
+  }
+
+  public get<K extends keyof LocalData<T>>(key: K): LocalData<T>[typeof key] {
+    return this._data[key];
+  }
+
   protected prepForSave(data: LocalData<T>): LocalData<T> {
     const now = BigInt(Date.now());
     if (data.createdAt) {

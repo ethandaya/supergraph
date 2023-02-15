@@ -70,4 +70,21 @@ describe("Entity", () => {
     expect(saved2.createdAt).toBe(saved.createdAt);
     expect(saved2.updatedAt).not.toBe(saved.updatedAt);
   });
+
+  it("should be able to use entity set method", () => {
+    entity.set("name", "test");
+    expect(entity._data.name).toBe("test");
+  });
+
+  it("should be able to use entity unset method", () => {
+    entity.set("name", "test");
+    expect(entity._data.name).toBe("test");
+    entity.unset("name");
+    expect(entity._data.name).toBe(null);
+  });
+
+  it("should be able to use entity get method", () => {
+    entity.set("name", "test");
+    expect(entity.get("name")).toBe("test");
+  });
 });
