@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { baseSchema, SyncCrudEntity } from "../../src/core/entity";
+import { baseSchema, SyncCrudEntity } from "../../src/entity";
 import { z } from "zod";
 import { TestStore } from "../utils/store";
 

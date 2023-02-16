@@ -14,7 +14,7 @@
     "lint": "TIMING=1 eslint packages/engine/src/**/*.ts* --fix",
     "clean": "rm -rf dist",
     "pre:test": "tsc --noEmit",
-    "test:watch": "STAGE=test vitest",
+    "test:watch": "vitest",
     "test": "vitest --watch=false",
     "coverage": "vitest run --coverage"
   },

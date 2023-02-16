@@ -5,8 +5,8 @@ import {
   CrudDto,
   ModelLookup,
   SyncStore,
-} from "../../src/core/store";
-import { StoreType } from "../../src/core/entity";
+} from "../../src/store";
+import { StoreType } from "../../src/entity";
 
 export class AsyncTestStore<
     H extends string,

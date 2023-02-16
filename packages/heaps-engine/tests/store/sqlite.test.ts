@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { baseSchema } from "../../src/core/entity";
+import { baseSchema } from "../../src/entity";
 import { z } from "zod";
 import { SqliteStore } from "../../src";
 
@@ -17,6 +17,7 @@ describe("SQLite Store", () => {
     sqliteStore = new SqliteStore({
       test: testSchema,
     });
+    sqliteStore.db.exec(`DROP TABLE IF EXISTS test`);
     sqliteStore.db.exec(
       `CREATE TABLE IF NOT EXISTS test
              (

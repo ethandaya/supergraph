@@ -1,26 +1,33 @@
-import { ModelLookup, StatementLookup, StoreMeta } from "./common";
-import { CrudEntity, Store } from "../engine";
 import postgres, { PendingQuery } from "postgres";
+import {
+  AsyncStore,
+  BaseStore,
+  CrudData,
+  CrudDto,
+  ModelLookup,
+  SchemaLookup,
+} from "../store";
+import { StoreType } from "../entity";
+import { StatementLookup } from "./common";
 import { z } from "zod";
 
 type Statement = (dto: any) => PendingQuery<any>;
 
 export class PostgresStore<
-  K extends string,
-  T extends ModelLookup<K> = ModelLookup<K>
-> implements Store
+    H extends string,
+    E extends ModelLookup<H>,
+    A extends keyof E = keyof E
+  >
+  extends BaseStore<H, E, A>
+  implements AsyncStore<H, E, A>
 {
+  type = StoreType.ASYNC;
   public sql: postgres.Sql;
-  public stmts: StatementLookup<K, Statement>;
+  public stmts: StatementLookup<H, Statement>;
 
-  public meta: StoreMeta = {
-    name: "postgres",
-    description: "Postgres store",
-    type: "async",
-  };
-
-  constructor(url: string, public readonly models: T) {
-    this.sql = postgres(url, {
+  constructor(public readonly models: SchemaLookup<H, E>) {
+    super();
+    this.sql = postgres(process.env.STORE_URL || "", {
       debug: false,
       types: {
         bigint: postgres.BigInt,
@@ -30,13 +37,13 @@ export class PostgresStore<
     this.stmts = this.prepareStatements(models);
   }
 
-  prepareStatements(models: T) {
-    const stmts: StatementLookup<K, Statement> = {} as StatementLookup<
-      K,
+  prepareStatements(models: SchemaLookup<H, E>) {
+    const stmts: StatementLookup<H, Statement> = {} as StatementLookup<
+      H,
       Statement
     >;
     for (const [tableName, model] of Object.entries<z.AnyZodObject>(models)) {
-      stmts[tableName as K] = {
+      stmts[tableName as H] = {
         upsert: this.getUpsertStatementForModel(tableName, model),
         select: this.getSelectStatementForModel(tableName),
       };
@@ -67,27 +74,21 @@ export class PostgresStore<
       } limit 1`;
   }
 
-  async set<T extends Record<string, any>>(
-    entity: K,
-    id: string | number,
-    data: T
-  ): Promise<CrudEntity<T>> {
+  async get(entity: H, id: string | number): Promise<CrudData<E[A]["type"]>> {
     const stmts = this.stmts[entity];
-    const dto = {
-      id,
-      ...data,
-      createdAt: BigInt(Date.now()),
-      updatedAt: BigInt(Date.now()),
-    };
+    const [data] = await stmts.select({ id }).execute();
+    return data;
+  }
+  async set(
+    entity: H,
+    id: string | number,
+    data: CrudDto<E[A]["type"]>
+  ): Promise<CrudData<E[A]["type"]>> {
+    const stmts = this.stmts[entity];
+    const model = this.models[entity];
+    model.omit({ id: true, createdAt: true, updatedAt: true }).parse(data);
+    const dto = this.prepForSave({ id, ...data });
     await stmts.upsert(dto).execute();
     return dto;
-  }
-
-  async get<J extends Record<string, any>>(
-    entity: K,
-    id: string | number
-  ): Promise<CrudEntity<J>> {
-    const [data] = await this.stmts[entity].select({ id }).execute();
-    return data;
   }
 }

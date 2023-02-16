@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { AsyncCrudEntity, baseSchema } from "../../src/core/entity";
+import { AsyncCrudEntity, baseSchema } from "../../src/entity";
 import { z } from "zod";
 import { AsyncTestStore } from "../utils/store";
 
