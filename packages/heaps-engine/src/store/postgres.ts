@@ -30,7 +30,7 @@ export class PostgresStore<
   constructor(public readonly models: SchemaLookup<H, E>) {
     super();
     this.sql = postgres(process.env.STORE_URL || "", {
-      debug: (_, s) => console.log(s),
+      // debug: (_, s) => console.log(s),
       types: {
         bigint: postgres.BigInt,
       },
