@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { baseSchema } from "../../src/entity";
 import { z } from "zod";
 import { SqliteStore } from "../../src";
@@ -13,7 +13,8 @@ describe("SQLite Store", () => {
     { test: { type: z.infer<typeof testSchema>; schema: typeof testSchema } }
   >;
 
-  beforeEach(() => {
+  beforeAll(() => {
+    vi.useFakeTimers();
     sqliteStore = new SqliteStore({
       test: testSchema,
     });
@@ -27,6 +28,10 @@ describe("SQLite Store", () => {
                  createdAt INTEGER
              )`
     );
+  });
+
+  beforeEach(() => {
+    sqliteStore.db.exec(`DELETE FROM test`);
   });
 
   it("should be able to create a new entity", () => {
@@ -52,6 +57,7 @@ describe("SQLite Store", () => {
     const update = {
       name: "Jane",
     };
+    vi.advanceTimersByTime(100);
     sqliteStore.set("test", "1", update);
     const res = sqliteStore.db.prepare("SELECT * FROM test").get();
     expect(res).toEqual({
@@ -74,5 +80,38 @@ describe("SQLite Store", () => {
       updatedAt: expect.any(BigInt),
       createdAt: expect.any(BigInt),
     });
+  });
+
+  it("should be able to batch writes", () => {
+    const dto = {
+      name: "John",
+    };
+    const dto2 = {
+      name: "Jane",
+    };
+    sqliteStore.startBatch();
+    const dto1Res = sqliteStore.set("test", "1", dto);
+    const snap = [...sqliteStore.batch];
+    const dto2Res = sqliteStore.set("test", "2", dto2);
+    const snap2 = [...sqliteStore.batch];
+    sqliteStore.commitBatch();
+    const snap3 = [...sqliteStore.batch];
+    expect(snap).toEqual([
+      {
+        stmt: sqliteStore.stmts.test.upsert,
+        dto: dto1Res,
+      },
+    ]);
+    expect(snap2).toEqual([
+      {
+        stmt: sqliteStore.stmts.test.upsert,
+        dto: dto1Res,
+      },
+      {
+        stmt: sqliteStore.stmts.test.upsert,
+        dto: dto2Res,
+      },
+    ]);
+    expect(snap3).toEqual([]);
   });
 });

@@ -20,13 +20,17 @@ export class SqliteStore<
   implements SyncStore<H, E, A>
 {
   type = StoreType.SYNC;
+  waitForCommit = false;
+  public batch: any[] = [];
   public db: Database.Database;
 
   public stmts: StatementLookup<H, string>;
 
   constructor(public readonly models: SchemaLookup<H, E>) {
     super();
-    this.db = new Database(process.env.STORE_URL || ":memory:");
+    this.db = new Database(process.env.STORE_URL || ":memory:", {
+      // verbose: console.log,
+    });
     this.db.pragma("journal_mode = WAL");
     this.db.defaultSafeIntegers();
     this.stmts = this.prepareStatements(models);
@@ -56,7 +60,7 @@ export class SqliteStore<
   getUpdateStatementForModel(model: z.AnyZodObject): string {
     const values = Object.keys(model.shape);
     const sets = values
-      .filter((key) => key !== "id")
+      .filter((key) => key !== "id" && key !== "createdAt")
       .map((key) => `${key} = $${key}`)
       .concat(["updatedAt = $updatedAt"])
       .join(", ");
@@ -81,7 +85,34 @@ export class SqliteStore<
     const model = this.models[entity];
     model.omit({ id: true, createdAt: true, updatedAt: true }).parse(data);
     const dto = this.prepForSave({ id, ...data });
+    if (this.waitForCommit) {
+      this.batch.push({ stmt: stmts.upsert, dto });
+      return dto;
+    }
     this.db.prepare(stmts.upsert).run(dto);
-    return dto;
+    return this.db.prepare(stmts.select).get({ id });
+  }
+
+  startBatch() {
+    this.waitForCommit = true;
+  }
+
+  commitBatch() {
+    const batch = this.batch;
+    this.batch = [];
+    const runner = this.db.transaction((batch) => {
+      for (const { stmt, dto } of batch) {
+        this.db.prepare(stmt).run(dto);
+      }
+    });
+    try {
+      runner(batch);
+      this.batch = [];
+    } catch (e) {
+      console.error(e);
+      this.batch = [...batch, ...this.batch];
+    }
+
+    this.waitForCommit = false;
   }
 }
