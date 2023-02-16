@@ -1,20 +1,9 @@
 import { Project, SourceFile, VariableDeclarationKind } from "ts-morph";
-import {
-  DefinitionNode,
-  DocumentNode,
-  Kind,
-  ObjectTypeDefinitionNode,
-  parse,
-} from "graphql/language";
+import { DocumentNode, parse } from "graphql/language";
 import * as fs from "fs";
 import { SchemaHandler } from "../schema";
 import { format } from "prettier";
-
-function isEntityDefinition(
-  node: DefinitionNode
-): node is ObjectTypeDefinitionNode {
-  return node.kind === Kind.OBJECT_TYPE_DEFINITION;
-}
+import { isEnumTypeDefinition, isObjectTypeDefinition } from "../common";
 
 type ModelGeneratorOptions = {
   outputPath: string;
@@ -57,17 +46,21 @@ export class ModelGenerator {
   }
 
   public generateModels() {
-    const entities = this.schema.definitions.filter(isEntityDefinition);
+    const entities = this.schema.definitions.filter(isObjectTypeDefinition);
     const generator = new SchemaHandler(this.schema, {
       String: "z.string()",
       Number: "z.number()",
       Boolean: "z.boolean()",
       BigInt: "z.bigint()",
       Date: "z.date()",
+      Bytes: "z.string()",
+      Enum: (name: string) => name,
     });
 
     entities.forEach((entity) => {
-      const columns = generator.mapFieldsToColumn(entity.fields || []);
+      const columns = generator
+        .mapFieldsToColumn(entity.fields || [])
+        .filter((col) => col.name !== "id");
       const types = columns.map((column) => {
         return `${column.name}: ${column.type}${
           column.isArray ? ".array()" : ""
@@ -89,8 +82,29 @@ export class ModelGenerator {
     });
   }
 
+  public generateEnums() {
+    const enums = this.schema.definitions.filter(isEnumTypeDefinition);
+    enums.forEach((enumType) => {
+      const values = enumType.values?.map((value) => `"${value.name.value}"`);
+      if (!values) return;
+      this.targetFile.addVariableStatements([
+        {
+          declarationKind: VariableDeclarationKind.Const,
+          declarations: [
+            {
+              name: enumType.name.value,
+              initializer: `z.enum([${values.join(", ")}])`,
+            },
+          ],
+          isExported: true,
+        },
+      ]);
+    });
+  }
+
   public generate(save = false) {
     this.generateImports();
+    this.generateEnums();
     this.generateModels();
     if (save) {
       const formatted = format(this.targetFile.getText(), {

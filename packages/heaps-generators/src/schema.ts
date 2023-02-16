@@ -16,7 +16,14 @@ import {
 } from "./common";
 import { FieldDefinitionNode } from "graphql/index";
 
-type SchemaTypes = "String" | "Number" | "Boolean" | "BigInt" | "Date";
+type SchemaTypes =
+  | "String"
+  | "Bytes"
+  | "Number"
+  | "Boolean"
+  | "BigInt"
+  | "Date"
+  | "Enum";
 
 export type PrimitiveLookup = {
   [key in SchemaTypes]: ((val: SchemaTypes) => string) | string;
@@ -66,14 +73,12 @@ export class SchemaHandler {
         return this.mapListType(type);
       case Kind.NON_NULL_TYPE:
         return this.mapNonNullType(type);
-      // case type.kind === "EnumTypeDefinition":
-      //   return mapEnumType(type as EnumTypeDefinitionNode);
-      // case type.kind === "EnumValueDefinition":
-      //   return mapEnumValue(type as EnumValueDefinitionNode);
-      // case type.kind === "InputObjectTypeDefinition":
-      //   return mapInputObjectType(type);
+      case Kind.ENUM_TYPE_DEFINITION:
+        return this.mapEnumType(type);
+      case Kind.ENUM_VALUE_DEFINITION:
+        return this.mapEnumValue(type);
       default:
-        throw new Error(`Unsupported input type: ${type.kind}`);
+        throw new Error("Unknown type");
     }
   }
 
@@ -108,10 +113,36 @@ export class SchemaHandler {
             isRelation: true,
           };
         }
+        if (
+          this.getEnumTypes()
+            .map((enumType) => enumType.name.value)
+            .includes(type.name.value)
+        ) {
+          return {
+            type: this.mapNamedTypeValue("Enum", type.name.value),
+            isEnum: true,
+          };
+        }
         return {
           type: this.mapNamedTypeValue("String", type.name.value),
         };
     }
+  }
+
+  public mapEnumValue(type: EnumValueDefinitionNode): UnamedColumn {
+    console.log("enum value", type);
+    return {
+      type: this.mapNamedTypeValue("String", type.name.value),
+      isEnum: true,
+    };
+  }
+
+  public mapEnumType(type: EnumTypeDefinitionNode): UnamedColumn {
+    console.log("enum type", type);
+    return {
+      type: this.mapNamedTypeValue("String", type.name.value),
+      isEnum: true,
+    };
   }
 
   public mapNonNullType(type: NonNullTypeNode): UnamedColumn {

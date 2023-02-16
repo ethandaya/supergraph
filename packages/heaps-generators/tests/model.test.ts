@@ -1,23 +1,18 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ModelGenerator } from "../src";
 
-// vi.mock(
-//   "./schema.graphql",
-//   () => `
-// type DelegationEvent @entity {
-//     id: ID!
-//     name: String!
-// }
-// `
-// );
-
 vi.mock("fs", () => ({
   writeFileSync: vi.fn(),
   readFileSync: vi.fn(
     () => `
+    enum MyEnum {
+        A
+        B
+    }
     type DelegationEvent @entity {
         id: ID!
         name: String!
+        myEnum: MyEnum!
     }
   `
   ),
@@ -39,7 +34,8 @@ describe("Model Generator", () => {
       "import { z } from \\"zod\\";
       import { baseSchema } from \\"@heaps/engine\\";
 
-      export const DelegationEvent = baseSchema.extend({ id: z.string(), name: z.string() });
+      export const MyEnum = z.enum([\\"A\\", \\"B\\"]);
+      export const DelegationEvent = baseSchema.extend({ name: z.string(), myEnum: MyEnum });
       "
     `);
   });
@@ -51,7 +47,8 @@ describe("Model Generator", () => {
       "import { z } from \\"zod\\";
       import { baseSchema } from \\"@heaps/engine\\";
 
-      export const DelegationEvent = baseSchema.extend({ id: z.string(), name: z.string() });
+      export const MyEnum = z.enum([\\"A\\", \\"B\\"]);
+      export const DelegationEvent = baseSchema.extend({ name: z.string(), myEnum: MyEnum });
       "
     `);
   });
