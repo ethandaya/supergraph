@@ -1,8 +1,4 @@
-import { z } from "zod";
-
-export type ModelLookup<T extends string> = {
-  [key in T]: z.AnyZodObject;
-};
+import { StoreType } from "../entity";
 
 export type StatementLookup<T extends string, K> = {
   [key in T]: {
@@ -10,8 +6,6 @@ export type StatementLookup<T extends string, K> = {
     select: K;
   };
 };
-
-export type StoreType = "sync" | "async";
 
 export type StoreMeta = {
   type: StoreType;

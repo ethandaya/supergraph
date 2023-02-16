@@ -1,0 +1,40 @@
+{
+  "name": "@heaps/generators",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "./dist/**"
+  ],
+  "scripts": {
+    "build": "rm -rf dist && tsup src/index.ts --dts",
+    "dev": "rm -rf dist && tsup src/index.ts --dts --watch",
+    "lint": "TIMING=1 eslint ./src/**/*.ts* --fix",
+    "clean": "rm -rf dist",
+    "pre:test": "tsc --noEmit",
+    "test:watch": "vitest",
+    "test": "vitest --watch=false",
+    "coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@heaps/engine": "workspace:*",
+    "graphql": "^16.6.0",
+    "ts-morph": "^17.0.1",
+    "zod": "^3.20.2"
+  },
+  "devDependencies": {
+    "@heaps/tsconfig": "workspace:*",
+    "@types/node": "^18.11.17",
+    "@vitest/coverage-c8": "^0.28.5",
+    "@vitest/ui": "^0.28.5",
+    "prettier": "^2.8.1",
+    "ts-node": "^10.9.1",
+    "tslib": "^2.4.1",
+    "tsup": "^6.5.0",
+    "typescript": "^4.9.4",
+    "vite": "^4.1.1",
+    "vitest": "^0.28.5"
+  }
+}
