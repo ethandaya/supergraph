@@ -86,14 +86,17 @@ export class SqliteStore<
     model.omit({ id: true, createdAt: true, updatedAt: true }).parse(data);
     const dto = this.prepForSave({ id, ...data });
     if (this.waitForCommit) {
+      // TODO - gonna need in mem update for this
       this.batch.push({ stmt: stmts.upsert, dto });
       return dto;
     }
     this.db.prepare(stmts.upsert).run(dto);
+    // TODO - add mature logic to discern data updates in mem
     return this.db.prepare(stmts.select).get({ id });
   }
 
   startBatch() {
+    // TODO - handle if batch started but not committed
     this.waitForCommit = true;
   }
 

@@ -113,5 +113,11 @@ describe("SQLite Store", () => {
       },
     ]);
     expect(snap3).toEqual([]);
+    expect(sqliteStore.db.prepare("SELECT * FROM test").all()).toEqual([
+      dto1Res,
+      dto2Res,
+    ]);
   });
+
+  // TODO - add tests for batch update
 });

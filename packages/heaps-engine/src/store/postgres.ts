@@ -11,7 +11,7 @@ import { StoreType } from "../entity";
 import { StatementLookup } from "./common";
 import { z } from "zod";
 
-type Statement = (dto: any) => PendingQuery<any>;
+type Statement = (dto: any, sql?: postgres.Sql) => PendingQuery<any>;
 
 export class PostgresStore<
     H extends string,
@@ -22,13 +22,15 @@ export class PostgresStore<
   implements AsyncStore<H, E, A>
 {
   type = StoreType.ASYNC;
+  waitForCommit = false;
+  public batch: any[] = [];
   public sql: postgres.Sql;
   public stmts: StatementLookup<H, Statement>;
 
   constructor(public readonly models: SchemaLookup<H, E>) {
     super();
     this.sql = postgres(process.env.STORE_URL || "", {
-      debug: false,
+      debug: (_, s) => console.log(s),
       types: {
         bigint: postgres.BigInt,
       },
@@ -56,22 +58,19 @@ export class PostgresStore<
     const updates = inserts.filter(
       (key) => key !== "id" && key !== "createdAt"
     );
-    return (dto: any) => {
-      return this.sql`INSERT INTO ${this.sql(tableName)} ${this.sql(
+    return (dto: any, sql: postgres.Sql = this.sql) => {
+      return sql`INSERT INTO ${sql(tableName)} ${sql(
         dto,
         ...inserts
-      )} ON CONFLICT (id) DO UPDATE SET ${this.sql(
-        dto,
-        ...updates
-      )} WHERE ${this.sql(tableName)}.id = ${dto.id}`;
+      )} ON CONFLICT (id) DO UPDATE SET ${sql(dto, ...updates)} WHERE ${sql(
+        tableName
+      )}.id = ${dto.id}`;
     };
   }
 
   getSelectStatementForModel(tableName: string) {
-    return (dto: any) =>
-      this.sql`select * from ${this.sql(tableName)} where id = ${
-        dto.id
-      } limit 1`;
+    return (dto: any, sql: postgres.Sql = this.sql) =>
+      sql`select * from ${sql(tableName)} where id = ${dto.id} limit 1`;
   }
 
   async get(entity: H, id: string | number): Promise<CrudData<E[A]["type"]>> {
@@ -88,7 +87,42 @@ export class PostgresStore<
     const model = this.models[entity];
     model.omit({ id: true, createdAt: true, updatedAt: true }).parse(data);
     const dto = this.prepForSave({ id, ...data });
+    if (this.waitForCommit) {
+      // TODO - gonna need in mem update for this
+      this.batch.push({ stmt: stmts.upsert, dto });
+      return dto;
+    }
     await stmts.upsert(dto).execute();
-    return dto;
+    // TODO - add mature logic to discern data updates in mem
+    return this.get(entity, id);
+  }
+
+  async startBatch() {
+    // TODO - handle if batch started but not committed
+    this.waitForCommit = true;
+  }
+
+  async commitBatch() {
+    const batch = this.batch;
+    this.batch = [];
+
+    // TODO - handle if batch started but not committed
+    this.batch = [];
+    await this.sql
+      .begin(async (sql) => {
+        for (const { stmt, dto } of batch) {
+          await stmt(dto, sql).execute();
+        }
+      })
+      .catch((e) => {
+        console.error(e);
+        this.batch = [...batch, ...this.batch];
+        throw e;
+      })
+      .finally(() => {
+        this.batch = [];
+      });
+
+    this.waitForCommit = false;
   }
 }
