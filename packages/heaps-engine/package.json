@@ -13,6 +13,8 @@
     "dev": "rm -rf dist && tsup src/index.ts --dts --watch",
     "lint": "TIMING=1 eslint packages/engine/src/**/*.ts* --fix",
     "clean": "rm -rf dist",
+    "pre:test": "tsc --noEmit",
+    "test:watch": "vitest",
     "test": "vitest --watch=false",
     "coverage": "vitest run --coverage"
   },

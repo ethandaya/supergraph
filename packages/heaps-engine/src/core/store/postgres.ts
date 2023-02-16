@@ -50,7 +50,6 @@ export class PostgresStore<
       (key) => key !== "id" && key !== "createdAt"
     );
     return (dto: any) => {
-      console.log("Upserting: ", dto);
       return this.sql`INSERT INTO ${this.sql(tableName)} ${this.sql(
         dto,
         ...inserts

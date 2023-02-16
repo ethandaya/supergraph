@@ -7,7 +7,7 @@ const testSchema = baseSchema.extend({
   name: z.string(),
 });
 
-describe("Entity", () => {
+describe("SQLite Store", () => {
   let sqliteStore: SqliteStore<
     "test",
     { test: { type: z.infer<typeof testSchema>; schema: typeof testSchema } }

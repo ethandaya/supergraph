@@ -26,7 +26,7 @@ export class SqliteStore<
 
   constructor(public readonly models: SchemaLookup<H, E>) {
     super();
-    this.db = new Database(process.env.STORE_PATH || ":memory:");
+    this.db = new Database(process.env.STORE_URL || ":memory:");
     this.db.pragma("journal_mode = WAL");
     this.db.defaultSafeIntegers();
     this.stmts = this.prepareStatements(models);
@@ -80,7 +80,8 @@ export class SqliteStore<
     const stmts = this.stmts[entity];
     const model = this.models[entity];
     model.omit({ id: true, createdAt: true, updatedAt: true }).parse(data);
-    this.db.prepare(stmts.upsert).run(this.prepForSave({ id, ...data }));
-    return data;
+    const dto = this.prepForSave({ id, ...data });
+    this.db.prepare(stmts.upsert).run(dto);
+    return dto;
   }
 }
