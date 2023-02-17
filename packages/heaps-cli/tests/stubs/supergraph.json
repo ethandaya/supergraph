@@ -6,7 +6,7 @@
       "name": "NounsAuctionHouse",
       "network": "mainnet",
       "kind": "contract",
-      "abi": "./abi.ts",
+      "abi": "ABI_PATH",
       "addresses": [
         "0xDAF873A2Ae77D570da094B52A8eC50Ef8885b2c4"
       ],

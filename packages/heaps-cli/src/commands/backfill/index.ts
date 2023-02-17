@@ -6,7 +6,7 @@ import csv from "csv-parser";
 import { parseEther } from "@ethersproject/units";
 import { isBigNumberish } from "@ethersproject/bignumber/lib/bignumber";
 import { loadConfig } from "../../utils/load";
-import { SuperGraphConfig } from "../codegen/types";
+import { SuperGraphConfig } from "../types";
 import * as console from "console";
 import { watch } from "chokidar";
 

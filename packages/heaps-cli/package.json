@@ -16,6 +16,8 @@
     "dev": "rm -rf dist && tsup src/cli-*.ts --watch",
     "lint": "TIMING=1 eslint src/**/*.ts* --fix",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+    "pre:test": "tsc --noEmit",
+    "test:watch": "vitest",
     "test": "vitest --watch=false",
     "coverage": "vitest run --coverage"
   },

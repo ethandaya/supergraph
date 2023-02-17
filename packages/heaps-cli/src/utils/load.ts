@@ -1,5 +1,5 @@
 import fs from "fs";
-import { SuperGraphConfig } from "../commands/codegen/types";
+import { SuperGraphConfig } from "../commands/types";
 
 export function loadAndParseJSON<T>(pathToConfig: string): T {
   const resp = fs.readFileSync(pathToConfig, "utf-8");

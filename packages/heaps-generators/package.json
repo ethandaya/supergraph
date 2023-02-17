@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@heaps/engine": "workspace:*",
+    "abitype": "^0.3.0",
     "graphql": "^16.6.0",
     "ts-morph": "^17.0.1",
     "zod": "^3.20.2"
