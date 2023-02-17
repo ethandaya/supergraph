@@ -3,7 +3,7 @@ import { z } from "zod";
 
 export type ModelLookup<T extends string> = {
   [key in T]: {
-    type: CrudData<z.infer<z.AnyZodObject>>;
+    type: z.infer<z.AnyZodObject>;
     schema: z.AnyZodObject;
   };
 };

@@ -1,10 +1,6 @@
-import { bundle } from "../../utils/build";
-import { EntityGenerator } from "./generators/entity.generator";
 import * as fs from "fs";
 import { SuperGraphConfig } from "./types";
 import { EventGenerator } from "./generators/event.generator";
-import { uncachedRequire } from "@heaps/common";
-import path from "path";
 import { loadConfig } from "../../utils/load";
 
 type CodegenOptions = {
@@ -14,23 +10,6 @@ type CodegenOptions = {
   outputDir: string;
   watch: boolean;
 };
-
-async function buildSchema({
-  pathToModels,
-  outputDir,
-  pathToStore,
-}: CodegenOptions) {
-  const storePath = await bundle(pathToStore);
-  const buildPath = await bundle(pathToModels);
-  const models = uncachedRequire(path.resolve(buildPath));
-  const storeModule = uncachedRequire(path.resolve(storePath));
-  const entityGenerator = new EntityGenerator({
-    models,
-    outputPath: outputDir + "/schema.ts",
-    storeType: storeModule.store.meta.type,
-  });
-  entityGenerator.generate();
-}
 
 function buildEvents({ outputDir }: CodegenOptions, config: SuperGraphConfig) {
   for (const idx in config.sources) {
@@ -49,7 +28,6 @@ export async function codegen(options: CodegenOptions) {
     console.log("Watching for changes...");
     fs.watch(options.pathToModels, async () => {
       console.log("Change detected, rebuilding...");
-      await buildSchema(options);
     });
     fs.watch(options.pathToConfig, () => {
       console.log("Change detected, rebuilding...");
@@ -58,7 +36,6 @@ export async function codegen(options: CodegenOptions) {
     });
   } else {
     const config = loadConfig(options);
-    await buildSchema(options);
     buildEvents(options, config);
   }
 }

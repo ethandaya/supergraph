@@ -22,7 +22,7 @@ describe("Model Generator", () => {
   let modelGenerator: ModelGenerator;
   beforeEach(() => {
     modelGenerator = new ModelGenerator({
-      outputPath: "./schema.ts",
+      outputPath: "./models.ts",
       schemaPath: "./schema.graphql",
     });
   });
@@ -35,7 +35,7 @@ describe("Model Generator", () => {
       import { baseSchema } from \\"@heaps/engine\\";
 
       export const MyEnum = z.enum([\\"A\\", \\"B\\"]);
-      export const DelegationEvent = baseSchema.extend({ name: z.string(), myEnum: MyEnum });
+      export const DelegationEventSchema = baseSchema.extend({ name: z.string(), myEnum: MyEnum });
       "
     `);
   });
@@ -48,7 +48,7 @@ describe("Model Generator", () => {
       import { baseSchema } from \\"@heaps/engine\\";
 
       export const MyEnum = z.enum([\\"A\\", \\"B\\"]);
-      export const DelegationEvent = baseSchema.extend({ name: z.string(), myEnum: MyEnum });
+      export const DelegationEventSchema = baseSchema.extend({ name: z.string(), myEnum: MyEnum });
       "
     `);
   });
