@@ -6,14 +6,16 @@ import {
 } from "ts-morph";
 import * as fs from "fs";
 import { format } from "prettier";
-import { z } from "zod";
+import { isObjectTypeDefinition } from "../common";
+import { DocumentNode, Kind, parse } from "graphql/language";
+import { FieldDefinitionNode } from "graphql/index";
 
 type EntityGeneratorOptions = {
   isAsync: boolean;
   outputPath: string;
   storeImportPath: string;
   modelImportPath: string;
-  models: { [key: string]: z.AnyZodObject };
+  schemaPath: string;
 };
 
 type GetterStatementOptions = {
@@ -45,6 +47,7 @@ export function makeSetterStatements(key: string) {
 export class EntityGenerator {
   private project: Project;
   public targetFile: SourceFile;
+  public schema: DocumentNode;
 
   constructor(private readonly options: EntityGeneratorOptions) {
     this.project = new Project();
@@ -53,7 +56,18 @@ export class EntityGenerator {
       undefined,
       { overwrite: true }
     );
+    this.schema = this.loadSchema(options.schemaPath);
   }
+
+  private loadSchema(path: string) {
+    const document = fs.readFileSync(path, "utf-8");
+    return parse(document);
+  }
+
+  get entities() {
+    return this.schema.definitions.filter(isObjectTypeDefinition);
+  }
+
   public generateImports() {
     const imports = [
       {
@@ -68,7 +82,7 @@ export class EntityGenerator {
         moduleSpecifier: "@heaps/engine",
       },
       {
-        namedImports: [...Object.keys(this.options.models)],
+        namedImports: [...this.entities.map((e) => e.name.value + "Schema")],
         moduleSpecifier: this.options.modelImportPath,
       },
       {
@@ -87,7 +101,10 @@ export class EntityGenerator {
     });
   }
 
-  public generateEntityForModel(name: string, schema: z.ZodObject<any>) {
+  public generateEntityForModel(
+    name: string,
+    fields: readonly FieldDefinitionNode[]
+  ) {
     let methods: OptionalKind<MethodDeclarationStructure>[] = [];
     methods.push({
       name: "load",
@@ -113,9 +130,11 @@ export class EntityGenerator {
       ],
     });
 
-    for (const key in schema.shape) {
+    for (const idx in fields) {
+      const field = fields[idx];
+      const key = field.name.value;
       const type = `${name}Model["${key}"]`;
-      const isNullable = schema.shape[key].isNullable();
+      const isNullable = field.type.kind === Kind.NON_NULL_TYPE;
       methods.push({
         name: `get ${key}`,
         returnType: type,
@@ -161,30 +180,33 @@ export class EntityGenerator {
     });
   }
 
-  public generateDefinitionsForModel(name: string, schema: z.ZodObject<any>) {
+  public generateDefinitionsForModel(
+    name: string,
+    fields: readonly FieldDefinitionNode[]
+  ) {
     this.generateTypeForModel(name);
-    this.generateEntityForModel(name, schema);
+    this.generateEntityForModel(name, fields);
   }
 
   public generateGlobalDefinitions() {
     this.targetFile.addTypeAlias({
       isExported: true,
       name: "SchemaNames",
-      type: Object.keys(this.options.models)
-        .map((key) => `"${key.replace("Schema", "")}"`)
-        .join(" | "),
+      type: this.entities.map((obj) => `"${obj.name.value}"`).join(" | "),
     });
+  }
+
+  public generateEntities() {
+    for (const en in this.entities) {
+      const entity = this.entities[en];
+      this.generateDefinitionsForModel(entity.name.value, entity.fields || []);
+    }
   }
 
   public generate(save = false) {
     this.generateImports();
     this.generateGlobalDefinitions();
-    for (const name in this.options.models) {
-      this.generateDefinitionsForModel(
-        name.replace("Schema", ""),
-        this.options.models[name]
-      );
-    }
+    this.generateEntities();
     if (save) {
       const formatted = format(this.targetFile.getText(), {
         parser: "typescript",

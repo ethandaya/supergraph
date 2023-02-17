@@ -25,7 +25,7 @@ export class ModelGenerator {
     this.schema = this.loadSchema(options.schemaPath);
   }
 
-  private loadSchema(path: string) {
+  protected loadSchema(path: string) {
     const document = fs.readFileSync(path, "utf-8");
     return parse(document);
   }

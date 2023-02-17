@@ -1,5 +1,5 @@
 import { cac } from "cac";
-import { registerCommands } from "./commands";
+import { registerCommands } from "./main";
 
 export async function main() {
   const cli = cac("heaps");
