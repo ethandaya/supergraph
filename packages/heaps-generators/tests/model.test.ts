@@ -36,6 +36,14 @@ describe("Model Generator", () => {
 
       export const MyEnum = z.enum([\\"A\\", \\"B\\"]);
       export const DelegationEventSchema = baseSchema.extend({ name: z.string(), myEnum: MyEnum });
+
+      export type EntityNames = \\"DelegationEvent\\";
+      export const models = {
+      DelegationEvent: DelegationEventSchema,
+      };
+      export type ModelLookupType = {
+      DelegationEvent: { type: z.infer<typeof DelegationEventSchema>, schema: typeof DelegationEventSchema },
+      };
       "
     `);
   });
@@ -49,6 +57,14 @@ describe("Model Generator", () => {
 
       export const MyEnum = z.enum([\\"A\\", \\"B\\"]);
       export const DelegationEventSchema = baseSchema.extend({ name: z.string(), myEnum: MyEnum });
+
+      export type EntityNames = \\"DelegationEvent\\";
+      export const models = {
+      DelegationEvent: DelegationEventSchema,
+      };
+      export type ModelLookupType = {
+      DelegationEvent: { type: z.infer<typeof DelegationEventSchema>, schema: typeof DelegationEventSchema },
+      };
       "
     `);
   });

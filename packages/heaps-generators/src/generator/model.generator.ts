@@ -30,6 +30,10 @@ export class ModelGenerator {
     return parse(document);
   }
 
+  get entities() {
+    return this.schema.definitions.filter(isObjectTypeDefinition);
+  }
+
   public generateImports() {
     const imports = [
       {
@@ -82,6 +86,33 @@ export class ModelGenerator {
     });
   }
 
+  public generateLookup() {
+    const entities = this.schema.definitions.filter(isObjectTypeDefinition);
+    const types = entities.map((entity) => entity.name.value);
+    this.targetFile.addStatements([
+      `export const models = {`,
+      types.map((type) => `${type}: ${type}Schema,`).join("\n"),
+      `};`,
+    ]);
+    const storeDefs = types.map(
+      (type) =>
+        `${type}: { type: z.infer<typeof ${type}Schema>, schema: typeof ${type}Schema },`
+    );
+    this.targetFile.addStatements([
+      `export type ModelLookupType = {`,
+      ...storeDefs,
+      `};`,
+    ]);
+  }
+
+  public generateGlobalDefinitions() {
+    this.targetFile.addTypeAlias({
+      isExported: true,
+      name: "EntityNames",
+      type: this.entities.map((obj) => `"${obj.name.value}"`).join(" | "),
+    });
+  }
+
   public generateEnums() {
     const enums = this.schema.definitions.filter(isEnumTypeDefinition);
     enums.forEach((enumType) => {
@@ -106,6 +137,8 @@ export class ModelGenerator {
     this.generateImports();
     this.generateEnums();
     this.generateModels();
+    this.generateGlobalDefinitions();
+    this.generateLookup();
     if (save) {
       const formatted = format(this.targetFile.getText(), {
         parser: "typescript",

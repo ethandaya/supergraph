@@ -192,14 +192,6 @@ export class EntityGenerator {
     this.generateEntityForModel(name, fields);
   }
 
-  public generateGlobalDefinitions() {
-    this.targetFile.addTypeAlias({
-      isExported: true,
-      name: "SchemaNames",
-      type: this.entities.map((obj) => `"${obj.name.value}"`).join(" | "),
-    });
-  }
-
   public generateEntities() {
     for (const en in this.entities) {
       const entity = this.entities[en];
@@ -209,7 +201,6 @@ export class EntityGenerator {
 
   public generate(save = false) {
     this.generateImports();
-    this.generateGlobalDefinitions();
     this.generateEntities();
     if (save) {
       const formatted = format(this.targetFile.getText(), {
