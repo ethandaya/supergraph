@@ -5,17 +5,17 @@ export function registerCodegenCommands(cli: CAC) {
   cli
     .command("codegen")
     .option("--watch", "Watch mode")
-    .option("--pathToSchema", "Generate entities for defined entities", {
+    .option("--pathToSchema", "Path to schema definition", {
       default: "./schema.graphql",
     })
-    .option("--pathToConfig", "Generate entities for defined entities", {
+    .option("--storeImportPath", "Path to store definition", {
+      default: "../../store",
+    })
+    .option("--pathToConfig", "Path to supergraph config", {
       default: "./supergraph.json",
     })
-    .option("--outputDir", "Generate entities for defined entities", {
+    .option("--outputDir", "Directory to output artifacts too", {
       default: "./src/types",
-    })
-    .option("--mappingDir", "Generate entities for defined entities", {
-      default: "./src",
     })
     .action(codegen);
   return cli;

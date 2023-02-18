@@ -10,9 +10,10 @@ import { watch } from "chokidar";
 export type CodegenOptions = {
   watch: boolean;
   pathToSchema: string;
+  // TODO - design of store path needs a lot of work
+  storeImportPath: string;
   pathToConfig: string;
   outputDir: string;
-  mappingDir: string;
 };
 export function buildArtifacts(options: Omit<CodegenOptions, "watch">) {
   const config = loadConfig(options);
@@ -25,7 +26,7 @@ export function buildArtifacts(options: Omit<CodegenOptions, "watch">) {
     isAsync: false,
     schemaPath: pathToSchema,
     outputPath: outputDir + "/schema.ts",
-    storeImportPath: "./store",
+    storeImportPath: options.storeImportPath,
     modelImportPath: "./models",
   });
   for (const idx in config.sources) {
