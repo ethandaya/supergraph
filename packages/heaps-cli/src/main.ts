@@ -3,6 +3,7 @@ import { registerCodegenCommands } from "./commands/codegen";
 
 export function registerCommands(cli: CAC) {
   let heaps: CAC = cli;
+
   heaps = registerCodegenCommands(heaps);
 
   heaps.command("hello").action(() => {

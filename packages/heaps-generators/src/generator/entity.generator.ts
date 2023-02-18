@@ -6,7 +6,7 @@ import {
 } from "ts-morph";
 import * as fs from "fs";
 import { format } from "prettier";
-import { isObjectTypeDefinition } from "../common";
+import { isDerivedField, isObjectTypeDefinition } from "../common";
 import { DocumentNode, Kind, parse } from "graphql/language";
 import { FieldDefinitionNode } from "graphql/index";
 
@@ -130,8 +130,12 @@ export class EntityGenerator {
       ],
     });
 
-    for (const idx in fields) {
-      const field = fields[idx];
+    const fieldsToGenerate = fields.filter(
+      (field) => !isDerivedField(field.directives)
+    );
+
+    for (const idx in fieldsToGenerate) {
+      const field = fieldsToGenerate[idx];
       const key = field.name.value;
       const type = `${name}Model["${key}"]`;
       const isNullable = field.type.kind === Kind.NON_NULL_TYPE;
@@ -172,7 +176,7 @@ export class EntityGenerator {
           ],
           statements: [
             `super(id, "${name}", ${name}Schema, store)`,
-            `this._data = { id, ...data } || {};`,
+            `this._data = { id, ...data } || { id };`,
           ],
         },
       ],

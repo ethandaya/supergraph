@@ -1,0 +1,89 @@
+
+type Noun @entity {
+    "The Noun's ERC721 token id"
+    id: ID!
+
+    "The seed used to determine the Noun's traits"
+    seed: Seed
+
+    "The owner of the Noun"
+    owner: Account!
+
+    "Historical votes for the Noun"
+    votes: [Vote!]! @derivedFrom(field: "nouns")
+}
+
+type Bid @entity {
+    "Bid transaction hash"
+    id: ID!
+
+    "The Noun being bid on"
+    noun: Noun!
+
+    "Bid amount"
+    amount: BigInt!
+
+    "Bidder account"
+    bidder: Account
+
+    "Block number of the bid"
+    blockNumber: BigInt!
+
+    "Index of transaction within block"
+    txIndex: BigInt!
+
+    "The auction being bid in"
+    auction: Auction!
+
+    "The timestamp of the block the bid is in"
+    blockTimestamp: BigInt!
+}
+
+type Auction @entity {
+    "The Noun's ERC721 token id"
+    id: ID!
+
+    "The Noun"
+    noun: Noun!
+
+    "The current highest bid amount"
+    amount: BigInt!
+
+    "The time that the auction started"
+    startTime: BigInt!
+
+    "The time that the auction is scheduled to end"
+    endTime: BigInt!
+
+    "The account with the current highest bid"
+    bidder: Account
+
+    "Whether or not the auction has been settled"
+    settled: Boolean!
+
+    "The auction bids"
+    bids: [Bid!]! @derivedFrom(field: "auction")
+}
+
+type Account @entity {
+    "An Account is any address that holds any amount of Nouns, the id used is the blockchain address."
+    id: ID!
+
+    "Delegate address of the token holder which will participate in votings. Delegates don't need to hold any tokens and can even be the token holder itself."
+    delegate: Delegate
+
+    "Noun balance of this address expressed in the smallest unit of the Nouns ERC721 Token"
+    tokenBalanceRaw: BigInt!
+
+    "Noun balance of this address expressed as a BigInt normalized value for the Nouns ERC721 Token"
+    tokenBalance: BigInt!
+
+    "Total amount of Nouns ever held by this address expressed in the smallest unit of the Nouns ERC721 Token"
+    totalTokensHeldRaw: BigInt!
+
+    "Total amount of Nouns ever held by this address expressed as a BigInt normalized value for the Nouns ERC721 Token"
+    totalTokensHeld: BigInt!
+
+    "The Nouns owned by this account"
+    nouns: [Noun!]!
+}

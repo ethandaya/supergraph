@@ -1,15 +1,20 @@
-import { EntityGenerator, ModelGenerator } from "@heaps/generators";
+import {
+  EntityGenerator,
+  EventGenerator,
+  ModelGenerator,
+} from "@heaps/generators";
 import { loadConfig } from "../../utils/load";
 import fs from "fs";
-import { EventGenerator } from "@heaps/generators";
+import { watch } from "chokidar";
 
-type CodegenOptions = {
+export type CodegenOptions = {
   watch: boolean;
   pathToSchema: string;
   pathToConfig: string;
   outputDir: string;
+  mappingDir: string;
 };
-export async function codegen(options: CodegenOptions) {
+export function buildArtifacts(options: Omit<CodegenOptions, "watch">) {
   const config = loadConfig(options);
   const { pathToSchema, outputDir } = options;
   const modelGenerator = new ModelGenerator({
@@ -21,7 +26,7 @@ export async function codegen(options: CodegenOptions) {
     schemaPath: pathToSchema,
     outputPath: outputDir + "/schema.ts",
     storeImportPath: "./store",
-    modelImportPath: outputDir + "./models",
+    modelImportPath: "./models",
   });
   for (const idx in config.sources) {
     const source = config.sources[idx];
@@ -33,6 +38,22 @@ export async function codegen(options: CodegenOptions) {
     });
     eventGenerator.generate(true);
   }
-  await modelGenerator.generate(true);
-  await entityGenerator.generate(true);
+  modelGenerator.generate(true);
+  entityGenerator.generate(true);
+}
+
+export function codegen(options: CodegenOptions) {
+  buildArtifacts(options);
+  if (options.watch) {
+    console.log("Watching for Changes...");
+    watch(options.pathToSchema).on("change", async () => {
+      console.log("Change detected, regenerating...");
+      try {
+        await codegen(options);
+      } catch (e) {
+        console.error("Error while regenerating");
+        console.error(e);
+      }
+    });
+  }
 }

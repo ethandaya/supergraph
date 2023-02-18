@@ -1,6 +1,6 @@
 export type Block = {
   number: bigint;
-  timestamp: string;
+  timestamp: bigint;
 };
 
 export type Transaction = {

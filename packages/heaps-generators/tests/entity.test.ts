@@ -7,6 +7,7 @@ vi.mock("fs", () => ({
     () => `
     type Test @entity {
         id: ID!
+        votes: [Vote!]! @derivedFrom(field: "nouns")
     }
   `
   ),
@@ -54,7 +55,7 @@ describe("Entity Generator", () => {
       export class Test extends AsyncCrudEntity<\\"Test\\", TestModel, typeof TestSchema> {
           constructor(id: string, data?: TestModel) {
               super(id, \\"Test\\", TestSchema, store)
-              this._data = { id, ...data } || {};
+              this._data = { id, ...data } || { id };
           }
 
           static async load(id: string): Promise<Test | null> {

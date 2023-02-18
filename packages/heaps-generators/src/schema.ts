@@ -138,7 +138,6 @@ export class SchemaHandler {
   }
 
   public mapEnumType(type: EnumTypeDefinitionNode): UnamedColumn {
-    console.log("enum type", type);
     return {
       type: this.mapNamedTypeValue("String", type.name.value),
       isEnum: true,
