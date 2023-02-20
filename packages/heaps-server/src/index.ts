@@ -31,7 +31,12 @@ export function handlerFactory<TAbi extends Abi>(
     if (!event) return res.status(400).end("Missing event name");
     const handler = handlers?.[event];
     if (!handler) return res.status(400).end("Invalid event name");
-    await handler(req.body);
+    try {
+      await handler(req.body);
+    } catch (e) {
+      console.error(e);
+      return res.status(500).end("Internal server error");
+    }
     return res.status(200).end("OK");
   };
 }
