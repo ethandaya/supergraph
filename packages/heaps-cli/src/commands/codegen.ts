@@ -15,16 +15,18 @@ export type CodegenOptions = {
   storeImportPath: string;
   pathToConfig: string;
   outputDir: string;
+  isAsyncStore: boolean;
 };
 export function buildArtifacts(options: Omit<CodegenOptions, "watch">) {
   const config = loadConfig(options);
   const { pathToSchema, outputDir } = options;
+  console.log("Generating Artifacts... ", outputDir);
   const modelGenerator = new ModelGenerator({
     schemaPath: pathToSchema,
     outputPath: outputDir + "/models.ts",
   });
   const entityGenerator = new EntityGenerator({
-    isAsync: false,
+    isAsync: options.isAsyncStore,
     schemaPath: pathToSchema,
     outputPath: outputDir + "/schema.ts",
     storeImportPath: options.storeImportPath,
@@ -64,18 +66,19 @@ export function registerCodegenCommands(cli: CAC) {
   cli
     .command("codegen")
     .option("--watch", "Watch mode")
-    .option("--pathToSchema", "Path to schema definition", {
+    .option("--pathToSchema <path>", "Path to schema definition", {
       default: "./schema.graphql",
     })
-    .option("--storeImportPath", "Path to store definition", {
+    .option("--storeImportPath <path>", "Path to store definition", {
       default: "../../store",
     })
-    .option("--pathToConfig", "Path to supergraph config", {
+    .option("--pathToConfig <path>", "Path to supergraph config", {
       default: "./supergraph.json",
     })
-    .option("--outputDir", "Directory to output artifacts too", {
+    .option("--outputDir <path>", "Directory to output artifacts too", {
       default: "./src/types",
     })
+    .option("--isAsyncStore", "Generate Async Entities")
     .action(codegen);
   return cli;
 }

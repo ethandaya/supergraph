@@ -1,7 +1,19 @@
 import { Project, SourceFile, VariableDeclarationKind } from "ts-morph";
-import { Abi, AbiEvent, ExtractAbiEventNames } from "abitype";
+import {
+  Abi,
+  AbiError,
+  AbiEvent,
+  AbiFunction,
+  ExtractAbiEventNames,
+} from "abitype";
 import { format } from "prettier";
 import fs from "fs";
+
+export function isEventType(
+  event: AbiFunction | AbiEvent | AbiError
+): event is AbiEvent {
+  return event.type === "event";
+}
 
 type EventGeneratorOptions = {
   abi: Abi;
@@ -12,7 +24,6 @@ export class EventGenerator {
   public targetFile: SourceFile;
 
   public abi: Abi;
-  private events: AbiEvent[];
 
   constructor(private readonly options: EventGeneratorOptions) {
     this.project = new Project();
@@ -24,9 +35,10 @@ export class EventGenerator {
       }
     );
     this.abi = options.abi;
-    this.events = options.abi.filter(
-      (item) => item.type === "event"
-    ) as AbiEvent[];
+  }
+
+  get events() {
+    return this.abi.filter(isEventType);
   }
 
   public generateImports() {
@@ -34,6 +46,7 @@ export class EventGenerator {
       namedImports: [
         "AbiParametersToPrimitiveTypes",
         "ExtractAbiEvent",
+        "ExtractAbiEventNames",
         "narrow",
       ],
       moduleSpecifier: "abitype",
@@ -47,6 +60,7 @@ export class EventGenerator {
   public inlineAbiEvents() {
     this.targetFile.addVariableStatement({
       declarationKind: VariableDeclarationKind.Const,
+      isExported: true,
       declarations: [
         {
           name: "abi",
@@ -60,7 +74,7 @@ export class EventGenerator {
     // TODO: addTypeAliases borked, will need to work out
     this.targetFile.addTypeAlias({
       name: `${event}Event`,
-      type: `ExtractAbiEvent<typeof abi, "AuctionCreated">`,
+      type: `ExtractAbiEvent<typeof abi, "${event}">`,
       isExported: true,
     });
     this.targetFile.addTypeAlias({
@@ -75,16 +89,19 @@ export class EventGenerator {
     });
     this.targetFile.addTypeAlias({
       name: event,
-      type: `SuperGraphEventType<{ [key in ${event}EventKeyType]: ${event}EventParamType[number] }>`,
+      type: `SuperGraphEventType<${event}Event["inputs"]>`,
       isExported: true,
     });
   }
 
   public generateEventTypes() {
-    this.abi.map((item) => {
-      if (item.type === "event") {
-        this.generateTypesForEvent(item.name);
-      }
+    this.events.forEach((event) => {
+      this.generateTypesForEvent(event.name);
+    });
+    this.targetFile.addTypeAlias({
+      isExported: true,
+      name: "EventNames",
+      type: "ExtractAbiEventNames<typeof abi>",
     });
   }
 

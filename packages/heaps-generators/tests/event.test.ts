@@ -28,7 +28,7 @@ describe("Event Generator", () => {
     eventGenerator.generateImports();
     const sourceFile = eventGenerator.targetFile.getFullText();
     expect(sourceFile).toMatchInlineSnapshot(`
-      "import { AbiParametersToPrimitiveTypes, ExtractAbiEvent, narrow } from \\"abitype\\";
+      "import { AbiParametersToPrimitiveTypes, ExtractAbiEvent, ExtractAbiEventNames, narrow } from \\"abitype\\";
       import { SuperGraphEventType } from \\"@heaps/engine\\";
       "
     `);
@@ -38,7 +38,7 @@ describe("Event Generator", () => {
     eventGenerator.inlineAbiEvents();
     const sourceFile = eventGenerator.targetFile.getFullText();
     expect(sourceFile).toMatchInlineSnapshot(`
-      "const abi = narrow([
+      "export const abi = narrow([
             {
               \\"anonymous\\": false,
               \\"inputs\\": [
@@ -61,10 +61,11 @@ describe("Event Generator", () => {
     eventGenerator.generateEventTypes();
     const sourceFile = eventGenerator.targetFile.getFullText();
     expect(sourceFile).toMatchInlineSnapshot(`
-      "export type TokenEventEvent = ExtractAbiEvent<typeof abi, \\"AuctionCreated\\">;
+      "export type TokenEventEvent = ExtractAbiEvent<typeof abi, \\"TokenEvent\\">;
       export type TokenEventEventKeyType = TokenEventEvent[\\"inputs\\"][number][\\"name\\"];
       export type TokenEventEventParamType = AbiParametersToPrimitiveTypes<TokenEventEvent[\\"inputs\\"]>;
-      export type TokenEvent = SuperGraphEventType<{ [key in TokenEventEventKeyType]: TokenEventEventParamType[number] }>;
+      export type TokenEvent = SuperGraphEventType<TokenEventEvent[\\"inputs\\"]>;
+      export type EventNames = ExtractAbiEventNames<typeof abi>;
       "
     `);
   });

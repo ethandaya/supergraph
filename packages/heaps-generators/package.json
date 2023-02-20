@@ -1,12 +1,12 @@
 {
   "name": "@heaps/generators",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "sideEffects": false,
   "files": [
-    "./dist/**"
+    "/dist"
   ],
   "scripts": {
     "build": "rm -rf dist && tsup src/index.ts --minify --dts",
@@ -18,11 +18,9 @@
     "test": "vitest --watch=false",
     "coverage": "vitest run --coverage"
   },
-  "dependencies": {
-    "abitype": "^0.3.0"
-  },
   "peerDependencies": {
-    "@heaps/engine": "workspace:*",
+    "@heaps/engine": "*",
+    "abitype": "^0.3.0",
     "graphql": "^16.6.0",
     "prettier": "^2.8.1"
   },
