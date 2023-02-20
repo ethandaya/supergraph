@@ -64,7 +64,7 @@ describe("Event Generator", () => {
       "export type TokenEventEvent = ExtractAbiEvent<typeof abi, \\"TokenEvent\\">;
       export type TokenEventEventKeyType = TokenEventEvent[\\"inputs\\"][number][\\"name\\"];
       export type TokenEventEventParamType = AbiParametersToPrimitiveTypes<TokenEventEvent[\\"inputs\\"]>;
-      export type TokenEvent = SuperGraphEventType<TokenEventEvent[\\"inputs\\"]>;
+      export type TokenEvent = SuperGraphEventType<\\"TokenEvent\\",TokenEventEvent[\\"inputs\\"]>;
       export type EventNames = ExtractAbiEventNames<typeof abi>;
       "
     `);

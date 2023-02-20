@@ -89,7 +89,7 @@ export class EventGenerator {
     });
     this.targetFile.addTypeAlias({
       name: event,
-      type: `SuperGraphEventType<${event}Event["inputs"]>`,
+      type: `SuperGraphEventType<"${event}",${event}Event["inputs"]>`,
       isExported: true,
     });
   }

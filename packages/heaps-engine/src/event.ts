@@ -28,7 +28,8 @@ export type MapNamedABIParametersToParams<T extends Array<NamedABIParameter>> =
     >;
   };
 
-export type SuperGraphEventType<T extends AbiParameter[]> = {
+export type SuperGraphEventType<K extends string, T extends AbiParameter[]> = {
+  event: K;
   backfill?: boolean;
   params: MapNamedABIParametersToParams<
     ExcludeUnnamedParametersFromInputs<T>
