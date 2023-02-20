@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import os from "os";
 import fs from "fs";
-import { codegen } from "../src/commands/codegen/command";
 import supergraph from "./stubs/supergraph.json";
 import abi from "./stubs/abi.json";
+import { codegen } from "../src/commands/codegen";
 
 describe("Codegen", () => {
   const tmpDir = os.tmpdir();
@@ -27,10 +27,11 @@ describe("Codegen", () => {
   });
 
   it("should correctly generate all artifacts for schema", async () => {
-    await codegen({
+    codegen({
       watch: false,
       pathToSchema: tmpDir + "/schema.graphql",
       pathToConfig: tmpDir + "/supergraph.json",
+      storeImportPath: "../../store",
       outputDir: tmpDir,
     });
 
