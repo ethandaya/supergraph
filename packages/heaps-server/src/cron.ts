@@ -1,11 +1,25 @@
 import { Abi, ExtractAbiEvent, ExtractAbiEventNames } from "abitype";
 import { baseHandlerFactory, HandlerLookup } from "./common";
-import { SuperGraphEventType } from "@heaps/engine";
-import { ExcludeUnnamedParametersFromInputs } from "@heaps/engine/src";
+import {
+  SuperGraphEventType,
+  ExcludeUnnamedParametersFromInputs,
+} from "@heaps/engine";
+import { InterfaceAbi } from "ethers";
 
-export function cron<TAbi extends Abi>(
+export type FetcherOptions = {
+  abi: InterfaceAbi;
+  contractAddress: string;
+  startBlock?: number;
+  endBlock?: number;
+};
+export function cronHandler<TAbi extends Abi>(
+  // TODO
+  abi: InterfaceAbi,
+  contractAddress: string,
   handlers: HandlerLookup<TAbi>,
-  fetcher: () => Promise<
+  fetcher: (
+    opts: FetcherOptions
+  ) => Promise<
     SuperGraphEventType<
       ExtractAbiEventNames<TAbi>,
       ExcludeUnnamedParametersFromInputs<
@@ -17,7 +31,11 @@ export function cron<TAbi extends Abi>(
   console.log(`Booting ${Object.keys(handlers).length} handlers...`);
   return baseHandlerFactory(
     async (_, res) => {
-      const events = await fetcher();
+      const events = await fetcher({
+        abi,
+        contractAddress,
+        startBlock: 0,
+      });
       console.log(events);
       return res.status(200).end();
     },

@@ -1,0 +1,6 @@
+{
+  "extends": "@heaps/tsconfig/node.json",
+  "include": [
+    "types.d.ts", "**/*.ts"],
+  "exclude": ["dist", "build", "node_modules"],
+}

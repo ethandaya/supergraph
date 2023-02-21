@@ -24,6 +24,7 @@
     "@types/jest": "^29.2.4",
     "@types/node": "^18.11.17",
     "abitype": "^0.3.0",
+    "ethers": "^6.0.5",
     "jest": "^29.3.1",
     "prettier": "^2.8.1",
     "ts-jest": "^29.0.3",
