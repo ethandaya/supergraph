@@ -16,7 +16,9 @@
     "pre:test": "tsc --noEmit",
     "test:watch": "vitest",
     "test": "vitest --watch=false",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "yalc:publish": "yalc publish --private",
+    "yalc:push": "yalc push --private"
   },
   "devDependencies": {
     "@ethersproject/bignumber": "^5.7.0",

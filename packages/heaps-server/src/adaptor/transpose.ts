@@ -1,8 +1,7 @@
 import { FetcherOptions } from "../cron";
-import { SuperGraphEventType } from "@heaps/engine";
+import { SuperGraphEventType, makeEventDecoder } from "@heaps/engine";
 import { Abi, ExtractAbiEvents } from "abitype";
 import { isEventType } from "../common";
-import { makeEventDecoder } from "@heaps/engine/src";
 
 const queryData = (options: FetcherOptions) =>
   JSON.stringify({
@@ -24,7 +23,9 @@ function transposeResultToEvent<TAbi extends Abi>(
   const decoder = makeEventDecoder(events);
   const { event, data } = decoder({
     data: row.data,
-    topics: [row.topic_0, row.topic_1, row.topic_2, row.topic_3],
+    topics: [row.topic_0, row.topic_1, row.topic_2, row.topic_3].filter(
+      (t) => !!t
+    ),
   });
   const params = {
     sender: row.from_address,
