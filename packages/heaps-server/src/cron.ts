@@ -1,20 +1,19 @@
 import { Abi, ExtractAbiEvent, ExtractAbiEventNames } from "abitype";
 import { baseHandlerFactory, HandlerLookup } from "./common";
 import {
-  SuperGraphEventType,
   ExcludeUnnamedParametersFromInputs,
+  SuperGraphEventType,
 } from "@heaps/engine";
-import { InterfaceAbi } from "ethers";
 
 export type FetcherOptions = {
-  abi: InterfaceAbi;
+  abi: Abi;
   contractAddress: string;
   startBlock?: number;
   endBlock?: number;
 };
+
 export function cronHandler<TAbi extends Abi>(
-  // TODO
-  abi: InterfaceAbi,
+  abi: TAbi,
   contractAddress: string,
   handlers: HandlerLookup<TAbi>,
   fetcher: (

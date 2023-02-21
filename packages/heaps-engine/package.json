@@ -28,6 +28,7 @@
     "@vitest/ui": "^0.28.5",
     "abitype": "^0.3.0",
     "better-sqlite3": "^8.0.1",
+    "ethers": "^6.0.5",
     "pg-mem": "^2.6.4",
     "postgres": "^3.3.3",
     "prettier": "^2.8.1",

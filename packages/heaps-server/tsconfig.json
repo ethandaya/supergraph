@@ -1,5 +1,5 @@
 {
   "extends": "@heaps/tsconfig/next.json",
-  "include": ["**/*.ts"],
+  "include": ["types.d.ts" ,"**/*.ts"],
   "exclude": ["dist", "build", "node_modules"],
 }
