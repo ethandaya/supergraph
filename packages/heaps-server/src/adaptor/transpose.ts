@@ -2,6 +2,7 @@ import { FetcherOptions } from "../cron";
 import { SuperGraphEventType, makeEventDecoder } from "@heaps/engine";
 import { Abi, ExtractAbiEvents } from "abitype";
 import { isEventType } from "../common";
+import fetch from "cross-fetch";
 
 const queryData = (options: FetcherOptions) =>
   JSON.stringify({
@@ -68,6 +69,11 @@ export async function transposeFetcher(options: FetcherOptions) {
   console.log("Credits charged:", res.headers.get("x-credits-charged"));
   const output = await res.json();
   console.log(`Fetched ${output.stats.count} events`);
-  const events = options.abi.filter(isEventType);
-  return output.results.map((row: any) => transposeResultToEvent(events, row));
+  if (options.decode) {
+    const events = options.abi.filter(isEventType);
+    return output.results.map((row: any) =>
+      transposeResultToEvent(events, row)
+    );
+  }
+  return output.results;
 }

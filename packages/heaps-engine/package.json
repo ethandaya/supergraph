@@ -9,7 +9,7 @@
     "/dist"
   ],
   "scripts": {
-    "build": "rm -rf dist && tsup src/index.ts --dts",
+    "build": "rm -rf dist && tsup src/index.ts --minify --dts",
     "dev": "rm -rf dist && tsup src/index.ts --dts --watch",
     "lint": "TIMING=1 eslint packages/engine/src/**/*.ts* --fix",
     "clean": "rm -rf dist",
@@ -31,7 +31,6 @@
     "abitype": "^0.3.0",
     "better-sqlite3": "^8.0.1",
     "ethers": "^6.0.5",
-    "pg-mem": "^2.6.4",
     "postgres": "^3.3.3",
     "prettier": "^2.8.1",
     "ts-node": "^10.9.1",

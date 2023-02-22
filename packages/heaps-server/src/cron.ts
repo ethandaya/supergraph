@@ -10,6 +10,7 @@ export type FetcherOptions = {
   contractAddress: string;
   startBlock?: number;
   endBlock?: number;
+  decode?: boolean;
 };
 
 export function cronHandler<TAbi extends Abi>(

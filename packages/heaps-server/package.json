@@ -9,7 +9,7 @@
     "/dist"
   ],
   "scripts": {
-    "build": "rm -rf dist && tsup src/index.ts --dts",
+    "build": "rm -rf dist && tsup src/index.ts --minify --dts",
     "dev": "rm -rf dist && tsup src/index.ts --dts --watch",
     "lint": "TIMING=1 eslint src/**/*.ts* --fix",
     "clean": "rm -rf dist",
@@ -17,7 +17,8 @@
     "yalc:push": "yalc push --private"
   },
   "peerDependencies": {
-    "@heaps/engine": "*"
+    "@heaps/engine": "*",
+    "next": "^13.1.6"
   },
   "devDependencies": {
     "@heaps/engine": "workspace:*",
@@ -40,8 +41,6 @@
     "maxWorkers": 1
   },
   "dependencies": {
-    "cross-fetch": "^3.1.5",
-    "fastify": "^4.13.0",
-    "next": "^13.1.6"
+    "cross-fetch": "^3.1.5"
   }
 }

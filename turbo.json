@@ -29,6 +29,15 @@
     },
     "clean": {
       "cache": false
+    },
+    "yalc:publish": {
+      "outputs": [
+        "dist/**/*",
+        ".next/**"
+      ],
+      "dependsOn": [
+        "^build"
+      ]
     }
   }
 }

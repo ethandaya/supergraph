@@ -1,6 +1,6 @@
 {
   "name": "@heaps/generators",
-  "version": "0.0.2",
+  "version": "0.0.1",
   "private": true,
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -16,7 +16,9 @@
     "pre:test": "tsc --noEmit",
     "test:watch": "vitest",
     "test": "vitest --watch=false",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "yalc:publish": "yalc publish --private",
+    "yalc:push": "yalc push --private"
   },
   "peerDependencies": {
     "@heaps/engine": "*",

@@ -6,7 +6,7 @@
   "types": "./dist/index.d.ts",
   "sideEffects": false,
   "files": [
-    "./dist"
+    "/dist"
   ],
   "scripts": {
     "build": "rm -rf dist && tsup src/**/*.ts --dts",

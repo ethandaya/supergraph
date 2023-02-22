@@ -19,11 +19,15 @@
     "pre:test": "tsc --noEmit",
     "test:watch": "vitest",
     "test": "vitest --watch=false",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "yalc:publish": "yalc publish --private",
+    "preyalc:push": "pnpm build",
+    "yalc:push": "yalc push --private"
   },
   "peerDependencies": {
     "@heaps/engine": "*",
-    "@heaps/generators": "*"
+    "@heaps/generators": "*",
+    "@heaps/server": "*"
   },
   "devDependencies": {
     "@heaps/common": "workspace:*",

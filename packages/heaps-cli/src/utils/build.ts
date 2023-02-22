@@ -10,6 +10,7 @@ export async function bundle(entryPath: string) {
     outdir: "./.heaps",
     platform: "node",
     external: ["zod", "@heaps/engine"],
+    target: ["esnext"],
   });
 
   return path.join(
