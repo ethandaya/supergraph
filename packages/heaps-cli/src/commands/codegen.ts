@@ -11,7 +11,6 @@ import { watch } from "chokidar";
 export type CodegenOptions = {
   watch: boolean;
   pathToSchema: string;
-  // TODO - design of store path needs a lot of work
   storeImportPath: string;
   pathToConfig: string;
   outputDir: string;

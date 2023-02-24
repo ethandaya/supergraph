@@ -13,11 +13,10 @@
     "dev": "rm -rf dist && tsup src/index.ts --dts --watch",
     "lint": "TIMING=1 eslint src/**/*.ts* --fix",
     "clean": "rm -rf dist",
-    "yalc:publish": "yalc publish --private",
-    "yalc:push": "yalc push --private"
+    "yalc:publish": "yalc publish --private"
   },
   "peerDependencies": {
-    "@heaps/engine": "*",
+    "@heaps/engine": "workspace:*",
     "next": "^13.1.6"
   },
   "devDependencies": {

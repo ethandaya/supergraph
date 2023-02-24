@@ -5,3 +5,4 @@ store.db-shm
 store.db-wal
 .env.*
 .env
+snapshots

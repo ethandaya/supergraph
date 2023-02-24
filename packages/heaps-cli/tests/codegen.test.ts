@@ -33,6 +33,7 @@ describe("Codegen", () => {
       pathToConfig: tmpDir + "/supergraph.json",
       storeImportPath: "../../store",
       outputDir: tmpDir,
+      isAsyncStore: false,
     });
 
     expect(fs.existsSync(tmpDir + "/models.ts")).toBe(true);

@@ -6,11 +6,9 @@ import {
 } from "@heaps/engine";
 
 export type FetcherOptions = {
-  abi: Abi;
   contractAddress: string;
   startBlock?: number;
   endBlock?: number;
-  decode?: boolean;
 };
 
 export function cronHandler<TAbi extends Abi>(
@@ -32,11 +30,20 @@ export function cronHandler<TAbi extends Abi>(
   return baseHandlerFactory(
     async (_, res) => {
       const events = await fetcher({
-        abi,
         contractAddress,
         startBlock: 0,
       });
-      console.log(events);
+      await events.reduce(async (prev, event) => {
+        await prev;
+        const handler = handlers?.[event.event];
+        console.log("event", event.event, handlers);
+        if (!handler) return;
+        try {
+          await handler(event);
+        } catch (e) {
+          console.error(e);
+        }
+      }, Promise.resolve());
       return res.status(200).end();
     },
     ["POST"]
