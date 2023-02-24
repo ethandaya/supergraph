@@ -125,4 +125,8 @@ export class PostgresStore<
 
     this.waitForCommit = false;
   }
+
+  async close() {
+    await this.sql.end();
+  }
 }

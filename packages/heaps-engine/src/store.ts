@@ -23,7 +23,7 @@ export interface SyncStore<
   H extends string,
   E extends ModelLookup<H>,
   A extends keyof E = keyof E
-> {
+> extends BaseStore<H, E, A> {
   type: StoreType;
   get(entity: H, id: string | number): CrudData<E[A]["type"]>;
   set(
@@ -31,12 +31,15 @@ export interface SyncStore<
     id: string | number,
     data: CrudDto<E[A]["type"]>
   ): CrudData<E[A]["type"]>;
+
+  startBatch(): void;
+  commitBatch(): void;
 }
 export interface AsyncStore<
   H extends string,
   E extends ModelLookup<H>,
   A extends keyof E = keyof E
-> {
+> extends BaseStore<H, E, A> {
   type: StoreType;
   get(entity: H, id: string | number): Promise<CrudData<E[A]["type"]>>;
   set(
@@ -44,6 +47,9 @@ export interface AsyncStore<
     id: string | number,
     data: CrudDto<E[A]["type"]>
   ): Promise<CrudData<E[A]["type"]>>;
+
+  startBatch(): Promise<void>;
+  commitBatch(): Promise<void>;
 }
 
 export type Store<
@@ -67,5 +73,9 @@ export class BaseStore<
       _data.updatedAt = now;
     }
     return _data;
+  }
+
+  close() {
+    throw new Error("Method not implemented.");
   }
 }
