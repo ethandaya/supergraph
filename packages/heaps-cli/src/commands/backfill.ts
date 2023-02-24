@@ -6,6 +6,8 @@ import fs from "fs";
 import path from "path";
 import { loadConfig } from "../utils/load";
 import { transposeFetcher } from "../fetcher/transpose";
+import { uncachedRequire } from "@heaps/common/src";
+import { bundle } from "../utils/build";
 
 type BackfillOptions = {
   watch: boolean;
@@ -16,15 +18,15 @@ type BackfillOptions = {
   mappingDir: string;
 };
 
-// async function setupStore(options: BackfillOptions) {
-//   if (!options.pathToSetupScript) return;
-//   const outputPath = await bundle(options.pathToSetupScript);
-//   console.log(`Setup Script Bundled to ${outputPath}`);
-//   const script = uncachedRequire(path.resolve(outputPath));
-//   if (script.default && typeof script.default === "function") {
-//     await script.default();
-//   }
-// }
+async function setupStore(options: BackfillOptions) {
+  if (!options.pathToSetupScript) return;
+  const outputPath = await bundle(options.pathToSetupScript);
+  console.log(`Setup Script Bundled to ${outputPath}`);
+  const script = uncachedRequire(path.resolve(outputPath));
+  if (script.default && typeof script.default === "function") {
+    await script.default();
+  }
+}
 
 async function fetchSnapshotForSource(
   options: BackfillOptions,
@@ -35,14 +37,14 @@ async function fetchSnapshotForSource(
     source.name + ".json"
   );
   if (!fs.existsSync(snapshotPath)) {
-    console.log("No snapshot found, fetching a new snapshot for", source.name);
+    console.log("No snapshot found, fetching a  new snapshot for", source.name);
+    const events = await transposeFetcher({
+      contractAddress: source.addresses[0],
+      startBlock: 0,
+    });
+    fs.mkdirSync(options.pathToSnapshotDir, { recursive: true });
+    fs.writeFileSync(snapshotPath, JSON.stringify(events));
   }
-  const events = await transposeFetcher({
-    contractAddress: source.addresses[0],
-    startBlock: 0,
-  });
-  fs.mkdirSync(options.pathToSnapshotDir, { recursive: true });
-  fs.writeFileSync(snapshotPath, JSON.stringify(events));
 }
 
 async function fetchSnapshots(options: BackfillOptions) {
@@ -55,6 +57,7 @@ async function fetchSnapshots(options: BackfillOptions) {
 
 export async function backfill(options: BackfillOptions) {
   await fetchSnapshots(options);
+  await setupStore(options);
   if (options.watch) {
     console.log("Watching for Changes...");
     watch(options.mappingDir).on("change", async () => {
