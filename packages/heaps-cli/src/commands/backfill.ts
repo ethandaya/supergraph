@@ -6,11 +6,10 @@ import path from "path";
 import { loadConfig } from "../utils/load";
 import { transposeFetcher } from "../fetcher/transpose";
 import { bundle } from "../utils/build";
-import { Store } from "@heaps/engine";
 import { LogData } from "../fetcher/common";
 import { Abi as AbiSchema } from "abitype/zod";
 import { Abi } from "abitype";
-import { EventFragment, Interface, InterfaceAbi, keccak256 } from "ethers";
+import { EventFragment, Interface, InterfaceAbi } from "ethers";
 import { isEventType } from "@heaps/generators";
 import { SuperGraphEventType } from "@heaps/engine/src";
 
@@ -62,11 +61,6 @@ async function fetchSnapshots(
   );
 }
 
-function getTopic0Hash(eventInterface: string): string {
-  const hash = keccak256(Buffer.from(eventInterface, "utf-8"));
-  return hash.toString();
-}
-
 async function seedStore(config: SuperGraphConfig, options: BackfillOptions) {
   if (!options.pathToStore) {
     throw new Error("No path to store provided");
@@ -74,7 +68,6 @@ async function seedStore(config: SuperGraphConfig, options: BackfillOptions) {
   const outputPath = await bundle(options.pathToStore);
   const storeModule = uncachedRequire(path.resolve(outputPath));
   if (storeModule.store && typeof storeModule.store === "object") {
-    const { store }: { store: Store<any, any> } = storeModule;
     await Promise.all(
       config.sources.map(async (source) => {
         const snapshotPath = path.join(
@@ -86,7 +79,8 @@ async function seedStore(config: SuperGraphConfig, options: BackfillOptions) {
         const logs: LogData[] = JSON.parse(
           fs.readFileSync(snapshotPath, "utf-8")
         );
-        console.log("Seeding", source.name, "with", logs.length, "events");
+        // console.log("Seeding", source.name, "with", logs.length, "events");
+        console.log("Seeding", source.name);
         let abi: Abi = JSON.parse(fs.readFileSync(source.abi, "utf-8"));
         try {
           abi = AbiSchema.parse(abi);
@@ -105,7 +99,7 @@ async function seedStore(config: SuperGraphConfig, options: BackfillOptions) {
         const matchingLogs = logs.filter((log) =>
           hashes.includes(log.topics[0])
         );
-        console.log("matching events: ", matchingLogs.length);
+        // console.log("matching events: ", matchingLogs.length);
         const iface = new Interface(abi as InterfaceAbi);
         const events = matchingLogs.map((log) => {
           const logDescription = iface.parseLog(log);
@@ -136,46 +130,29 @@ async function seedStore(config: SuperGraphConfig, options: BackfillOptions) {
             },
           };
         }) as SuperGraphEventType<any, any>[];
-        await store.startBatch();
-        try {
-          for (const event of events.slice(0, 1)) {
-            console.log("event", event);
-            const handler = handlerModule[`handle${event.event}`];
-            if (handler) {
-              await handler(event);
-            } else {
-              console.log("No handler found for", event.event);
-            }
+
+        await events.reduce(async (acc, event) => {
+          await acc;
+          const handler = handlerModule[`handle${event.event}`];
+          if (handler) {
+            await handler(event);
+          } else {
+            console.log("No handler found for", event.event);
           }
-          await store.commitBatch();
-          console.log("Seeding complete for", source.name);
-        } catch (e) {
-          console.log("Error while seeding", e);
-        } finally {
-          await store.close();
-        }
+        }, Promise.resolve());
       })
     );
   }
 }
 
 export async function backfill(options: BackfillOptions) {
+  const time = Date.now();
   const config = loadConfig(options);
   await fetchSnapshots(config, options);
   await setupStore(options);
   await seedStore(config, options);
-  // if (options.watch) {
-  //   console.log("Watching for Changes...");
-  //   watch(options.mappingDir).on("change", async () => {
-  //     console.log("Change detected, regenerating...");
-  //     try {
-  //       console.log("backfill");
-  //     } catch (e) {
-  //       console.error("Error while regenerating");
-  //       console.error(e);
-  //     }
-  //   });
-  // }
+  console.log("Time to Backfill: ", (Date.now() - time) / 1000, " seconds");
+  process.exit();
 }
 
 export function registerBackfillCommands(cli: CAC) {

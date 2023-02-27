@@ -1,7 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import { baseSchema } from "../../src";
+import { baseSchema, PostgresStore } from "../../src";
 import { z } from "zod";
-import { PostgresStore } from "../../src";
 
 const testSchema = baseSchema.extend({
   name: z.string(),
@@ -92,38 +91,5 @@ describe("Postgres Store", () => {
       updatedAt: expect.any(BigInt),
       createdAt: expect.any(BigInt),
     });
-  });
-
-  it("should be able to batch writes", async () => {
-    const dto = {
-      name: "John",
-    };
-    const dto2 = {
-      name: "Jane",
-    };
-    await postgresStore.startBatch();
-    const dto1Res = await postgresStore.set("test", "1", dto);
-    const snap = [...postgresStore.batch];
-    const dto2Res = await postgresStore.set("test", "2", dto2);
-    const snap2 = [...postgresStore.batch];
-    await postgresStore.commitBatch();
-    const snap3 = [...postgresStore.batch];
-    expect(snap).toEqual([
-      {
-        stmt: postgresStore.stmts.test.upsert,
-        dto: dto1Res,
-      },
-    ]);
-    expect(snap2).toEqual([
-      {
-        stmt: postgresStore.stmts.test.upsert,
-        dto: dto1Res,
-      },
-      {
-        stmt: postgresStore.stmts.test.upsert,
-        dto: dto2Res,
-      },
-    ]);
-    expect(snap3).toEqual([]);
   });
 });

@@ -37,12 +37,12 @@ describe("Model Generator", () => {
       export const MyEnum = z.enum([\\"A\\", \\"B\\"]);
       export const DelegationEventSchema = baseSchema.extend({ name: z.string(), myEnum: MyEnum });
 
-      export type EntityNames = \\"DelegationEvent\\";
+      export type EntityNames = \\"delegationevent\\";
       export const models = {
-      DelegationEvent: DelegationEventSchema,
+      delegationevent: DelegationEventSchema,
       };
       export type ModelLookupType = {
-      DelegationEvent: { type: z.infer<typeof DelegationEventSchema>, schema: typeof DelegationEventSchema },
+      delegationevent: { type: z.infer<typeof DelegationEventSchema>, schema: typeof DelegationEventSchema },
       };
       "
     `);
@@ -58,12 +58,12 @@ describe("Model Generator", () => {
       export const MyEnum = z.enum([\\"A\\", \\"B\\"]);
       export const DelegationEventSchema = baseSchema.extend({ name: z.string(), myEnum: MyEnum });
 
-      export type EntityNames = \\"DelegationEvent\\";
+      export type EntityNames = \\"delegationevent\\";
       export const models = {
-      DelegationEvent: DelegationEventSchema,
+      delegationevent: DelegationEventSchema,
       };
       export type ModelLookupType = {
-      DelegationEvent: { type: z.infer<typeof DelegationEventSchema>, schema: typeof DelegationEventSchema },
+      delegationevent: { type: z.infer<typeof DelegationEventSchema>, schema: typeof DelegationEventSchema },
       };
       "
     `);

@@ -72,7 +72,7 @@ describe("Entity Generator", () => {
           }
 
           static async load(id: string): Promise<Test | null> {
-              const data = await store.get(\\"Test\\", id);
+              const data = await store.get(\\"test\\", id);
               if (!data) {
                  return new Test(id);
               }
@@ -82,10 +82,10 @@ describe("Entity Generator", () => {
 
           async save() {
               const dto = this._schema.extend({
-              updatedAt: z.date().optional(),
-              createdAt: z.date().optional(),
+              updatedAt: z.bigint().optional(),
+              createdAt: z.bigint().optional(),
               }).parse({ id: this._id, ...this._data });
-              this._data = await store.set(\\"Test\\", this.id, dto);
+              this._data = await store.set(\\"test\\", this.id, dto);
               return this._data;
           }
       }

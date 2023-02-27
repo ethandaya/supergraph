@@ -42,6 +42,7 @@ export class SchemaHandler {
       .filter((field) => !isDerivedField(field.directives))
       .map((field) => ({
         name: field.name.value,
+        isNullable: true,
         ...this.mapInputField(field.type),
       }));
   }
@@ -130,7 +131,6 @@ export class SchemaHandler {
   }
 
   public mapEnumValue(type: EnumValueDefinitionNode): UnamedColumn {
-    console.log("enum value", type);
     return {
       type: this.mapNamedTypeValue("String", type.name.value),
       isEnum: true,

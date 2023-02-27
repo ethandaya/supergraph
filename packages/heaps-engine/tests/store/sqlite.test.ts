@@ -15,7 +15,10 @@ describe("SQLite Store", () => {
 
   beforeAll(() => {
     vi.useFakeTimers();
-    sqliteStore = new SqliteStore({
+    sqliteStore = new SqliteStore<
+      "test",
+      { test: { type: z.infer<typeof testSchema>; schema: typeof testSchema } }
+    >({
       test: testSchema,
     });
     sqliteStore.db.exec(`DROP TABLE IF EXISTS test`);

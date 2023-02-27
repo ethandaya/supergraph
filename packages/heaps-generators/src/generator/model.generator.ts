@@ -68,7 +68,7 @@ export class ModelGenerator {
       const types = columns.map((column) => {
         return `${column.name}: ${column.type}${
           column.isArray ? ".array()" : ""
-        }`;
+        }${column.isNullable ? ".nullable().default(null)" : ""}`;
       });
 
       this.targetFile.addVariableStatements([
@@ -91,12 +91,12 @@ export class ModelGenerator {
     const types = entities.map((entity) => entity.name.value);
     this.targetFile.addStatements([
       `export const models = {`,
-      types.map((type) => `${type}: ${type}Schema,`).join("\n"),
+      types.map((type) => `${type.toLowerCase()}: ${type}Schema,`).join("\n"),
       `};`,
     ]);
     const storeDefs = types.map(
       (type) =>
-        `${type}: { type: z.infer<typeof ${type}Schema>, schema: typeof ${type}Schema },`
+        `${type.toLowerCase()}: { type: z.infer<typeof ${type}Schema>, schema: typeof ${type}Schema },`
     );
     this.targetFile.addStatements([
       `export type ModelLookupType = {`,
@@ -109,7 +109,9 @@ export class ModelGenerator {
     this.targetFile.addTypeAlias({
       isExported: true,
       name: "EntityNames",
-      type: this.entities.map((obj) => `"${obj.name.value}"`).join(" | "),
+      type: this.entities
+        .map((obj) => `"${obj.name.value.toLowerCase()}"`)
+        .join(" | "),
     });
   }
 

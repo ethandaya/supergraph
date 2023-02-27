@@ -26,8 +26,6 @@ export class PostgresStore<
   implements AsyncStore<E, A>
 {
   type = StoreType.ASYNC;
-  waitForCommit = false;
-  public batch: any[] = [];
   public sql: postgres.Sql;
   public stmts: P;
   constructor(public readonly models: ModelSchemaLookup<H, E>) {
@@ -93,46 +91,20 @@ export class PostgresStore<
     const model = this.models[entity];
     model.omit({ id: true, createdAt: true, updatedAt: true }).parse(data);
     const dto = this.prepForSave({ id, ...data });
-    if (this.waitForCommit) {
-      // TODO - gonna need in mem update for this
-      this.batch.push({ stmt: stmts.upsert, dto });
-      return dto;
-    }
     await stmts.upsert(dto).execute();
     // TODO - add mature logic to discern data updates in mem
     return this.get(entity, id);
   }
 
   async startBatch() {
-    // TODO - handle if batch started but not committed
-    this.waitForCommit = true;
+    throw new Error("Method not implemented.");
   }
 
   async commitBatch() {
-    const batch = this.batch;
-    this.batch = [];
-
-    // TODO - handle if batch started but not committed
-    this.batch = [];
-    await this.sql
-      .begin(async (sql) => {
-        for (const { stmt, dto } of batch) {
-          await stmt(dto, sql).execute();
-        }
-      })
-      .catch((e) => {
-        console.error(e);
-        this.batch = [...batch, ...this.batch];
-        throw e;
-      })
-      .finally(() => {
-        this.batch = [];
-      });
-
-    this.waitForCommit = false;
+    throw new Error("Method not implemented.");
   }
 
   async close() {
-    await this.sql.end();
+    throw new Error("Method not implemented.");
   }
 }
