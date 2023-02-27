@@ -13,54 +13,52 @@ export type SchemaLookup<T extends string, K extends ModelLookup<T>> = {
 };
 
 export type CrudData<T> = T & {
-  createdAt?: bigint;
-  updatedAt?: bigint;
+  createdAt: bigint;
+  updatedAt: bigint;
 };
 
 export type CrudDto<T> = Omit<T, "id" | "updatedAt" | "createdAt">;
 
 export interface SyncStore<
-  H extends string,
-  E extends ModelLookup<H>,
+  E extends ModelLookup<string>,
   A extends keyof E = keyof E
-> extends BaseStore<H, E, A> {
+> extends BaseStore<E, A> {
   type: StoreType;
-  get(entity: H, id: string | number): CrudData<E[A]["type"]>;
-  set(
-    entity: H,
+  get<J extends A = A>(entity: A, id: string | number): CrudData<E[J]["type"]>;
+  set<J extends A = A>(
+    entity: J,
     id: string | number,
-    data: CrudDto<E[A]["type"]>
-  ): CrudData<E[A]["type"]>;
+    data: CrudDto<E[J]["type"]>
+  ): CrudData<E[J]["type"]>;
 
   startBatch(): void;
   commitBatch(): void;
 }
 export interface AsyncStore<
-  H extends string,
-  E extends ModelLookup<H>,
+  E extends ModelLookup<string>,
   A extends keyof E = keyof E
-> extends BaseStore<H, E, A> {
+> extends BaseStore<E, A> {
   type: StoreType;
-  get(entity: H, id: string | number): Promise<CrudData<E[A]["type"]>>;
-  set(
-    entity: H,
+  get<J extends A = A>(
+    entity: A,
+    id: string | number
+  ): Promise<CrudData<E[J]["type"]>>;
+  set<J extends A = A>(
+    entity: J,
     id: string | number,
-    data: CrudDto<E[A]["type"]>
-  ): Promise<CrudData<E[A]["type"]>>;
+    data: CrudDto<E[J]["type"]>
+  ): Promise<CrudData<E[J]["type"]>>;
 
   startBatch(): Promise<void>;
   commitBatch(): Promise<void>;
 }
 
-export type Store<
-  H extends string,
-  E extends ModelLookup<H>,
-  A extends keyof E = keyof E
-> = SyncStore<H, E, A> | AsyncStore<H, E, A>;
+export type Store<E extends ModelLookup<string>, A extends keyof E = keyof E> =
+  | SyncStore<E, A>
+  | AsyncStore<E, A>;
 
 export class BaseStore<
-  H extends string,
-  E extends ModelLookup<H>,
+  E extends ModelLookup<string>,
   A extends keyof E = keyof E
 > {
   protected prepForSave(data: CrudDto<E[A]["type"]>): CrudData<E[A]["type"]> {

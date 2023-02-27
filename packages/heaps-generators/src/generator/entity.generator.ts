@@ -75,10 +75,7 @@ export class EntityGenerator {
         moduleSpecifier: "zod",
       },
       {
-        namedImports: [
-          `${this.options.isAsync ? "Async" : "Sync"}CrudEntity`,
-          "KeyAccessError",
-        ],
+        namedImports: ["CrudEntity", "KeyAccessError"],
         moduleSpecifier: "@heaps/engine",
       },
       {
@@ -106,29 +103,6 @@ export class EntityGenerator {
     fields: readonly FieldDefinitionNode[]
   ) {
     let methods: OptionalKind<MethodDeclarationStructure>[] = [];
-    methods.push({
-      name: "load",
-      isStatic: true,
-      isAsync: this.options.isAsync,
-      parameters: [
-        {
-          name: "id",
-          type: "string",
-        },
-      ],
-      returnType: this.options.isAsync
-        ? `Promise<${name} | null>`
-        : `${name} | null`,
-      statements: [
-        `const data =${
-          this.options.isAsync ? " await" : ""
-        } store.get("${name}", id);`,
-        `if (!data) {`,
-        `   return new ${name}(id);`,
-        `}`,
-        `return new ${name}(id, data);`,
-      ],
-    });
 
     const fieldsToGenerate = fields.filter(
       (field) => !isDerivedField(field.directives)
@@ -155,12 +129,49 @@ export class EntityGenerator {
       });
     }
 
+    methods.push({
+      name: "load",
+      isAsync: this.options.isAsync,
+      isStatic: true,
+      parameters: [
+        {
+          name: "id",
+          type: "string",
+        },
+      ],
+      returnType: this.options.isAsync
+        ? `Promise<${name} | null>`
+        : `${name} | null`,
+      statements: [
+        `const data =${
+          this.options.isAsync ? " await" : ""
+        } store.get("${name}", id);`,
+        `if (!data) {`,
+        `   return new ${name}(id);`,
+        `}`,
+        `return new ${name}(id, data);`,
+      ],
+    });
+
+    methods.push({
+      name: "save",
+      isAsync: this.options.isAsync,
+      statements: [
+        `const dto = this._schema.extend({`,
+        `updatedAt: z.date().optional(),`,
+        `createdAt: z.date().optional(),`,
+        `}).parse({ id: this._id, ...this._data });`,
+        `this._data = ${
+          this.options.isAsync ? "await" : ""
+        } store.set("${name}", this.id, dto);`,
+        `return this._data;`,
+      ],
+    });
+
     this.targetFile.addClass({
       name,
       isExported: true,
-      extends: `${
-        this.options.isAsync ? "Async" : "Sync"
-      }CrudEntity<"${name}", ${name}Model, typeof ${name}Schema>`,
+      extends: `CrudEntity<"${name}", ${name}Model, typeof ${name}Schema>`,
       ctors: [
         {
           parameters: [
@@ -175,7 +186,7 @@ export class EntityGenerator {
             },
           ],
           statements: [
-            `super(id, "${name}", ${name}Schema, store)`,
+            `super(id, "${name}", ${name}Schema)`,
             `this._data = { id, ...data } || { id };`,
           ],
         },

@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { AsyncStore, CrudData, SyncStore } from "./store";
 
 export enum StoreType {
   SYNC = "sync",
@@ -12,9 +11,9 @@ export const baseSchema = z.object({
   createdAt: z.bigint(),
 });
 
-type LocalData<T, K = CrudData<T>> = K | Partial<K>;
+type LocalData<T> = T | Partial<T>;
 
-export class BaseCrudEntity<
+export class CrudEntity<
   J extends string,
   T extends {},
   K extends z.ZodTypeAny
@@ -44,45 +43,5 @@ export class BaseCrudEntity<
 
   public get<K extends keyof LocalData<T>>(key: K): LocalData<T>[typeof key] {
     return this._data[key];
-  }
-}
-
-export class SyncCrudEntity<
-  J extends string,
-  T extends {},
-  K extends z.ZodTypeAny
-> extends BaseCrudEntity<J, T, K> {
-  constructor(
-    id: string,
-    name: J,
-    schema: K,
-    private readonly _store: SyncStore<J, any>
-  ) {
-    super(id, name, schema);
-  }
-  save() {
-    const res = this._store.set(this._name, this._id, this._data);
-    this._data = res;
-    return res;
-  }
-}
-
-export class AsyncCrudEntity<
-  J extends string,
-  T extends {},
-  K extends z.AnyZodObject
-> extends BaseCrudEntity<J, T, K> {
-  constructor(
-    id: string,
-    name: J,
-    schema: K,
-    private readonly _store: AsyncStore<J, any>
-  ) {
-    super(id, name, schema);
-  }
-  async save() {
-    const res = await this._store.set(this._name, this._id, this._data);
-    this._data = res;
-    return res;
   }
 }

@@ -1,32 +1,26 @@
 import Database from "better-sqlite3";
 import { z } from "zod";
-import {
-  BaseStore,
-  CrudData,
-  CrudDto,
-  ModelLookup,
-  SchemaLookup,
-  SyncStore,
-} from "../store";
+import { BaseStore, CrudData, CrudDto, ModelLookup, SyncStore } from "../store";
 import { StoreType } from "../entity";
-import { StatementLookup } from "./common";
+import { ModelSchemaLookup, StatementLookup } from "./common";
 
 export class SqliteStore<
     H extends string,
     E extends ModelLookup<H>,
-    A extends keyof E = keyof E
+    A extends keyof E = keyof E,
+    P extends StatementLookup<H, E, string> = StatementLookup<H, E, string>
   >
-  extends BaseStore<H, E, A>
-  implements SyncStore<H, E, A>
+  extends BaseStore<E, A>
+  implements SyncStore<E, A>
 {
   type = StoreType.SYNC;
   waitForCommit = false;
   public batch: any[] = [];
   public db: Database.Database;
 
-  public stmts: StatementLookup<H, string>;
+  public stmts: P;
 
-  constructor(public readonly models: SchemaLookup<H, E>) {
+  constructor(public readonly models: ModelSchemaLookup<H, E>) {
     super();
     this.db = new Database(process.env.STORE_URL || ":memory:", {
       // verbose: console.log,
@@ -36,15 +30,18 @@ export class SqliteStore<
     this.stmts = this.prepareStatements(models);
   }
 
-  prepareStatements(models: SchemaLookup<H, E>) {
-    const stmts: StatementLookup<H, string> = {} as StatementLookup<H, string>;
-    for (const [tableName, model] of Object.entries<z.AnyZodObject>(models)) {
-      stmts[tableName as H] = {
-        upsert: this.getUpsertStatementForModel(tableName, model),
-        select: this.getSelectStatementForModel(tableName),
-      };
-    }
-    return stmts;
+  prepareStatements(models: ModelSchemaLookup<H, E>) {
+    const keys: H[] = Object.keys(models) as H[];
+    return keys.reduce<P>(
+      (acc, key) => ({
+        ...acc,
+        [key]: {
+          upsert: this.getUpsertStatementForModel(key, models[key]),
+          select: this.getSelectStatementForModel(key),
+        },
+      }),
+      {} as P
+    );
   }
 
   getUpsertStatementForModel(tableName: string, model: z.AnyZodObject): string {
@@ -73,14 +70,14 @@ export class SqliteStore<
     return `SELECT * FROM ${tableName} WHERE id = $id LIMIT 1`;
   }
 
-  get(entity: H, id: string | number): CrudData<E[A]["type"]> {
+  get<J extends A = A>(entity: J, id: string | number): CrudData<E[J]["type"]> {
     return this.db.prepare(this.stmts[entity].select).get({ id });
   }
-  set(
-    entity: H,
+  set<J extends A = A>(
+    entity: J,
     id: string | number,
-    data: CrudDto<E[A]["type"]>
-  ): CrudData<E[A]["type"]> {
+    data: CrudDto<E[J]["type"]>
+  ): CrudData<E[J]["type"]> {
     const stmts = this.stmts[entity];
     const model = this.models[entity];
     model.omit({ id: true, createdAt: true, updatedAt: true }).parse(data);

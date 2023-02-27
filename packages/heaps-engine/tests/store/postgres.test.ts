@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import { baseSchema } from "../../src/entity";
+import { baseSchema } from "../../src";
 import { z } from "zod";
 import { PostgresStore } from "../../src";
 
@@ -18,7 +18,10 @@ describe("Postgres Store", () => {
       "STORE_URL",
       "postgres://postgres:postgres@localhost:5432/postgres"
     );
-    postgresStore = new PostgresStore({
+    postgresStore = new PostgresStore<
+      "test",
+      { test: { type: z.infer<typeof testSchema>; schema: typeof testSchema } }
+    >({
       test: testSchema,
     });
     await postgresStore.sql`

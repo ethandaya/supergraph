@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { AsyncCrudEntity, baseSchema } from "../../src/entity";
+import { baseSchema, CrudEntity } from "../../src";
 import { z } from "zod";
 import { AsyncTestStore } from "../utils/store";
 
@@ -9,30 +9,51 @@ const asyncTestSchema = baseSchema.extend({
 
 type AsyncTestModel = z.infer<typeof asyncTestSchema>;
 
-describe("Entity", () => {
-  let entity: AsyncCrudEntity<
-    "asynccrudentity",
-    AsyncTestModel,
-    typeof asyncTestSchema
-  >;
-  let testStore: AsyncTestStore<
-    "asynccrudentity",
-    {
-      asynccrudentity: {
-        type: z.infer<typeof asyncTestSchema>;
-        schema: typeof asyncTestSchema;
-      };
+const testStore = new AsyncTestStore<{
+  asynccrudentity: {
+    type: z.infer<typeof asyncTestSchema>;
+    schema: typeof asyncTestSchema;
+  };
+}>();
+
+class TestAsyncEntity extends CrudEntity<
+  "asynccrudentity",
+  AsyncTestModel,
+  typeof asyncTestSchema
+> {
+  constructor(id: string, data?: AsyncTestModel) {
+    super(id, "asynccrudentity", asyncTestSchema);
+    this._data = { id, ...data } || { id };
+  }
+
+  static async load(id: string): Promise<TestAsyncEntity | null> {
+    const data = await testStore.get("asynccrudentity", id);
+    if (!data) {
+      return new TestAsyncEntity(id);
     }
-  >;
+
+    return new TestAsyncEntity(id, data);
+  }
+
+  async save() {
+    const dto = this._schema
+      .extend({
+        updatedAt: z.bigint().optional(),
+        createdAt: z.bigint().optional(),
+      })
+      .parse({ id: this._id, ...this._data });
+    this._data = await testStore.set("asynccrudentity", this._id, dto);
+    return this._data;
+  }
+}
+
+describe("Entity", () => {
+  let entity: TestAsyncEntity;
 
   beforeEach(() => {
     vi.useFakeTimers();
-    testStore = new AsyncTestStore();
-    entity = new AsyncCrudEntity<
-      "asynccrudentity",
-      AsyncTestModel,
-      typeof asyncTestSchema
-    >("1", "asynccrudentity", asyncTestSchema, testStore);
+    entity = new TestAsyncEntity("1");
+    testStore.data = {};
   });
 
   it("should be able to save an initial object with crud", async () => {

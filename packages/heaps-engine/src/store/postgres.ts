@@ -5,29 +5,32 @@ import {
   CrudData,
   CrudDto,
   ModelLookup,
-  SchemaLookup,
 } from "../store";
 import { StoreType } from "../entity";
-import { StatementLookup } from "./common";
 import { z } from "zod";
+import { ModelSchemaLookup, StatementLookup } from "./common";
 
 type Statement = (dto: any, sql?: postgres.Sql) => PendingQuery<any>;
 
 export class PostgresStore<
     H extends string,
-    E extends ModelLookup<H>,
-    A extends keyof E = keyof E
+    E extends ModelLookup<H> = ModelLookup<H>,
+    A extends keyof E = keyof E,
+    P extends StatementLookup<H, E, Statement> = StatementLookup<
+      H,
+      E,
+      Statement
+    >
   >
-  extends BaseStore<H, E, A>
-  implements AsyncStore<H, E, A>
+  extends BaseStore<E, A>
+  implements AsyncStore<E, A>
 {
   type = StoreType.ASYNC;
   waitForCommit = false;
   public batch: any[] = [];
   public sql: postgres.Sql;
-  public stmts: StatementLookup<H, Statement>;
-
-  constructor(public readonly models: SchemaLookup<H, E>) {
+  public stmts: P;
+  constructor(public readonly models: ModelSchemaLookup<H, E>) {
     super();
     this.sql = postgres(process.env.STORE_URL || "", {
       // debug: (_, s) => console.log(s),
@@ -39,18 +42,18 @@ export class PostgresStore<
     this.stmts = this.prepareStatements(models);
   }
 
-  prepareStatements(models: SchemaLookup<H, E>) {
-    const stmts: StatementLookup<H, Statement> = {} as StatementLookup<
-      H,
-      Statement
-    >;
-    for (const [tableName, model] of Object.entries<z.AnyZodObject>(models)) {
-      stmts[tableName as H] = {
-        upsert: this.getUpsertStatementForModel(tableName, model),
-        select: this.getSelectStatementForModel(tableName),
-      };
-    }
-    return stmts;
+  prepareStatements(models: ModelSchemaLookup<H, E>) {
+    const keys: H[] = Object.keys(models) as H[];
+    return keys.reduce<P>(
+      (acc, key) => ({
+        ...acc,
+        [key]: {
+          upsert: this.getUpsertStatementForModel(key, models[key]),
+          select: this.getSelectStatementForModel(key),
+        },
+      }),
+      {} as P
+    );
   }
 
   getUpsertStatementForModel(tableName: string, model: z.AnyZodObject) {
@@ -73,16 +76,19 @@ export class PostgresStore<
       sql`select * from ${sql(tableName)} where id = ${dto.id} limit 1`;
   }
 
-  async get(entity: H, id: string | number): Promise<CrudData<E[A]["type"]>> {
+  async get<J extends A = A>(
+    entity: J,
+    id: string | number
+  ): Promise<CrudData<E[J]["type"]>> {
     const stmts = this.stmts[entity];
     const [data] = await stmts.select({ id }).execute();
     return data;
   }
-  async set(
-    entity: H,
+  async set<J extends A = A>(
+    entity: J,
     id: string | number,
-    data: CrudDto<E[A]["type"]>
-  ): Promise<CrudData<E[A]["type"]>> {
+    data: CrudDto<E[J]["type"]>
+  ): Promise<CrudData<E[J]["type"]>> {
     const stmts = this.stmts[entity];
     const model = this.models[entity];
     model.omit({ id: true, createdAt: true, updatedAt: true }).parse(data);

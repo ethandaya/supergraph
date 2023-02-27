@@ -30,7 +30,7 @@ describe("Entity Generator", () => {
     const sourceFile = entityGenerator.targetFile.getFullText();
     expect(sourceFile).toMatchInlineSnapshot(`
       "import { z } from \\"zod\\";
-      import { AsyncCrudEntity, KeyAccessError } from \\"@heaps/engine\\";
+      import { CrudEntity, KeyAccessError } from \\"@heaps/engine\\";
       import { TestSchema } from \\"./models\\";
       import { store } from \\"./store\\";
       "
@@ -52,19 +52,10 @@ describe("Entity Generator", () => {
     expect(sourceFile).toMatchInlineSnapshot(`
       "type TestModel = z.infer<typeof TestSchema>;
 
-      export class Test extends AsyncCrudEntity<\\"Test\\", TestModel, typeof TestSchema> {
+      export class Test extends CrudEntity<\\"Test\\", TestModel, typeof TestSchema> {
           constructor(id: string, data?: TestModel) {
-              super(id, \\"Test\\", TestSchema, store)
+              super(id, \\"Test\\", TestSchema)
               this._data = { id, ...data } || { id };
-          }
-
-          static async load(id: string): Promise<Test | null> {
-              const data = await store.get(\\"Test\\", id);
-              if (!data) {
-                 return new Test(id);
-              }
-
-              return new Test(id, data);
           }
 
           get id(): TestModel[\\"id\\"] {
@@ -78,6 +69,24 @@ describe("Entity Generator", () => {
 
           set id(value: TestModel[\\"id\\"]) {
               this.set(\\"id\\", value);
+          }
+
+          static async load(id: string): Promise<Test | null> {
+              const data = await store.get(\\"Test\\", id);
+              if (!data) {
+                 return new Test(id);
+              }
+
+              return new Test(id, data);
+          }
+
+          async save() {
+              const dto = this._schema.extend({
+              updatedAt: z.date().optional(),
+              createdAt: z.date().optional(),
+              }).parse({ id: this._id, ...this._data });
+              this._data = await store.set(\\"Test\\", this.id, dto);
+              return this._data;
           }
       }
       "

@@ -9,17 +9,17 @@ import {
 import { StoreType } from "../../src/entity";
 
 export class AsyncTestStore<
-    H extends string,
-    E extends ModelLookup<H>,
+    E extends ModelLookup<string>,
     A extends keyof E = keyof E
   >
-  extends BaseStore<H, E, A>
-  implements AsyncStore<H, E, A>
+  extends BaseStore<E, A>
+  implements AsyncStore<E, A>
 {
   type: StoreType = StoreType.ASYNC;
-  data: Record<string, Record<string, any>> = {};
+  // TODO - type
+  data: any;
   set(
-    entity: H,
+    entity: A,
     id: string | number,
     data: CrudDto<E[A]["type"]>
   ): Promise<CrudData<E[A]["type"]>> {
@@ -27,33 +27,49 @@ export class AsyncTestStore<
     this.data[entity][id] = this.prepForSave(data);
     return Promise.resolve(this.data[entity][id]);
   }
-  get(entity: H, id: string | number): Promise<CrudData<E[A]["type"]>> {
+  get(entity: A, id: string | number): Promise<CrudData<E[A]["type"]>> {
     this.data[entity] = this.data[entity] || {};
     return Promise.resolve(this.data[entity][id]);
+  }
+
+  startBatch(): Promise<void> {
+    return Promise.resolve();
+  }
+
+  commitBatch(): Promise<void> {
+    return Promise.resolve();
   }
 }
 
 export class TestStore<
-    H extends string,
-    E extends ModelLookup<H>,
+    E extends ModelLookup<string>,
     A extends keyof E = keyof E
   >
-  extends BaseStore<H, E, A>
-  implements SyncStore<H, E, A>
+  extends BaseStore<E, A>
+  implements SyncStore<E, A>
 {
   type: StoreType = StoreType.SYNC;
-  data: Record<string, Record<string, CrudData<any>>> = {};
-  set(
-    entity: H,
+  // TODO - type
+  data: any;
+  set<J extends A = A>(
+    entity: J,
     id: string | number,
-    data: CrudDto<E[A]["type"]>
-  ): CrudData<E[A]["type"]> {
+    data: CrudDto<E[J]["type"]>
+  ): CrudData<E[J]["type"]> {
     this.data[entity] = this.data[entity] || {};
     this.data[entity][id] = this.prepForSave(data);
     return this.data[entity][id];
   }
-  get(entity: H, id: string | number): CrudData<E[A]["type"]> {
+  get<J extends A = A>(entity: J, id: string | number): CrudData<E[J]["type"]> {
     this.data[entity] = this.data[entity] || {};
     return this.data[entity][id];
+  }
+
+  startBatch(): void {
+    return;
+  }
+
+  commitBatch(): void {
+    return;
   }
 }

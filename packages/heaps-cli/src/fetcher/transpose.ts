@@ -1,10 +1,44 @@
 import fetch from "cross-fetch";
+import { hexToInt, hexToString, LogData } from "./common";
 
 type FetcherOptions = {
   contractAddress: string;
   startBlock?: number;
   endBlock?: number;
 };
+
+function mapRowToLog(row: any): LogData {
+  const txHash = row["transaction_hash"];
+  const blockNumber = hexToInt(row["block_number"]);
+  const blockHash = row["block_hash"];
+  const blockTimestamp = new Date(row["timestamp"]).getTime() / 1000;
+  const logIndex = hexToInt(row["log_index"]);
+  const contractAddress = row["contract_address"];
+  const topics = [
+    row["topic_0"],
+    row["topic_1"],
+    row["topic_2"],
+    row["topic_3"],
+  ].filter(Boolean);
+  const data = row["data"];
+  const value = hexToString(row["value"]);
+  const sender = row["from_address"];
+  const recipient = row["to_address"];
+
+  return {
+    txHash,
+    blockNumber,
+    blockHash,
+    blockTimestamp,
+    logIndex,
+    contractAddress,
+    topics,
+    data,
+    value,
+    sender,
+    recipient,
+  };
+}
 
 const queryData = (options: FetcherOptions) =>
   JSON.stringify({
@@ -40,5 +74,5 @@ export async function transposeFetcher(options: FetcherOptions) {
   console.log("Credits charged:", res.headers.get("x-credits-charged"));
   const output = await res.json();
   console.log(`Fetched ${output.stats.count} events`);
-  return output.results;
+  return output.results.map(mapRowToLog);
 }
