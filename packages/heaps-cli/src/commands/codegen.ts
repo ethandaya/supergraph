@@ -1,12 +1,8 @@
-import { CAC } from "cac";
-import { loadConfig } from "../utils/load";
-import {
-  EntityGenerator,
-  EventGenerator,
-  ModelGenerator,
-} from "@heaps/generators";
+import {CAC} from "cac";
+import {loadConfig} from "../utils/load";
+import {EntityGenerator, EventGenerator, ModelGenerator,} from "@heaps/generators";
 import fs from "fs";
-import { watch } from "chokidar";
+import {watch} from "chokidar";
 
 export type CodegenOptions = {
   watch: boolean;

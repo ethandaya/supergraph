@@ -7,8 +7,8 @@ export enum StoreType {
 
 export const baseSchema = z.object({
   id: z.string(),
-  updatedAt: z.bigint(),
-  createdAt: z.bigint(),
+  updatedAt: z.bigint().or(z.number()),
+  createdAt: z.bigint().or(z.number()),
 });
 
 type LocalData<T> = T | Partial<T>;

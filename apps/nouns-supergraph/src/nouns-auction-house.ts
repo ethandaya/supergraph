@@ -47,8 +47,9 @@ export async function handleAuctionBid(event: AuctionBid): Promise<void> {
     return;
   }
 
-  auction.amount = event.params.value.toString();
+  auction.amount = event.params.value;
   auction.bidder = bidder.id;
+
   await auction.save();
 
   // Save Bid

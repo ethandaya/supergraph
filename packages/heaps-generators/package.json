@@ -18,6 +18,7 @@
     "test": "vitest --watch=false",
     "coverage": "vitest run --coverage",
     "yalc:publish": "yalc publish --private",
+    "preyalc:push": "pnpm build",
     "yalc:push": "yalc push --private"
   },
   "peerDependencies": {

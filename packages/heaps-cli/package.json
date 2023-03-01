@@ -1,6 +1,6 @@
 {
   "name": "@heaps/cli",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "main": "dist/cli-default.js",
   "types": "dist/cli-default.d.ts",

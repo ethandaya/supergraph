@@ -74,7 +74,7 @@ describe("Entity Generator", () => {
           static async load(id: string): Promise<Test | null> {
               const data = await store.get(\\"test\\", id);
               if (!data) {
-                 return new Test(id);
+                 return null
               }
 
               return new Test(id, data);

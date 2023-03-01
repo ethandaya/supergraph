@@ -147,7 +147,7 @@ export class EntityGenerator {
           this.options.isAsync ? " await" : ""
         } store.get("${name.toLowerCase()}", id);`,
         `if (!data) {`,
-        `   return new ${name}(id);`,
+        `   return null`,
         `}`,
         `return new ${name}(id, data);`,
       ],

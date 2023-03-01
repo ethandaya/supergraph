@@ -7,7 +7,6 @@ export default async function () {
     sql`DROP TABLE IF EXISTS noun`,
     sql`DROP TABLE IF EXISTS account`,
     sql`DROP TABLE IF EXISTS bid`,
-    // TODO - add bids
     sql`CREATE TABLE IF NOT EXISTS auction
             (
                 id         VARCHAR(255) PRIMARY KEY,
@@ -20,7 +19,6 @@ export default async function () {
                 created_at BIGINT,
                 updated_at BIGINT
             )`,
-    // TODO - add votes
     sql`CREATE TABLE IF NOT EXISTS noun
             (
                 id         VARCHAR(255) PRIMARY KEY,
@@ -29,7 +27,6 @@ export default async function () {
                 created_at BIGINT,
                 updated_at BIGINT
             )`,
-    // TODO - add nouns
     sql`CREATE TABLE IF NOT EXISTS account
             (
                 id                    VARCHAR(255) PRIMARY KEY,
