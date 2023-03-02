@@ -79,6 +79,10 @@ export class SchemaHandler {
   mapNamedType(type: NamedTypeNode, field: FieldDefinitionNode): UnamedColumn {
     switch (type.name.value) {
       case "ID":
+        return {
+          type: this.mapNamedTypeValue("String", type, field),
+          isPrimaryKey: true,
+        };
       case "String":
         return {
           type: this.mapNamedTypeValue("String", type, field),

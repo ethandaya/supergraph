@@ -66,8 +66,6 @@ async function seedStore(source: Source, options: BackfillOptions) {
     const handler = handlers[`handle${event.event}`];
     if (handler) {
       await handler(event);
-    } else {
-      console.log("No handler found for", event.event);
     }
   }, Promise.resolve());
   await store.sql.end();

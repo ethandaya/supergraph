@@ -1,8 +1,13 @@
-import {CAC} from "cac";
-import {loadConfig} from "../utils/load";
-import {EntityGenerator, EventGenerator, ModelGenerator,} from "@heaps/generators";
+import { CAC } from "cac";
+import { loadConfig } from "../utils/load";
+import {
+  EntityGenerator,
+  EventGenerator,
+  ModelGenerator,
+  MigrationGenerator,
+} from "@heaps/generators";
 import fs from "fs";
-import {watch} from "chokidar";
+import { watch } from "chokidar";
 
 export type CodegenOptions = {
   watch: boolean;
@@ -27,6 +32,10 @@ export function buildArtifacts(options: Omit<CodegenOptions, "watch">) {
     storeImportPath: options.storeImportPath,
     modelImportPath: "./models",
   });
+  const migrationGenerator = new MigrationGenerator({
+    schemaPath: pathToSchema,
+    outputPath: outputDir + "/migrations.txt",
+  });
   for (const idx in config.sources) {
     const source = config.sources[idx];
     fs.mkdirSync(outputDir + `/${source.name}`, { recursive: true });
@@ -39,6 +48,7 @@ export function buildArtifacts(options: Omit<CodegenOptions, "watch">) {
   }
   modelGenerator.generate(true);
   entityGenerator.generate(true);
+  migrationGenerator.generate(true);
 }
 
 export function codegen(options: CodegenOptions) {
