@@ -1,5 +1,5 @@
 import { Project, SourceFile, VariableDeclarationKind } from "ts-morph";
-import { DocumentNode, parse } from "graphql/language";
+import { DocumentNode, NamedTypeNode, parse } from "graphql/language";
 import * as fs from "fs";
 import { SchemaHandler } from "../schema";
 import { format } from "prettier";
@@ -58,7 +58,7 @@ export class ModelGenerator {
       BigInt: "z.bigint()",
       Date: "z.date()",
       Bytes: "z.string()",
-      Enum: (name: string) => name,
+      Enum: (type: NamedTypeNode) => type.name.value,
     });
 
     entities.forEach((entity) => {

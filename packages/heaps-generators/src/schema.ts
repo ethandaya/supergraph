@@ -1,6 +1,5 @@
 import {
   EnumTypeDefinitionNode,
-  EnumValueDefinitionNode,
   Kind,
   ListTypeNode,
   NamedTypeNode,
@@ -26,7 +25,9 @@ type SchemaTypes =
   | "Enum";
 
 export type PrimitiveLookup = {
-  [key in SchemaTypes]: ((val: SchemaTypes) => string) | string;
+  [key in SchemaTypes]:
+    | ((val: NamedTypeNode, field: FieldDefinitionNode) => string)
+    | string;
 };
 
 export class SchemaHandler {
@@ -43,7 +44,7 @@ export class SchemaHandler {
       .map((field) => ({
         name: field.name.value,
         isNullable: true,
-        ...this.mapInputField(field.type),
+        ...this.mapInputField(field.type, field),
       }));
   }
 
@@ -60,57 +61,49 @@ export class SchemaHandler {
   }
 
   mapInputField(
-    type:
-      | NamedTypeNode
-      | ListTypeNode
-      | NonNullTypeNode
-      | EnumTypeDefinitionNode
-      | EnumValueDefinitionNode
+    type: NamedTypeNode | ListTypeNode | NonNullTypeNode,
+    field: FieldDefinitionNode
   ): UnamedColumn {
     switch (type.kind) {
       case Kind.NAMED_TYPE:
-        return this.mapNamedType(type);
+        return this.mapNamedType(type, field);
       case Kind.LIST_TYPE:
-        return this.mapListType(type);
+        return this.mapListType(type, field);
       case Kind.NON_NULL_TYPE:
-        return this.mapNonNullType(type);
-      case Kind.ENUM_TYPE_DEFINITION:
-        return this.mapEnumType(type);
-      case Kind.ENUM_VALUE_DEFINITION:
-        return this.mapEnumValue(type);
+        return this.mapNonNullType(type, field);
       default:
         throw new Error("Unknown type");
     }
   }
 
-  mapNamedType(type: NamedTypeNode): UnamedColumn {
+  mapNamedType(type: NamedTypeNode, field: FieldDefinitionNode): UnamedColumn {
     switch (type.name.value) {
       case "ID":
       case "String":
         return {
-          type: this.mapNamedTypeValue("String", type.name.value),
+          type: this.mapNamedTypeValue("String", type, field),
         };
       case "Int":
       case "Float":
         return {
-          type: this.mapNamedTypeValue("Number", type.name.value),
+          type: this.mapNamedTypeValue("Number", type, field),
         };
       case "Boolean":
         return {
-          type: this.mapNamedTypeValue("Boolean", type.name.value),
+          type: this.mapNamedTypeValue("Boolean", type, field),
         };
       case "Date":
         return {
-          type: this.mapNamedTypeValue("Date", type.name.value),
+          type: this.mapNamedTypeValue("Date", type, field),
         };
       case "BigInt":
         return {
-          type: this.mapNamedTypeValue("BigInt", type.name.value),
+          type: this.mapNamedTypeValue("BigInt", type, field),
         };
       default:
         if (this.getObjectNames().includes(type.name.value)) {
           return {
-            type: this.mapNamedTypeValue("String", type.name.value),
+            type: this.mapNamedTypeValue("String", type, field),
             isRelation: true,
           };
         }
@@ -120,54 +113,51 @@ export class SchemaHandler {
             .includes(type.name.value)
         ) {
           return {
-            type: this.mapNamedTypeValue("Enum", type.name.value),
+            type: this.mapNamedTypeValue("Enum", type, field),
             isEnum: true,
           };
         }
         return {
-          type: this.mapNamedTypeValue("String", type.name.value),
+          type: this.mapNamedTypeValue("String", type, field),
         };
     }
   }
 
-  public mapEnumValue(type: EnumValueDefinitionNode): UnamedColumn {
-    return {
-      type: this.mapNamedTypeValue("String", type.name.value),
-      isEnum: true,
-    };
-  }
-
-  public mapEnumType(type: EnumTypeDefinitionNode): UnamedColumn {
-    return {
-      type: this.mapNamedTypeValue("String", type.name.value),
-      isEnum: true,
-    };
-  }
-
-  public mapNonNullType(type: NonNullTypeNode): UnamedColumn {
-    const nullableType = this.mapInputField(type.type);
+  public mapNonNullType(
+    type: NonNullTypeNode,
+    field: FieldDefinitionNode
+  ): UnamedColumn {
+    const nullableType = this.mapInputField(type.type, field);
     return {
       ...nullableType,
       isNullable: false,
     };
   }
 
-  public mapListType(type: ListTypeNode): UnamedColumn {
-    const elementType = this.mapInputField(type.type);
+  public mapListType(
+    type: ListTypeNode,
+    field: FieldDefinitionNode
+  ): UnamedColumn {
+    const elementType = this.mapInputField(type.type, field);
     return {
       isArray: true,
       ...elementType,
     };
   }
 
-  mapNamedTypeValue(type: SchemaTypes, val: any): string {
-    const mapperFunction = this.schemaLookup[type];
+  mapNamedTypeValue(
+    type: SchemaTypes,
+    val: NamedTypeNode,
+    field: FieldDefinitionNode
+  ): string {
+    const restMappers = this.schemaLookup;
+    const mapperFunction = restMappers[type];
     if (!mapperFunction) {
       throw new Error(`Unsupported mapper: ${type}`);
     }
     if (typeof mapperFunction === "string") {
       return mapperFunction;
     }
-    return mapperFunction(val);
+    return mapperFunction(val, field);
   }
 }

@@ -28,19 +28,23 @@
     "prettier": "^2.8.1"
   },
   "devDependencies": {
-    "abitype": "^0.3.0",
-    "graphql": "^16.6.0",
-    "ts-morph": "^17.0.1",
     "@heaps/tsconfig": "workspace:*",
+    "@types/lodash": "^4.14.191",
     "@types/node": "^18.11.17",
     "@vitest/coverage-c8": "^0.28.5",
     "@vitest/ui": "^0.28.5",
+    "abitype": "^0.3.0",
+    "graphql": "^16.6.0",
     "prettier": "^2.8.1",
+    "ts-morph": "^17.0.1",
     "ts-node": "^10.9.1",
     "tslib": "^2.4.1",
     "tsup": "^6.5.0",
     "typescript": "^4.9.4",
     "vite": "^4.1.1",
     "vitest": "^0.28.5"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21"
   }
 }

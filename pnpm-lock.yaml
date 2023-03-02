@@ -194,11 +194,13 @@ importers:
     specifiers:
       '@heaps/engine': '*'
       '@heaps/tsconfig': workspace:*
+      '@types/lodash': ^4.14.191
       '@types/node': ^18.11.17
       '@vitest/coverage-c8': ^0.28.5
       '@vitest/ui': ^0.28.5
       abitype: ^0.3.0
       graphql: ^16.6.0
+      lodash: ^4.17.21
       prettier: ^2.8.1
       ts-morph: ^17.0.1
       ts-node: ^10.9.1
@@ -209,8 +211,10 @@ importers:
       vitest: ^0.28.5
     dependencies:
       '@heaps/engine': link:../heaps-engine
+      lodash: 4.17.21
     devDependencies:
       '@heaps/tsconfig': link:../heaps-tsconfig
+      '@types/lodash': 4.14.191
       '@types/node': 18.11.18
       '@vitest/coverage-c8': 0.28.5_@vitest+ui@0.28.5
       '@vitest/ui': 0.28.5
@@ -1948,6 +1952,10 @@ packages:
   /@types/json5/0.0.29:
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
     dev: false
+
+  /@types/lodash/4.14.191:
+    resolution: {integrity: sha512-BdZ5BCCvho3EIXw6wUCXHe7rS53AIDPLE+JzwgT+OsJk53oBfbSmZZ7CX4VaRoN78N+TJpFi9QPlfIVNmJYWxQ==}
+    dev: true
 
   /@types/node/17.0.45:
     resolution: {integrity: sha512-w+tIMs3rq2afQdsPJlODhoUEKzFP1ayaoyl1CcnwtIlsVe7K7bA1NGm4s3PraqTLlXnbIN84zuBlxBWo1u9BLw==}
@@ -5165,6 +5173,10 @@ packages:
     resolution: {integrity: sha512-jttmRe7bRse52OsWIMDLaXxWqRAmtIUccAQ3garviCqJjafXOfNMO0yMfNpdD6zbGaTU0P5Nz7e7gAT6cKmJRw==}
     dev: true
 
+  /lodash/4.17.21:
+    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+    dev: false
+
   /loose-envify/1.4.0:
     resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
     hasBin: true
@@ -5777,7 +5789,7 @@ packages:
         optional: true
     dependencies:
       lilconfig: 2.0.6
-      ts-node: 10.9.1_zpb5kzpnyozdjq4cwaojlul57u
+      ts-node: 10.9.1_awa2wsr5thmg3i7jqycphctjfq
       yaml: 1.10.2
     dev: true
 
