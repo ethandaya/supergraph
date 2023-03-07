@@ -91,13 +91,10 @@ export class ModelGenerator {
     const types = entities.map((entity) => entity.name.value);
     this.targetFile.addStatements([
       `export const models = {`,
-      types.map((type) => `${type.toLowerCase()}: ${type}Schema,`).join("\n"),
+      types.map((type) => `${type}: ${type}Schema,`).join("\n"),
       `};`,
     ]);
-    const storeDefs = types.map(
-      (type) =>
-        `${type.toLowerCase()}: { type: z.infer<typeof ${type}Schema>, schema: typeof ${type}Schema },`
-    );
+    const storeDefs = types.map((type) => `${type}: typeof ${type}Schema,`);
     this.targetFile.addStatements([
       `export type ModelLookupType = {`,
       ...storeDefs,
@@ -109,9 +106,7 @@ export class ModelGenerator {
     this.targetFile.addTypeAlias({
       isExported: true,
       name: "EntityNames",
-      type: this.entities
-        .map((obj) => `"${obj.name.value.toLowerCase()}"`)
-        .join(" | "),
+      type: this.entities.map((obj) => `"${obj.name.value}"`).join(" | "),
     });
   }
 

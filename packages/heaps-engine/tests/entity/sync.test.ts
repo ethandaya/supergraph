@@ -14,16 +14,16 @@ const testSchema2 = baseSchema.extend({
 
 type TestModel = z.infer<typeof testSchema>;
 
-const testStore = new TestStore<{
-  synccrudentity: {
-    type: z.infer<typeof testSchema>;
-    schema: typeof testSchema;
-  };
-  synccrudentity2: {
-    type: z.infer<typeof testSchema2>;
-    schema: typeof testSchema2;
-  };
-}>();
+const testStore = new TestStore<
+  "synccrudentity" | "synccrudentity2",
+  {
+    synccrudentity: typeof testSchema;
+    synccrudentity2: typeof testSchema2;
+  }
+>({
+  synccrudentity: testSchema,
+  synccrudentity2: testSchema2,
+});
 
 class TestEntity extends CrudEntity<
   "synccrudentity",

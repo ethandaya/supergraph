@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "codegen": "heaps codegen --isAsyncStore",
-    "backfill": "dotenv -e .env.local -- heaps backfill"
+    "backfill": "dotenv -e .env.local -- heaps backfill --target=NounsDAO --entryPoint ./index.ts"
   },
   "dependencies": {
     "@ethersproject/abi": "^5.7.0",

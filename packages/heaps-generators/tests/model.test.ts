@@ -37,33 +37,12 @@ describe("Model Generator", () => {
       export const MyEnum = z.enum([\\"A\\", \\"B\\"]);
       export const DelegationEventSchema = baseSchema.extend({ name: z.string(), myEnum: MyEnum });
 
-      export type EntityNames = \\"delegationevent\\";
+      export type EntityNames = \\"DelegationEvent\\";
       export const models = {
-      delegationevent: DelegationEventSchema,
+      DelegationEvent: DelegationEventSchema,
       };
       export type ModelLookupType = {
-      delegationevent: { type: z.infer<typeof DelegationEventSchema>, schema: typeof DelegationEventSchema },
-      };
-      "
-    `);
-  });
-
-  it("should generate model ", () => {
-    modelGenerator.generate();
-    const sourceFile = modelGenerator.targetFile.getFullText();
-    expect(sourceFile).toMatchInlineSnapshot(`
-      "import { z } from \\"zod\\";
-      import { baseSchema } from \\"@heaps/engine\\";
-
-      export const MyEnum = z.enum([\\"A\\", \\"B\\"]);
-      export const DelegationEventSchema = baseSchema.extend({ name: z.string(), myEnum: MyEnum });
-
-      export type EntityNames = \\"delegationevent\\";
-      export const models = {
-      delegationevent: DelegationEventSchema,
-      };
-      export type ModelLookupType = {
-      delegationevent: { type: z.infer<typeof DelegationEventSchema>, schema: typeof DelegationEventSchema },
+      DelegationEvent: typeof DelegationEventSchema,
       };
       "
     `);

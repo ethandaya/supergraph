@@ -10,6 +10,7 @@
       "addresses": [
         "0x830BD73E4184ceF73443C15111a1DF14e495C706"
       ],
+      "startBlock": 12985451,
       "events": [
         {
           "name": "AuctionCreated",
@@ -32,7 +33,98 @@
           "handler": "handleAuctionSettled"
         }
       ],
-      "mapping": "./src/nouns-auction-house.ts"
+      "mapping": "./lib/nouns-auction-house.ts"
+    },
+    {
+      "name": "NounsToken",
+      "network": "mainnet",
+      "kind": "contract",
+      "abi": "./abis/NounsToken.json",
+      "addresses": [
+        "0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03"
+      ],
+      "startBlock": 12985438,
+      "events": [
+        {
+          "name": "NounCreated",
+          "interface": "NounCreated(indexed uint256,(uint48,uint48,uint48,uint48,uint48))",
+          "handler": "handleNounCreated"
+        },
+        {
+          "name": "DelegateChanged",
+          "interface": "DelegateChanged(indexed address,indexed address,indexed address)",
+          "handler": "handleDelegateChanged"
+        },
+        {
+          "name": "DelegateVotesChanged",
+          "interface": "DelegateVotesChanged(indexed address,uint256,uint256)",
+          "handler": "handleDelegateVotesChanged"
+        },
+        {
+          "name": "Transfer",
+          "interface": "Transfer(indexed address,indexed address,indexed uint256)",
+          "handler": "handleTransfer"
+        }
+      ],
+      "mapping": "./lib/nouns-token.ts"
+    },
+    {
+      "name": "NounsDAO",
+      "network": "mainnet",
+      "kind": "contract",
+      "abi": "./abis/NounsDAO.json",
+      "addresses": [
+        "0x6f3E6272A167e8AcCb32072d08E0957F9c79223d"
+      ],
+      "startBlock": 12985453,
+      "events": [
+        {
+          "name": "ProposalCreatedWithRequirements",
+          "interface": "ProposalCreatedWithRequirements(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,uint256,uint256,string)",
+          "handler": "handleProposalCreatedWithRequirements"
+        },
+        {
+          "name": "ProposalCanceled",
+          "interface": "ProposalCanceled(uint256)",
+          "handler": "handleProposalCanceled"
+        },
+        {
+          "name": "ProposalVetoed",
+          "interface": "ProposalVetoed(uint256)",
+          "handler": "handleProposalVetoed"
+        },
+        {
+          "name": "ProposalQueued",
+          "interface": "ProposalQueued(uint256,uint256)",
+          "handler": "handleProposalQueued"
+        },
+        {
+          "name": "ProposalExecuted",
+          "interface": "ProposalExecuted(uint256)",
+          "handler": "handleProposalExecuted"
+        },
+        {
+          "name": "VoteCast",
+          "interface": "VoteCast(indexed address,uint256,uint8,uint256,string)",
+          "handler": "handleVoteCast"
+        },
+        {
+          "name": "MinQuorumVotesBPSSet",
+          "interface": "MinQuorumVotesBPSSet(uint16,uint16)",
+          "handler": "handleMinQuorumVotesBPSSet"
+        },
+        {
+          "name": "MaxQuorumVotesBPSSet",
+          "interface": "MaxQuorumVotesBPSSet(uint16,uint16)",
+          "handler": "handleMaxQuorumVotesBPSSet"
+        },
+        {
+          "name": "QuorumCoefficientSet",
+          "interface": "QuorumCoefficientSet(uint32,uint32)",
+          "handler": "handleQuorumCoefficientSet"
+        }
+      ],
+      "mapping": "./lib/nouns-dao.ts"
     }
   ]
 }

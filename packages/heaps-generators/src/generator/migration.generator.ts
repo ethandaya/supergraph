@@ -6,7 +6,6 @@ import {
 import * as fs from "fs";
 import { SchemaHandler } from "../schema";
 import { isEnumTypeDefinition, isObjectTypeDefinition } from "../common";
-import { snakeCase } from "lodash";
 import { format } from "sql-formatter";
 
 type MigrationGeneratorOptions = {
@@ -47,22 +46,22 @@ export class MigrationGenerator {
       BigInt: "BIGINT",
       Date: "TIMESTAMPTZ",
       Bytes: "BIGINT",
-      Enum: (type) => snakeCase(type.name.value),
+      Enum: (type) => type.name.value,
     });
     const columnTypes = generator.mapFieldsToColumn(entity.fields || []);
     const columns = columnTypes
       .map((column) => {
-        return `${snakeCase(column.name)} ${column.type}${
+        return `"${column.name}" ${column.type}${
           column.isPrimaryKey ? " PRIMARY KEY" : ""
         }${column.isArray ? "[]" : ""}${
           column.isNullable ? "" : column.isPrimaryKey ? "" : " NOT NULL"
         }`;
       })
-      .concat(["created_at BIGINT", "updated_at BIGINT"]);
+      .concat(['"createdAt" BIGINT', '"updatedAt" BIGINT']);
     return (this.file =
       this.file +
       `
-      CREATE TABLE IF NOT EXISTS ${entity.name.value.toLowerCase()} (\n${columns.join(
+      CREATE TABLE IF NOT EXISTS "${entity.name.value}" (\n${columns.join(
         ",\n"
       )}\n);`);
   }
@@ -72,7 +71,7 @@ export class MigrationGenerator {
     const enumTypes = enums.map((enumType) => {
       let enumValues = enumType.values?.map((value) => value.name.value);
       return `
-      CREATE TYPE ${snakeCase(enumType.name.value)} AS ENUM (${enumValues
+      CREATE TYPE "${enumType.name.value}" AS ENUM (${enumValues
         ?.map((e) => `'${e}'`)
         .join(",")});`;
     });
@@ -84,15 +83,13 @@ export class MigrationGenerator {
   }
 
   public generateResets() {
-    const tables = this.entities.map((entity) =>
-      entity.name.value.toLowerCase()
-    );
+    const tables = this.entities.map((entity) => entity.name.value);
     const dropTableStmt = tables.map(
-      (table) => `DROP TABLE IF EXISTS ${table};\n`
+      (table) => `DROP TABLE IF EXISTS "${table}";\n`
     );
-    const enums = this.enums.map((enumType) => snakeCase(enumType.name.value));
+    const enums = this.enums.map((enumType) => enumType.name.value);
     const dropEnumStmt = enums.map(
-      (enumType) => `DROP TYPE IF EXISTS ${enumType};\n`
+      (enumType) => `DROP TYPE IF EXISTS "${enumType}";\n`
     );
     return (this.file =
       this.file + dropTableStmt.join("") + dropEnumStmt.join(""));

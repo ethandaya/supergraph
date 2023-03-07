@@ -72,7 +72,7 @@ describe("Entity Generator", () => {
           }
 
           static async load(id: string): Promise<Test | null> {
-              const data = await store.get(\\"test\\", id);
+              const data = await store.get(\\"Test\\", id);
               if (!data) {
                  return null
               }
@@ -85,7 +85,7 @@ describe("Entity Generator", () => {
               updatedAt: z.bigint().optional(),
               createdAt: z.bigint().optional(),
               }).parse({ id: this._id, ...this._data });
-              this._data = await store.set(\\"test\\", this.id, dto);
+              this._data = await store.set(\\"Test\\", this.id, dto);
               return this._data;
           }
       }

@@ -34,7 +34,7 @@ describe("Migration Generator", () => {
     migrationGenerator.generateEnums();
     expect(migrationGenerator.file).toMatchInlineSnapshot(`
       "
-            CREATE TYPE my_enum AS ENUM ('A','B');
+            CREATE TYPE \\"MyEnum\\" AS ENUM ('A','B');
 
       "
     `);
@@ -44,15 +44,15 @@ describe("Migration Generator", () => {
     migrationGenerator.generateMigrations();
     expect(migrationGenerator.file).toMatchInlineSnapshot(`
       "
-            CREATE TABLE IF NOT EXISTS delegationevent (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      my_enum my_enum NOT NULL,
-      biginnt BIGINT NOT NULL,
-      decimmmal BIGINT NOT NULL,
-      array_type TEXT[] NOT NULL,
-      created_at BIGINT,
-      updated_at BIGINT
+            CREATE TABLE IF NOT EXISTS \\"DelegationEvent\\" (
+      \\"id\\" TEXT PRIMARY KEY,
+      \\"name\\" TEXT NOT NULL,
+      \\"myEnum\\" MyEnum NOT NULL,
+      \\"biginnt\\" BIGINT NOT NULL,
+      \\"decimmmal\\" BIGINT NOT NULL,
+      \\"arrayType\\" TEXT[] NOT NULL,
+      \\"createdAt\\" BIGINT,
+      \\"updatedAt\\" BIGINT
       );"
     `);
   });
@@ -60,21 +60,21 @@ describe("Migration Generator", () => {
   it("should generate migrations", () => {
     migrationGenerator.generate(false);
     expect(migrationGenerator.file).toMatchInlineSnapshot(`
-      "DROP TABLE IF EXISTS delegationevent;
-      DROP TYPE IF EXISTS my_enum;
+      "DROP TABLE IF EXISTS \\"DelegationEvent\\";
+      DROP TYPE IF EXISTS \\"MyEnum\\";
 
-            CREATE TYPE my_enum AS ENUM ('A','B');
+            CREATE TYPE \\"MyEnum\\" AS ENUM ('A','B');
 
 
-            CREATE TABLE IF NOT EXISTS delegationevent (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      my_enum my_enum NOT NULL,
-      biginnt BIGINT NOT NULL,
-      decimmmal BIGINT NOT NULL,
-      array_type TEXT[] NOT NULL,
-      created_at BIGINT,
-      updated_at BIGINT
+            CREATE TABLE IF NOT EXISTS \\"DelegationEvent\\" (
+      \\"id\\" TEXT PRIMARY KEY,
+      \\"name\\" TEXT NOT NULL,
+      \\"myEnum\\" MyEnum NOT NULL,
+      \\"biginnt\\" BIGINT NOT NULL,
+      \\"decimmmal\\" BIGINT NOT NULL,
+      \\"arrayType\\" TEXT[] NOT NULL,
+      \\"createdAt\\" BIGINT,
+      \\"updatedAt\\" BIGINT
       );"
     `);
   });

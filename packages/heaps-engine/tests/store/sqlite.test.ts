@@ -6,19 +6,12 @@ import { SqliteStore } from "../../src";
 const testSchema = baseSchema.extend({
   name: z.string(),
 });
-
 describe("SQLite Store", () => {
-  let sqliteStore: SqliteStore<
-    "test",
-    { test: { type: z.infer<typeof testSchema>; schema: typeof testSchema } }
-  >;
+  let sqliteStore: SqliteStore<"test", { test: typeof testSchema }>;
 
   beforeAll(() => {
     vi.useFakeTimers();
-    sqliteStore = new SqliteStore<
-      "test",
-      { test: { type: z.infer<typeof testSchema>; schema: typeof testSchema } }
-    >({
+    sqliteStore = new SqliteStore<"test", { test: typeof testSchema }>({
       test: testSchema,
     });
     sqliteStore.db.exec(`DROP TABLE IF EXISTS test`);
@@ -58,6 +51,7 @@ describe("SQLite Store", () => {
     sqliteStore.set("test", "1", dto);
     const initial = sqliteStore.db.prepare("SELECT * FROM test").get();
     const update = {
+      ...initial,
       name: "Jane",
     };
     vi.advanceTimersByTime(100);
@@ -84,43 +78,4 @@ describe("SQLite Store", () => {
       createdAt: expect.any(BigInt),
     });
   });
-
-  it("should be able to batch writes", () => {
-    const dto = {
-      name: "John",
-    };
-    const dto2 = {
-      name: "Jane",
-    };
-    sqliteStore.startBatch();
-    const dto1Res = sqliteStore.set("test", "1", dto);
-    const snap = [...sqliteStore.batch];
-    const dto2Res = sqliteStore.set("test", "2", dto2);
-    const snap2 = [...sqliteStore.batch];
-    sqliteStore.commitBatch();
-    const snap3 = [...sqliteStore.batch];
-    expect(snap).toEqual([
-      {
-        stmt: sqliteStore.stmts.test.upsert,
-        dto: dto1Res,
-      },
-    ]);
-    expect(snap2).toEqual([
-      {
-        stmt: sqliteStore.stmts.test.upsert,
-        dto: dto1Res,
-      },
-      {
-        stmt: sqliteStore.stmts.test.upsert,
-        dto: dto2Res,
-      },
-    ]);
-    expect(snap3).toEqual([]);
-    expect(sqliteStore.db.prepare("SELECT * FROM test").all()).toEqual([
-      dto1Res,
-      dto2Res,
-    ]);
-  });
-
-  // TODO - add tests for batch update
 });

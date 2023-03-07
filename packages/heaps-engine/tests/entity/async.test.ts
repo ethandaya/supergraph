@@ -9,12 +9,14 @@ const asyncTestSchema = baseSchema.extend({
 
 type AsyncTestModel = z.infer<typeof asyncTestSchema>;
 
-const testStore = new AsyncTestStore<{
-  asynccrudentity: {
-    type: z.infer<typeof asyncTestSchema>;
-    schema: typeof asyncTestSchema;
-  };
-}>();
+const testStore = new AsyncTestStore<
+  "asynccrudentity",
+  {
+    asynccrudentity: typeof asyncTestSchema;
+  }
+>({
+  asynccrudentity: asyncTestSchema,
+});
 
 class TestAsyncEntity extends CrudEntity<
   "asynccrudentity",

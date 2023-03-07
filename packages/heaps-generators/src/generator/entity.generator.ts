@@ -145,7 +145,7 @@ export class EntityGenerator {
       statements: [
         `const data =${
           this.options.isAsync ? " await" : ""
-        } store.get("${name.toLowerCase()}", id);`,
+        } store.get("${name}", id);`,
         `if (!data) {`,
         `   return null`,
         `}`,
@@ -163,7 +163,7 @@ export class EntityGenerator {
         `}).parse({ id: this._id, ...this._data });`,
         `this._data = ${
           this.options.isAsync ? "await" : ""
-        } store.set("${name.toLowerCase()}", this.id, dto);`,
+        } store.set("${name}", this.id, dto);`,
         `return this._data;`,
       ],
     });
