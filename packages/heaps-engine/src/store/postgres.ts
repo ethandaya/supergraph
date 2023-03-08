@@ -21,7 +21,7 @@ export class PostgresStore<
       types: {
         bigint: postgres.BigInt,
       },
-      transform: postgres.toCamel,
+      // transform: postgres.toCamel,
     });
   }
 

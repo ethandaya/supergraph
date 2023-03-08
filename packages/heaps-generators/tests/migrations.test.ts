@@ -47,7 +47,7 @@ describe("Migration Generator", () => {
             CREATE TABLE IF NOT EXISTS \\"DelegationEvent\\" (
       \\"id\\" TEXT PRIMARY KEY,
       \\"name\\" TEXT NOT NULL,
-      \\"myEnum\\" MyEnum NOT NULL,
+      \\"myEnum\\" \\"MyEnum\\" NOT NULL,
       \\"biginnt\\" BIGINT NOT NULL,
       \\"decimmmal\\" BIGINT NOT NULL,
       \\"arrayType\\" TEXT[] NOT NULL,
@@ -69,7 +69,7 @@ describe("Migration Generator", () => {
             CREATE TABLE IF NOT EXISTS \\"DelegationEvent\\" (
       \\"id\\" TEXT PRIMARY KEY,
       \\"name\\" TEXT NOT NULL,
-      \\"myEnum\\" MyEnum NOT NULL,
+      \\"myEnum\\" \\"MyEnum\\" NOT NULL,
       \\"biginnt\\" BIGINT NOT NULL,
       \\"decimmmal\\" BIGINT NOT NULL,
       \\"arrayType\\" TEXT[] NOT NULL,

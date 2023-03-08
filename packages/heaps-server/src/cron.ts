@@ -36,7 +36,6 @@ export function cronHandler<TAbi extends Abi>(
       await events.reduce(async (prev, event) => {
         await prev;
         const handler = handlers?.[event.event];
-        console.log("event", event.event, handlers);
         if (!handler) return;
         try {
           await handler(event);

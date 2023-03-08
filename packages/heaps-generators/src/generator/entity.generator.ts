@@ -158,8 +158,8 @@ export class EntityGenerator {
       isAsync: this.options.isAsync,
       statements: [
         `const dto = this._schema.extend({`,
-        `updatedAt: z.bigint().optional(),`,
-        `createdAt: z.bigint().optional(),`,
+        `updatedAt: z.coerce.bigint().optional(),`,
+        `createdAt: z.coerce.bigint().optional(),`,
         `}).parse({ id: this._id, ...this._data });`,
         `this._data = ${
           this.options.isAsync ? "await" : ""

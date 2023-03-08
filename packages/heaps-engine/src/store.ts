@@ -59,10 +59,10 @@ export class BaseStore<
   serialize<J extends A = A>(entity: J, dto: z.infer<E[J]>, update = false) {
     const model: E[J] = this.models[entity];
     const arrayTypes = Object.keys(model.shape).filter(
-      (key) => model.shape[key] instanceof z.ZodArray
+      (key) => model.shape[key]._def.typeName === "ZodArray"
     );
     const bigIntTypes = Object.keys(model.shape).filter(
-      (key) => model.shape[key] instanceof z.ZodBigInt
+      (key) => model.shape[key]._def.typeName === "ZodBigInt"
     );
     const dbModel = model.extend({
       ...arrayTypes.reduce((acc, key) => {

@@ -55,7 +55,7 @@ export class ModelGenerator {
       String: "z.string()",
       Number: "z.number()",
       Boolean: "z.boolean()",
-      BigInt: "z.bigint()",
+      BigInt: "z.coerce.bigint()",
       Date: "z.date()",
       Bytes: "z.string()",
       Enum: (type: NamedTypeNode) => type.name.value,

@@ -28,9 +28,9 @@ describe("Postgres Store", () => {
         (
             id         VARCHAR(255) PRIMARY KEY,
             name       VARCHAR(255),
-            max_quorum_votes_b_p_s NUMERIC(78, 0)[],
-            created_at BIGINT,
-            updated_at BIGINT
+            "maxQuorumVotesBPS" NUMERIC(78, 0)[],
+            "createdAt" BIGINT,
+            "updatedAt" BIGINT
         );
     `.execute();
   });

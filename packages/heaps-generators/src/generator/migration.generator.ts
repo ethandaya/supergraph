@@ -46,7 +46,7 @@ export class MigrationGenerator {
       BigInt: "BIGINT",
       Date: "TIMESTAMPTZ",
       Bytes: "BIGINT",
-      Enum: (type) => type.name.value,
+      Enum: (type) => `"${type.name.value}"`,
     });
     const columnTypes = generator.mapFieldsToColumn(entity.fields || []);
     const columns = columnTypes

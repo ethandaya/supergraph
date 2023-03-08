@@ -78,7 +78,7 @@ export async function handleProposalCreatedWithRequirements(
   proposal.maxQuorumVotesBPS = dynamicQuorum.maxQuorumVotesBPS;
   proposal.quorumCoefficient = dynamicQuorum.quorumCoefficient;
 
-  proposal.save();
+  await proposal.save();
 }
 
 export async function handleProposalCanceled(event: ProposalCanceled) {
@@ -147,7 +147,7 @@ export async function handleVoteCast(event: VoteCast) {
   vote.votesRaw = event.params.votes;
   vote.votes = event.params.votes;
   vote.support = event.params.support == 1;
-  vote.supportDetailed = event.params.support;
+  vote.supportDetailed = Number(event.params.support);
   vote.nouns = voter.nounsRepresented;
   vote.blockNumber = event.block.number;
 
