@@ -58,6 +58,7 @@
     "nodejs-polars": "^0.7.2",
     "parquetjs": "^0.11.2",
     "parquets": "^0.10.10",
-    "ts-morph": "^17.0.1"
+    "ts-morph": "^17.0.1",
+    "viem": "^0.1.14"
   }
 }

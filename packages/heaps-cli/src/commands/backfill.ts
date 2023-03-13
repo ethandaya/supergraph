@@ -1,7 +1,11 @@
 import { CAC } from "cac";
 import { SuperGraphConfig } from "@heaps/common";
 import { loadConfig } from "../utils/load";
-import { fetchSnapshotForSource } from "../services/backfill";
+import { loadAndParseLogs } from "../services/backfill";
+import { uncachedRequire } from "@heaps/common/src";
+import { bundle } from "../utils/build";
+import path from "path";
+import esbuild from "esbuild";
 
 export type BackfillOptions = {
   target: string;
@@ -14,60 +18,62 @@ export type BackfillOptions = {
   mappingDir: string;
 };
 
-// async function setupStore(options: BackfillOptions) {
-//   if (!options.pathToSetupScript) return;
-//   const outputPath = await bundle(options.pathToSetupScript);
-//   console.log(`Setup Script Bundled to ${outputPath}`);
-//   const script = uncachedRequire(path.resolve(outputPath));
-//   if (script.default && typeof script.default === "function") {
-//     await script.default();
-//   }
-// }
-
-async function fetchSnapshots(
-  config: SuperGraphConfig,
-  options: BackfillOptions
-) {
-  if (!options.pathToSnapshotDir) return;
-  await fetchSnapshotForSource(config, options);
+async function setupStore(options: BackfillOptions) {
+  if (!options.pathToSetupScript) return;
+  const outputPath = await bundle(options.pathToSetupScript);
+  console.log(`Setup Script Bundled to ${outputPath}`);
+  const script = uncachedRequire(path.resolve(outputPath));
+  if (script.default && typeof script.default === "function") {
+    await script.default();
+  }
 }
-//
-// async function seedStore(source: Source, options: BackfillOptions) {
-//   await esbuild.build({
-//     entryPoints: [options.entryPoint],
-//     bundle: true,
-//     outdir: "./.heaps",
-//     platform: "node",
-//     external: ["zod", "@heaps/engine", "@heaps/common", "@heaps/server"],
-//     target: ["esnext"],
-//     resolveExtensions: [".ts"],
-//     minify: false,
-//   });
-//
-//   const modules = uncachedRequire(path.resolve("./.heaps/index.js"));
-//
-//   const handlers: {
-//     [key: string]: (data: any) => Promise<void>;
-//   } = {};
-//   for (const event of source.events) {
-//     handlers[`handle${event.name}`] = modules?.[`handle${event.name}`];
-//   }
-//   const store = modules.store;
-//   const events = await loadEvents(options, source);
-//   await events.reduce(async (acc, event) => {
-//     await acc;
-//     const handler = handlers[`handle${event.event}`];
-//     if (handler) {
-//       await handler(event);
-//     }
-//   }, Promise.resolve());
-//   await store.sql.end();
+
+// async function fetchSnapshots(
+//   config: SuperGraphConfig,
+//   options: BackfillOptions
+// ) {
+//   if (!options.pathToSnapshotDir) return;
+//   await fetchSnapshotForSource(config, options);
 // }
+//
+function bundleEntry(entryPoint: string) {
+  return esbuild.build({
+    entryPoints: [entryPoint],
+    bundle: true,
+    outdir: "./.heaps",
+    platform: "node",
+    external: ["zod", "@heaps/engine", "@heaps/common", "@heaps/server"],
+    target: ["esnext"],
+    resolveExtensions: [".ts"],
+    minify: false,
+  });
+}
+
+async function seedStore(config: SuperGraphConfig, options: BackfillOptions) {
+  await bundleEntry(options.entryPoint);
+  const events = await loadAndParseLogs(config, options);
+  console.log(`Loaded ${events.length} events`);
+  const modules = uncachedRequire(path.resolve("./.heaps/index.js"));
+  await events.reduce(async (acc, event) => {
+    await acc;
+    if (!event?.event) {
+      console.log("Skipping event", event);
+      return;
+    }
+    const handler = modules[`handle${event.event}`];
+    if (handler) {
+      await handler(event);
+    }
+  }, Promise.resolve());
+  await modules.store.sql.end();
+}
 
 export async function backfill(options: BackfillOptions) {
   const config = loadConfig(options);
-  await fetchSnapshots(config, options);
-  // await setupStore(options);
+  // TODO - add log fetcher
+  // await fetchSnapshots(config, options);
+  await setupStore(options);
+  await seedStore(config, options);
 
   // if (options.target) {
   //   const source = config.sources.find((s) => s.name === options.target);

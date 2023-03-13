@@ -9,7 +9,7 @@ export interface Source {
   network: string;
   kind: "contract";
   abi: string;
-  addresses: string[] | "*";
+  addresses: string[];
   events: Event[];
   mapping: string;
 }
