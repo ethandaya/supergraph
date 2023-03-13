@@ -1,32 +1,33 @@
 import path from "path";
 import fs from "fs";
 import console from "console";
-import { transposeFetcher } from "../fetcher/transpose";
-import { Source } from "@heaps/common";
+import { Source, SuperGraphConfig } from "@heaps/common";
 import { BackfillOptions } from "../commands/backfill";
 import { Abi } from "abitype";
 import { Abi as AbiSchema } from "abitype/zod";
 import { EventFragment, Interface, InterfaceAbi } from "ethers";
 import { isEventType } from "@heaps/generators";
 import { LogData } from "../fetcher/common";
-import { SuperGraphEventType } from "@heaps/engine/src";
+import { SuperGraphEventType } from "@heaps/engine";
 
 export async function fetchSnapshotForSource(
-  options: BackfillOptions,
-  source: Source
+  config: SuperGraphConfig,
+  options: BackfillOptions
 ) {
   const snapshotPath = path.join(
     options.pathToSnapshotDir,
-    source.name + ".json"
+    config.name + ".json"
   );
   if (!fs.existsSync(snapshotPath)) {
-    console.log("No snapshot found, fetching a  new snapshot for", source.name);
-    const events = await transposeFetcher({
-      contractAddress: source.addresses[0],
-      startBlock: 0,
-    });
+    console.log("No snapshot found, fetching a  new snapshot for", config.name);
+    // TODO fetch snapshot from heaps
+    // const contractAddresses = config.sources.map((s) => s.addresses).flat();
+    // const events = await transposeFetcher({
+    //   contractAddresses,
+    //   startBlock: 0,
+    // });
     fs.mkdirSync(options.pathToSnapshotDir, { recursive: true });
-    fs.writeFileSync(snapshotPath, JSON.stringify(events));
+    fs.writeFileSync(snapshotPath, JSON.stringify([]));
   }
 }
 

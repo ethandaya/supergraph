@@ -56,7 +56,7 @@ export async function handleProposalCreatedWithRequirements(
   proposal.calldatas = event.params.calldatas.map((c) => c.toString());
   proposal.createdTimestamp = event.block.timestamp;
   proposal.createdBlock = event.block.number;
-  proposal.createdTransactionHash = event.transaction.hash;
+  proposal.createdTransactionHash = "hash-" + event.transaction.hash;
   proposal.startBlock = event.params.startBlock;
   proposal.endBlock = event.params.endBlock;
   proposal.proposalThreshold = event.params.proposalThreshold;

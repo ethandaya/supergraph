@@ -43,9 +43,3 @@ export function baseHandlerFactory(
     return internalHandler(req, res);
   };
 }
-
-export function isEventType(
-  event: AbiFunction | AbiEvent | AbiError
-): event is AbiEvent {
-  return event.type === "event";
-}

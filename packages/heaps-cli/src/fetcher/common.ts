@@ -1,5 +1,12 @@
+export type FetcherOptions = {
+  contractAddresses: string[];
+  startBlock?: number;
+  endBlock?: number;
+};
+
 export type LogData = {
   txHash: string;
+  txIndex: number;
   blockNumber: number;
   blockHash: string;
   blockTimestamp: number;

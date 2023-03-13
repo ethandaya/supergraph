@@ -15,6 +15,7 @@ export interface Source {
 }
 
 export interface SuperGraphConfig {
+  name: string;
   version: string;
   description: string;
   sources: Source[];
