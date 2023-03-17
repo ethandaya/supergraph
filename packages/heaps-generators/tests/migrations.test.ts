@@ -48,8 +48,8 @@ describe("Migration Generator", () => {
       \\"id\\" TEXT PRIMARY KEY,
       \\"name\\" TEXT NOT NULL,
       \\"myEnum\\" \\"MyEnum\\" NOT NULL,
-      \\"biginnt\\" BIGINT NOT NULL,
-      \\"decimmmal\\" BIGINT NOT NULL,
+      \\"biginnt\\" NUMERIC(78, 0) NOT NULL,
+      \\"decimmmal\\" NUMERIC(78, 0) NOT NULL,
       \\"arrayType\\" TEXT[] NOT NULL,
       \\"createdAt\\" BIGINT,
       \\"updatedAt\\" BIGINT
@@ -70,8 +70,8 @@ describe("Migration Generator", () => {
       \\"id\\" TEXT PRIMARY KEY,
       \\"name\\" TEXT NOT NULL,
       \\"myEnum\\" \\"MyEnum\\" NOT NULL,
-      \\"biginnt\\" BIGINT NOT NULL,
-      \\"decimmmal\\" BIGINT NOT NULL,
+      \\"biginnt\\" NUMERIC(78, 0) NOT NULL,
+      \\"decimmmal\\" NUMERIC(78, 0) NOT NULL,
       \\"arrayType\\" TEXT[] NOT NULL,
       \\"createdAt\\" BIGINT,
       \\"updatedAt\\" BIGINT

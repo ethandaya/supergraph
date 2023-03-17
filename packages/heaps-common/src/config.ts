@@ -12,6 +12,7 @@ export interface Source {
   addresses: string[];
   events: Event[];
   mapping: string;
+  startBlock: number;
 }
 
 export interface SuperGraphConfig {

@@ -6,6 +6,10 @@ import { uncachedRequire } from "@heaps/common/src";
 import { bundle } from "../utils/build";
 import path from "path";
 import esbuild from "esbuild";
+import { RawEvent, RPCFetcher } from "@heaps/engine";
+import { createPublicClient, Hex, http, stringify } from "viem";
+import { mainnet } from "viem/chains";
+import fs from "fs";
 
 export type BackfillOptions = {
   target: string;
@@ -28,21 +32,60 @@ async function setupStore(options: BackfillOptions) {
   }
 }
 
-// async function fetchSnapshots(
-//   config: SuperGraphConfig,
-//   options: BackfillOptions
-// ) {
-//   if (!options.pathToSnapshotDir) return;
-//   await fetchSnapshotForSource(config, options);
-// }
-//
+function writeJSON<T = RawEvent>(path: string, objects: T[]) {
+  const stream = fs.createWriteStream(path, {
+    encoding: "utf8",
+    flags: "w",
+  });
+  stream.write("[");
+  objects.forEach((obj, idx) => {
+    stream.write(stringify(obj));
+    if (idx < objects.length - 1) {
+      stream.write(",");
+    }
+  });
+  stream.write("]");
+  stream.end();
+}
+
+async function fetchRawEvents(
+  config: SuperGraphConfig,
+  options: BackfillOptions
+) {
+  if (!options.pathToSnapshotDir) return;
+  const outputPath = path.join(options.pathToSnapshotDir, "events.json");
+  if (fs.existsSync(outputPath)) {
+    console.log(`Found existing snapshot at ${outputPath}`);
+    return;
+  }
+  console.log(`Fetching events from ${config.sources.length} sources...`);
+  const addresses = config.sources
+    .map((source) => source.addresses)
+    .flat() as Hex[];
+  const startBlock = Math.min(
+    ...config.sources.map((source) => source.startBlock)
+  );
+  const client = createPublicClient({
+    chain: mainnet,
+    transport: http(process.env.RPC_URL),
+  });
+  console.log(`RPC URL: ${process.env.RPC_URL}`);
+  console.log(`Addresses: ${addresses.join(", ")}`);
+  const fetcher = new RPCFetcher(addresses, client, 500000n, 100n);
+  const currentBlock = await client.getBlockNumber();
+  console.log(`Fetching events from ${startBlock} to ${currentBlock}...`);
+  const events = await fetcher.fetchEvents(BigInt(startBlock), currentBlock);
+  console.log(`Fetched ${events.length} events`);
+  writeJSON(outputPath, events);
+}
+
 function bundleEntry(entryPoint: string) {
   return esbuild.build({
     entryPoints: [entryPoint],
     bundle: true,
     outdir: "./.heaps",
     platform: "node",
-    external: ["zod", "@heaps/engine", "@heaps/common", "@heaps/server"],
+    external: ["zod", "@heaps/engine", "@heaps/common"],
     target: ["esnext"],
     resolveExtensions: [".ts"],
     minify: false,
@@ -70,8 +113,7 @@ async function seedStore(config: SuperGraphConfig, options: BackfillOptions) {
 
 export async function backfill(options: BackfillOptions) {
   const config = loadConfig(options);
-  // TODO - add log fetcher
-  // await fetchSnapshots(config, options);
+  await fetchRawEvents(config, options);
   await setupStore(options);
   await seedStore(config, options);
 

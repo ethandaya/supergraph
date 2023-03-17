@@ -5,4 +5,4 @@ export * from "./store/common";
 export * from "./event";
 export * from "./entity";
 export * from "./store";
-export * from "./decode";
+export * from "./fetcher/rpc";

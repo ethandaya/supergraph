@@ -43,7 +43,7 @@ export class MigrationGenerator {
       String: "TEXT",
       Number: "INTEGER",
       Boolean: "BOOLEAN",
-      BigInt: "BIGINT",
+      BigInt: "NUMERIC(78, 0)",
       Date: "TIMESTAMPTZ",
       Bytes: "BIGINT",
       Enum: (type) => `"${type.name.value}"`,

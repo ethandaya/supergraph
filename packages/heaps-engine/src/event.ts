@@ -39,4 +39,8 @@ export type SuperGraphEventType<K extends string, T extends AbiParameter[]> = {
   };
   transaction: Transaction;
   block: Block;
+
+  log: {
+    index: bigint;
+  };
 };
